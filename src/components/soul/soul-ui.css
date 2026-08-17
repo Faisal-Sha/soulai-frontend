@@ -1,0 +1,733 @@
+/* SOUL+AI reusable UI — Figma WIP components */
+
+@import '../../styles/soul-tokens.css';
+
+.soul-ui {
+  font-family: var(--soul-font-ui);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Brand ── */
+.soul-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.soul-brand__mark {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.soul-brand__mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.soul-brand__text {
+  margin: 0;
+  font-weight: 300;
+  font-size: 14px;
+  line-height: normal;
+  letter-spacing: 2px;
+  color: var(--soul-brand-logo);
+  text-transform: uppercase;
+}
+
+.soul-brand--on-light .soul-brand__text {
+  color: var(--soul-text-primary);
+}
+
+.soul-brand--lg .soul-brand__mark {
+  width: 28px;
+  height: 28px;
+}
+
+.soul-brand--lg .soul-brand__text {
+  font-size: 16px;
+  letter-spacing: 2.4px;
+}
+
+/* ── Primary button (full-width CTA + arrow CTA) ── */
+.soul-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: var(--soul-cta-height);
+  padding: 16px 24px;
+  border: none;
+  border-radius: var(--soul-radius-pill);
+  background: var(--soul-button-primary);
+  color: var(--soul-text-on-dark);
+  font-family: var(--soul-font-ui);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 22px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background 150ms var(--soul-ease),
+    box-shadow 150ms var(--soul-ease),
+    transform 150ms var(--soul-ease),
+    color 150ms var(--soul-ease);
+}
+
+.soul-btn--block {
+  width: 100%;
+}
+
+.soul-btn--arrow {
+  padding-left: 24px;
+  padding-right: 20px;
+}
+
+.soul-btn__icon,
+.soul-btn__warning {
+  flex-shrink: 0;
+  display: block;
+}
+
+.soul-btn__icon {
+  width: 16px;
+  height: 16px;
+}
+
+.soul-btn__warning {
+  width: 16px;
+  height: 14px;
+}
+
+.soul-btn:hover:not(:disabled):not(.soul-btn--error) {
+  background: var(--soul-button-primary-hover);
+  box-shadow: var(--soul-shadow-button-hover);
+}
+
+.soul-btn:active:not(:disabled):not(.soul-btn--error) {
+  background: #000000;
+  box-shadow: none;
+  transform: scale(0.98);
+}
+
+.soul-btn:disabled:not(.soul-btn--loading) {
+  background: var(--soul-button-primary-disabled);
+  color: var(--soul-button-primary-disabled-text);
+  font-weight: 400;
+  font-size: 15px;
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.soul-btn:focus-visible {
+  outline: 2px solid var(--soul-text-soft);
+  outline-offset: 3px;
+}
+
+.soul-btn--loading {
+  pointer-events: none;
+  background: #000000;
+  min-width: 56px;
+}
+
+.soul-btn--error,
+.soul-btn--error:hover:not(:disabled),
+.soul-btn--error:active:not(:disabled) {
+  background: var(--soul-button-error);
+  box-shadow: none;
+  color: #fff;
+  font-weight: 500;
+}
+
+.soul-btn__spinner {
+  display: block;
+  animation: soul-spin 0.75s linear infinite;
+}
+
+@keyframes soul-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.soul-spinner {
+  display: inline-block;
+  vertical-align: middle;
+  animation: soul-spin 0.75s linear infinite;
+}
+
+/* ── Outline button (Skip / Try again) ── */
+.soul-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: var(--soul-cta-height);
+  padding: 16px 24px;
+  border: 1px solid var(--soul-button-outline-border);
+  border-radius: 66px;
+  background: #fff;
+  color: var(--soul-text-primary);
+  font-family: var(--soul-font-ui);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: normal;
+  letter-spacing: -0.36px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background 150ms var(--soul-ease),
+    border-color 150ms var(--soul-ease),
+    color 150ms var(--soul-ease),
+    transform 150ms var(--soul-ease);
+}
+
+.soul-btn-outline--block {
+  width: 100%;
+}
+
+.soul-btn-outline:hover:not(:disabled):not(.soul-btn-outline--error) {
+  background: var(--soul-button-outline-hover);
+}
+
+.soul-btn-outline:active:not(:disabled):not(.soul-btn-outline--error) {
+  background: var(--soul-button-outline-pressed);
+  transform: scale(0.98);
+}
+
+.soul-btn-outline:disabled:not(.soul-btn-outline--loading) {
+  color: var(--soul-button-outline-disabled-text);
+  cursor: not-allowed;
+}
+
+.soul-btn-outline--loading {
+  pointer-events: none;
+}
+
+.soul-btn-outline--error,
+.soul-btn-outline--error:hover:not(:disabled),
+.soul-btn-outline--error:active:not(:disabled) {
+  background: #fff;
+  border-width: 1.5px;
+  border-color: var(--soul-button-error);
+  color: var(--soul-button-error);
+}
+
+.soul-btn-outline:focus-visible {
+  outline: 2px solid var(--soul-text-soft);
+  outline-offset: 3px;
+}
+
+/* ── Secondary icon button (50×50 circle) ── */
+.soul-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  padding: 0;
+  border: none;
+  border-radius: 25px;
+  background: var(--soul-button-secondary);
+  cursor: pointer;
+  transition: background 150ms var(--soul-ease), transform 150ms var(--soul-ease);
+}
+
+.soul-btn-secondary img,
+.soul-btn-secondary .soul-spinner {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+.soul-btn-secondary:hover:not(:disabled) {
+  background: var(--soul-button-secondary-pressed);
+}
+
+.soul-btn-secondary:active:not(:disabled) {
+  background: var(--soul-button-secondary-pressed);
+  transform: scale(0.96);
+}
+
+.soul-btn-secondary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.soul-btn-secondary--loading {
+  pointer-events: none;
+}
+
+/* ── Icon button (44×44 send) ── */
+.soul-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  border-radius: 22px;
+  background: var(--soul-button-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 150ms var(--soul-ease), transform 150ms var(--soul-ease);
+}
+
+.soul-icon-btn img {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+.soul-icon-btn:hover:not(:disabled) {
+  background: var(--soul-button-primary-pressed);
+}
+
+.soul-icon-btn:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.soul-icon-btn:disabled {
+  background: rgba(38, 34, 28, 0.35);
+  cursor: not-allowed;
+}
+
+/* ── Chip ── */
+.soul-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 18px;
+  border: 1px solid var(--soul-stroke-on-dark);
+  border-radius: var(--soul-radius-pill);
+  background: var(--soul-card-frost);
+  color: var(--soul-text-on-dark);
+  font-family: var(--soul-font-ui);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: normal;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 150ms var(--soul-ease), color 150ms var(--soul-ease);
+}
+
+.soul-chip[aria-pressed='true'],
+.soul-chip--selected,
+.soul-chip:active:not(.soul-chip--static):not(:disabled) {
+  background: var(--soul-card-solid);
+  color: var(--soul-text-primary);
+  border-color: transparent;
+}
+
+.soul-chip:focus-visible {
+  outline: 2px solid var(--soul-text-soft);
+  outline-offset: 2px;
+}
+
+.soul-chip--static {
+  cursor: default;
+}
+
+.soul-chip:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Text link ── */
+.soul-text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--soul-text-primary);
+  font-family: var(--soul-font-ui);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 150ms var(--soul-ease);
+}
+
+.soul-text-link__arrows {
+  position: relative;
+  display: inline-flex;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.soul-text-link__arrow {
+  width: 14px;
+  height: 14px;
+  display: block;
+}
+
+.soul-text-link__arrow--pressed {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.soul-text-link:hover,
+.soul-text-link:active {
+  color: var(--soul-text-link-pressed);
+}
+
+.soul-text-link:hover .soul-text-link__arrow--default,
+.soul-text-link:active .soul-text-link__arrow--default {
+  opacity: 0;
+}
+
+.soul-text-link:hover .soul-text-link__arrow--pressed,
+.soul-text-link:active .soul-text-link__arrow--pressed {
+  opacity: 1;
+}
+
+.soul-text-link--on-dark {
+  color: var(--soul-text-on-dark);
+}
+
+.soul-text-link--on-dark:hover,
+.soul-text-link--on-dark:active {
+  color: var(--soul-text-soft);
+}
+
+/* ── Composer ── */
+.soul-composer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 342px;
+  padding: 6px 6px 6px 18px;
+  border-radius: 28px;
+  background: var(--soul-composer-fill);
+  border: 3px solid transparent;
+  box-sizing: border-box;
+  transition: border-color 150ms var(--soul-ease);
+}
+
+.soul-composer--focused,
+.soul-composer--filled,
+.soul-composer:focus-within {
+  border-color: var(--soul-stroke-on-dark);
+}
+
+.soul-composer--disabled {
+  pointer-events: none;
+}
+
+.soul-composer--disabled .soul-composer__input,
+.soul-composer--disabled .soul-composer__input::placeholder {
+  color: rgba(138, 132, 122, 0.4);
+}
+
+.soul-composer__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--soul-font-ui);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--soul-text-primary);
+}
+
+.soul-composer__input::placeholder {
+  color: var(--soul-text-placeholder);
+}
+
+.soul-composer__input:disabled {
+  color: rgba(138, 132, 122, 0.4);
+}
+
+/* ── Quiz progress ── */
+.soul-progress {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.soul-progress__seg {
+  flex: 1 0 0;
+  min-width: 1px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--soul-progress-inactive);
+}
+
+.soul-progress__seg--on {
+  background: var(--soul-progress-active);
+}
+
+/* ── Bottom nav ── */
+.soul-nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 76px;
+  border: 1px solid var(--soul-nav-stroke);
+  background: var(--soul-nav-fill);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--soul-shadow-nav);
+}
+
+.soul-nav__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 69px;
+  min-height: 44px;
+  padding: 5px 12px;
+  border: none;
+  background: transparent;
+  border-radius: 999px;
+  cursor: pointer;
+  color: var(--soul-icon-inactive);
+  font-family: var(--soul-font-ui);
+  font-weight: 400;
+  font-size: 10px;
+  line-height: 12px;
+  transition: background 150ms var(--soul-ease), color 150ms var(--soul-ease);
+}
+
+.soul-nav__item img {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+.soul-nav__item[aria-current='page'],
+.soul-nav__item--active {
+  background: var(--soul-bg-chat);
+  color: var(--soul-text-on-dark);
+  font-weight: 500;
+}
+
+/* ── Input Field (Components 424:1788) ── */
+.soul-input {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 342px;
+  height: var(--soul-input-height-md);
+  padding: 0 24px;
+  box-sizing: border-box;
+  border-radius: var(--soul-input-radius);
+  border: 1px solid var(--soul-input-border);
+  background: var(--soul-input-bg);
+  transition:
+    background 150ms var(--soul-ease),
+    border-color 150ms var(--soul-ease),
+    box-shadow 150ms var(--soul-ease);
+}
+
+.soul-input--lg {
+  height: var(--soul-input-height-lg);
+  padding: 0 28px;
+}
+
+.soul-input:hover:not(.soul-input--disabled):not(.soul-input--readonly) {
+  background: var(--soul-input-bg-hover);
+  border-color: var(--soul-input-border-hover);
+}
+
+.soul-input:focus-within:not(.soul-input--disabled):not(.soul-input--readonly):not(.soul-input--error):not(.soul-input--success) {
+  background: var(--soul-input-bg-focus);
+  border-color: var(--soul-input-border-focus);
+  box-shadow: var(--soul-shadow-input-focus);
+}
+
+.soul-input--error {
+  border-color: var(--soul-input-border-error);
+}
+
+.soul-input--success {
+  border-color: var(--soul-input-border-success);
+}
+
+.soul-input--disabled {
+  background: var(--soul-input-bg-disabled);
+  border-color: transparent;
+  pointer-events: none;
+}
+
+.soul-input--readonly {
+  background: var(--soul-input-bg-readonly);
+}
+
+.soul-input__control {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--soul-font-ui);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 22px;
+  color: var(--soul-input-fg);
+  caret-color: #fffdfa;
+}
+
+.soul-input__control::placeholder {
+  color: var(--soul-input-placeholder);
+}
+
+.soul-input--disabled .soul-input__control,
+.soul-input--disabled .soul-input__control::placeholder {
+  color: var(--soul-input-disabled);
+}
+
+.soul-input__leading,
+.soul-input__icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.85;
+}
+
+.soul-input__icon {
+  width: 16px;
+  height: 20px;
+  object-fit: contain;
+}
+
+/* ── Textarea (Components 424:1831) ── */
+.soul-textarea {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 342px;
+  box-sizing: border-box;
+  padding: 16px 24px;
+  border-radius: var(--soul-input-radius);
+  border: 1px solid var(--soul-input-border);
+  background: var(--soul-input-bg);
+  transition:
+    background 150ms var(--soul-ease),
+    border-color 150ms var(--soul-ease),
+    box-shadow 150ms var(--soul-ease);
+}
+
+.soul-textarea--rows-3 {
+  min-height: 88px;
+}
+
+.soul-textarea--rows-5 {
+  min-height: 132px;
+}
+
+.soul-textarea--rows-8 {
+  min-height: 198px;
+}
+
+.soul-textarea:hover:not(.soul-textarea--disabled):not(.soul-textarea--readonly) {
+  background: var(--soul-input-bg-hover);
+  border-color: var(--soul-input-border-hover);
+}
+
+.soul-textarea:focus-within:not(.soul-textarea--disabled):not(.soul-textarea--readonly):not(.soul-textarea--error):not(.soul-textarea--success) {
+  background: var(--soul-input-bg-focus);
+  border-color: var(--soul-input-border-focus);
+  box-shadow: var(--soul-shadow-input-focus);
+}
+
+.soul-textarea--error {
+  border-color: var(--soul-input-border-error);
+}
+
+.soul-textarea--success {
+  border-color: var(--soul-input-border-success);
+}
+
+.soul-textarea--disabled {
+  background: var(--soul-input-bg-disabled);
+  border-color: transparent;
+  pointer-events: none;
+}
+
+.soul-textarea--readonly {
+  background: var(--soul-input-bg-readonly);
+}
+
+.soul-textarea__control {
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
+  font-family: var(--soul-font-ui);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 22px;
+  color: var(--soul-input-fg);
+  caret-color: #fffdfa;
+}
+
+.soul-textarea__control::placeholder {
+  color: var(--soul-input-placeholder);
+}
+
+.soul-textarea--disabled .soul-textarea__control,
+.soul-textarea--disabled .soul-textarea__control::placeholder {
+  color: var(--soul-input-disabled);
+}
+
+/* ── Form Field (Components Form Field) ── */
+.soul-field {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  width: 100%;
+  max-width: 342px;
+}
+
+.soul-field__label {
+  font-family: var(--soul-font-ui);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--soul-input-label);
+}
+
+.soul-field__message {
+  margin: 0;
+  font-family: var(--soul-font-ui);
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--soul-input-placeholder);
+}
+
+.soul-field__message--error {
+  color: var(--soul-error-text);
+}
+
+.soul-field__message--success {
+  color: var(--soul-success);
+}
+
+.soul-field .soul-input,
+.soul-field .soul-textarea {
+  max-width: none;
+}

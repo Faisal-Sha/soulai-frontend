@@ -1,0 +1,405 @@
+/* 03.1 · Generate · Waiting — Figma DEV 437:3056 */
+
+@import '../../styles/soul-tokens.css';
+
+.soul-wt {
+  --wt-text-white: var(--soul-text-white);
+  --wt-text-soft: var(--soul-text-soft);
+  --wt-text-dark: var(--soul-text-primary);
+  --wt-ui: var(--soul-font-ui);
+  --wt-display: var(--soul-font-display);
+
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  width: 100vw;
+  width: 100dvw;
+  height: 100%;
+  height: 100dvh;
+  background: #746c5e;
+  color: var(--wt-text-white);
+  font-family: var(--wt-ui);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+.soul-wt__bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.soul-wt__bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.soul-wt__bg-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.soul-wt__frame {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  max-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.soul-wt__scrim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 144% 67% at 50% 0%,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0.25) 59%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  opacity: 0.8;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.soul-wt__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-sizing: border-box;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 253, 250, 0.32) transparent;
+}
+
+.soul-wt__content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.soul-wt__content::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 16px 0;
+}
+
+.soul-wt__content::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 253, 250, 0.18) 0%,
+    rgba(255, 253, 250, 0.38) 50%,
+    rgba(255, 253, 250, 0.18) 100%
+  );
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.soul-wt__content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 253, 250, 0.5);
+}
+
+.soul-wt__header {
+  display: flex;
+  align-items: center;
+  padding: 24px 24px 0;
+  flex-shrink: 0;
+}
+
+.soul-wt__hero {
+  padding: 48px 24px 32px;
+  flex-shrink: 0;
+}
+
+.soul-wt__title {
+  margin: 0;
+  font-family: var(--wt-ui);
+  font-weight: 500;
+  font-size: clamp(24px, 7vw, 28px);
+  line-height: 1.32;
+  letter-spacing: -1.12px;
+  color: var(--wt-text-white);
+}
+
+.soul-wt__mark-stage {
+  position: relative;
+  flex: 0 0 auto;
+  /* Tall enough for 176 Mark / hero so rings don’t crowd title / checklist */
+  width: 176px;
+  height: 176px;
+  margin: 8px auto 16px;
+}
+
+.soul-wt__mark-spin {
+  position: absolute;
+  inset: 0;
+  animation: soul-wt-orbit 16s linear infinite;
+  pointer-events: none;
+}
+
+.soul-wt__mark-rings {
+  display: block;
+  width: 176px;
+  height: 176px;
+  object-fit: contain;
+}
+
+.soul-wt__orb-wrap {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  width: 120px;
+  height: 120px;
+  margin: -60px 0 0 -60px;
+  border-radius: 50%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.soul-wt__orb {
+  display: block;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.18));
+}
+
+@keyframes soul-wt-orbit {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .soul-wt__mark-spin {
+    animation: none;
+  }
+}
+
+.soul-wt__checks {
+  list-style: none;
+  margin: 0;
+  padding: 24px 48px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.soul-wt__check {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  opacity: 0.5;
+  font-size: 16px;
+  line-height: 22px;
+  transition: opacity 280ms ease;
+}
+
+.soul-wt__check--on {
+  opacity: 1;
+}
+
+.soul-wt__tick {
+  font-size: 14px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.soul-wt__wait-label {
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--wt-text-soft);
+  flex-shrink: 0;
+}
+
+.soul-wt__cards {
+  position: relative;
+  height: 146px;
+  margin: 0 24px;
+  flex-shrink: 0;
+}
+
+.soul-wt__card {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-sizing: border-box;
+  color: var(--wt-text-dark);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid #fff;
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+}
+
+.soul-wt__card--back {
+  left: 28px;
+  right: 28px;
+  top: 11px;
+  padding: 20px;
+  border-radius: 20px;
+  opacity: 0.6;
+  box-shadow: 0 20px 40px rgba(48, 40, 32, 0.15);
+  transform: scale(0.94);
+}
+
+.soul-wt__card--front {
+  left: 0;
+  right: 0;
+  top: 24px;
+  padding: 24px;
+  border-radius: 24px;
+  box-shadow: 0 24px 48px rgba(48, 40, 32, 0.15);
+  animation: soul-wt-card-in 320ms ease both;
+}
+
+@keyframes soul-wt-card-in {
+  from {
+    opacity: 0.7;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.soul-wt__card-title {
+  margin: 0;
+  font-family: var(--wt-display);
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 22px;
+}
+
+.soul-wt__card-body {
+  margin: 0;
+  font-family: var(--wt-ui);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.soul-wt__card--back .soul-wt__card-title {
+  font-size: 15px;
+}
+
+.soul-wt__card--back .soul-wt__card-body {
+  font-size: 12.5px;
+  line-height: 18px;
+}
+
+.soul-wt__dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 24px calc(48px + env(safe-area-inset-bottom, 0px));
+  flex-shrink: 0;
+}
+
+.soul-wt__dot {
+  width: 6px;
+  height: 6px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+}
+
+.soul-wt__dot--active {
+  background: #fff;
+}
+
+@media (max-height: 780px) {
+  .soul-wt__hero {
+    padding: 24px 24px 16px;
+  }
+
+  .soul-wt__mark-stage {
+    width: 140px;
+    height: 140px;
+  }
+
+  .soul-wt__mark-rings {
+    width: 140px;
+    height: 140px;
+  }
+
+  .soul-wt__orb-wrap {
+    width: 96px;
+    height: 96px;
+    margin: -48px 0 0 -48px;
+  }
+
+  .soul-wt__orb {
+    width: 96px;
+    height: 96px;
+  }
+
+  .soul-wt__checks {
+    padding: 12px 40px 20px;
+    gap: 6px;
+  }
+
+  .soul-wt__check {
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .soul-wt__cards {
+    height: 120px;
+  }
+
+  .soul-wt__card--front {
+    padding: 18px;
+    top: 16px;
+  }
+
+  .soul-wt__dots {
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (min-width: 900px) {
+  .soul-wt__content {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: clamp(24px, 4vh, 40px) clamp(32px, 5vw, 56px);
+  }
+
+  .soul-wt__header,
+  .soul-wt__hero,
+  .soul-wt__checks {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .soul-wt__cards {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}

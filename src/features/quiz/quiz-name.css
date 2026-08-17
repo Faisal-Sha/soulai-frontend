@@ -1,0 +1,252 @@
+/* 02.2 · Quiz · Name — Figma DEV 437:2823 */
+
+@import '../../styles/soul-tokens.css';
+@import './soul-field-input.css';
+
+.soul-qn {
+  --qn-text-white: var(--soul-text-white);
+  --qn-text-soft: var(--soul-text-soft);
+  --qn-ui: var(--soul-font-ui);
+
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  width: 100vw;
+  width: 100dvw;
+  height: 100%;
+  height: 100dvh;
+  background: #746c5e;
+  color: var(--qn-text-white);
+  font-family: var(--qn-ui);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+.soul-qn__bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.soul-qn__bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.soul-qn__bg-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.soul-qn__frame {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  max-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.soul-qn__scrim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 144% 67% at 50% 0%,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0.25) 59%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  opacity: 0.8;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.soul-qn__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-sizing: border-box;
+}
+
+.soul-qn__header {
+  display: flex;
+  align-items: center;
+  /* Figma Frame 58: 24 top + 20 brand + 24 bottom = 68 */
+  padding: 24px;
+  flex-shrink: 0;
+}
+
+.soul-qn__progress-wrap {
+  padding: 8px 24px;
+  flex-shrink: 0;
+}
+
+.soul-qn__progress-wrap .soul-progress__seg {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.soul-qn__progress-wrap .soul-progress__seg--on:first-child {
+  background: #fff;
+}
+
+.soul-qn__progress-wrap .soul-progress__seg--on {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.soul-qn__hero {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 28px 24px 40px;
+  flex-shrink: 0;
+}
+
+.soul-qn__title {
+  margin: 0;
+  font-family: var(--qn-ui);
+  font-weight: 500;
+  font-size: clamp(24px, 7vw, 28px);
+  line-height: 1.32;
+  letter-spacing: -1.12px;
+  color: var(--qn-text-white);
+}
+
+.soul-qn__subtitle {
+  margin: 0;
+  font-family: var(--qn-ui);
+  font-weight: 400;
+  font-size: clamp(14px, 4vw, 16px);
+  line-height: 1.375;
+  color: var(--qn-text-soft);
+}
+
+.soul-qn__form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 0 24px;
+  flex-shrink: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.soul-qn__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.soul-qn__label {
+  font-family: var(--qn-ui);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.soul-qn__input {
+  width: 100%;
+  height: 64px;
+  padding: 0 28px;
+  border: 1px solid transparent;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.16);
+  color: var(--qn-text-white);
+  font-family: var(--qn-ui);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 22px;
+  outline: none;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.soul-qn__input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.soul-qn__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+}
+
+.soul-qn__actions .soul-btn {
+  width: 100%;
+}
+
+.soul-qn__actions .soul-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.soul-qn__privacy {
+  margin: 0;
+  font-family: var(--qn-ui);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--qn-text-soft);
+  text-align: center;
+  max-width: 342px;
+}
+
+.soul-qn__spacer {
+  flex: 1 1 auto;
+  min-height: 12px;
+}
+
+@media (max-height: 740px) {
+  .soul-qn__header {
+    padding: 16px 24px 24px;
+  }
+
+  .soul-qn__hero {
+    padding: 16px 24px 24px;
+    gap: 10px;
+  }
+
+  .soul-qn__input {
+    height: 56px;
+    padding: 0 20px;
+  }
+
+  .soul-qn__form {
+    gap: 16px;
+  }
+}
+
+@media (min-width: 900px) {
+  .soul-qn__content {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: clamp(24px, 4vh, 40px) clamp(32px, 5vw, 56px);
+  }
+
+  .soul-qn__header,
+  .soul-qn__progress-wrap,
+  .soul-qn__hero,
+  .soul-qn__form {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}

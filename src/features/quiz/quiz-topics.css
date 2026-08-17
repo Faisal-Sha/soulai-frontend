@@ -1,0 +1,231 @@
+/* 02.1 · Quiz · Topics — Figma DEV 437:2749 */
+
+@import '../../styles/soul-tokens.css';
+
+.soul-qt {
+  --qt-text-white: var(--soul-text-white);
+  --qt-text-soft: var(--soul-text-soft);
+  --qt-ui: var(--soul-font-ui);
+
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  width: 100vw;
+  width: 100dvw;
+  height: 100%;
+  height: 100dvh;
+  background: #746c5e;
+  color: var(--qt-text-white);
+  font-family: var(--qt-ui);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+.soul-qt__bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.soul-qt__bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.soul-qt__bg-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.soul-qt__frame {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  max-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.soul-qt__scrim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 144% 67% at 50% 0%,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0.25) 59%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  opacity: 0.8;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.soul-qt__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-sizing: border-box;
+}
+
+.soul-qt__header {
+  display: flex;
+  align-items: center;
+  /* Figma Frame 58: 24 top + 20 brand + 24 bottom = 68 */
+  padding: 24px;
+  flex-shrink: 0;
+}
+
+.soul-qt__progress-wrap {
+  padding: 8px 24px;
+  flex-shrink: 0;
+}
+
+.soul-qt__progress-wrap .soul-progress__seg {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.soul-qt__progress-wrap .soul-progress__seg--on {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.soul-qt__hero {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 28px 24px 40px;
+  flex-shrink: 0;
+}
+
+.soul-qt__title {
+  margin: 0;
+  max-width: 297px;
+  font-family: var(--qt-ui);
+  font-weight: 500;
+  font-size: clamp(24px, 7vw, 28px);
+  line-height: 1.32;
+  letter-spacing: -1.12px;
+  color: var(--qt-text-white);
+}
+
+.soul-qt__subtitle {
+  margin: 0;
+  font-family: var(--qt-ui);
+  font-weight: 400;
+  font-size: clamp(14px, 4vw, 16px);
+  line-height: 1.375;
+  color: var(--qt-text-soft);
+}
+
+.soul-qt__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 0 24px;
+  flex-shrink: 0;
+}
+
+.soul-qt__chip.soul-chip {
+  height: 44px;
+  padding: 10px 20px;
+  font-size: 16px;
+  line-height: 22px;
+  box-sizing: border-box;
+}
+
+.soul-qt__chip.soul-chip--selected,
+.soul-qt__chip.soul-chip[aria-pressed='true'] {
+  font-family: var(--soul-font-display);
+  font-size: 15px;
+  border-radius: 24px;
+  box-shadow: 0 24px 24px rgba(48, 40, 32, 0.15);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+}
+
+.soul-qt__spacer {
+  flex: 1 1 auto;
+  min-height: 12px;
+}
+
+.soul-qt__cta {
+  flex-shrink: 0;
+  padding: 24px 24px calc(40px + env(safe-area-inset-bottom, 0px));
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.soul-qt__cta .soul-btn {
+  width: 100%;
+}
+
+.soul-qt__cta .soul-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@media (max-height: 740px) {
+  .soul-qt__header {
+    padding: 16px 24px 24px;
+  }
+
+  .soul-qt__hero {
+    padding: 16px 24px 20px;
+    gap: 10px;
+  }
+
+  .soul-qt__chips {
+    gap: 8px;
+  }
+
+  .soul-qt__chip.soul-chip {
+    height: 40px;
+    padding: 8px 16px;
+    font-size: 15px;
+  }
+
+  .soul-qt__cta {
+    padding: 16px 24px calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (min-width: 900px) {
+  .soul-qt__content {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: clamp(24px, 4vh, 40px) clamp(32px, 5vw, 56px);
+  }
+
+  .soul-qt__header,
+  .soul-qt__progress-wrap,
+  .soul-qt__hero,
+  .soul-qt__chips {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .soul-qt__title {
+    max-width: 420px;
+  }
+
+  .soul-qt__cta {
+    padding-left: 0;
+    padding-right: 0;
+    max-width: 360px;
+  }
+}

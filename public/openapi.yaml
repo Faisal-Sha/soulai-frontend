@@ -1,0 +1,1285 @@
+openapi: 3.0.3
+info:
+  title: Soul+AI API
+  description: |
+    REST API for the Soul+AI (Destiny Chart Insight) platform.
+
+    All endpoints are implemented as **Supabase Edge Functions** (Deno).
+
+    ## Authentication
+
+    Most endpoints require Supabase headers:
+
+    | Header | Value |
+    |--------|-------|
+    | `Authorization` | `Bearer <JWT>` (logged-in user) or `Bearer <SUPABASE_ANON_KEY>` (guest) |
+    | `apikey` | `<SUPABASE_ANON_KEY>` |
+    | `Content-Type` | `application/json` |
+
+    Admin / internal endpoints require the **service role key** as the Bearer token.
+
+    ## Base URL
+
+    `https://prlbfqczucqqvrvxxxfs.supabase.co/functions/v1/{function-name}`
+
+    ## Coverage
+
+    This spec documents all **21** Supabase Edge Functions deployed for Soul+AI.
+
+  version: 1.1.0
+  contact:
+    name: Soul+AI
+    url: https://soulplus-ai.com
+
+servers:
+  - url: https://prlbfqczucqqvrvxxxfs.supabase.co/functions/v1
+    description: Supabase Edge Functions (development)
+
+tags:
+  - name: Quiz & Leads
+    description: Quiz funnel lead capture and account creation
+  - name: Readings & PDF
+    description: AI reading generation and PDF delivery
+  - name: AI Insights
+    description: Destiny matrix AI analysis pipeline
+  - name: Chat
+    description: Knowledge-base grounded chat
+  - name: Compatibility
+    description: Compatibility deep-dive reports
+  - name: Payments
+    description: Stripe checkout and subscription management
+  - name: Upsell
+    description: Post-checkout compatibility add-on
+  - name: Knowledge Base
+    description: Document upload and semantic search (admin)
+  - name: Assistant Admin
+    description: OpenAI assistant configuration (admin)
+  - name: Webhooks & Internal
+    description: Stripe webhooks and internal cron jobs
+
+security:
+  - BearerAuth: []
+    ApiKeyAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: Supabase user JWT, anon key, or service role key
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: apikey
+      description: Supabase anon or service role key
+    StripeSignature:
+      type: apiKey
+      in: header
+      name: stripe-signature
+      description: Stripe webhook signature (HMAC)
+
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    MatrixValues:
+      type: object
+      description: Destiny matrix numeric values (a–z, numbered variants)
+      additionalProperties:
+        type: integer
+      properties:
+        a: { type: integer, description: Center — Soul's comfort zone }
+        b: { type: integer, description: Top — Main talent }
+        c: { type: integer, description: Left — Resource zone }
+        d: { type: integer, description: Bottom — Main processing }
+        e: { type: integer, description: Right — Soul's task }
+        f: { type: integer }
+        y: { type: integer }
+        o: { type: integer }
+        g: { type: integer }
+        k: { type: integer }
+        u: { type: integer }
+        b1: { type: integer }
+        b2: { type: integer }
+        h: { type: integer }
+        j: { type: integer }
+        m: { type: integer }
+        n: { type: integer }
+        t: { type: integer }
+        z: { type: integer }
+        s: { type: integer }
+        l: { type: integer }
+        d1: { type: integer }
+        d2: { type: integer }
+        c1: { type: integer }
+        c2: { type: integer }
+        x: { type: integer }
+        e1: { type: integer }
+        e2: { type: integer }
+
+    ChatMessage:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: [user, assistant, system]
+        content:
+          type: string
+      required:
+        - role
+        - content
+
+    KBSource:
+      type: object
+      properties:
+        documentId: { type: string }
+        filename: { type: string }
+        sourceUrl: { type: string }
+        similarity: { type: number }
+        chunksMatched: { type: integer }
+
+    RAGStats:
+      type: object
+      properties:
+        chunksUsed: { type: integer }
+        queriesRun: { type: integer }
+        avgSimilarity: { type: number }
+        maxSimilarity: { type: number }
+        minSimilarity: { type: number }
+        kbGroundingPct: { type: number }
+        totalDocumentsHit: { type: integer }
+
+    ChatUsageInfo:
+      type: object
+      description: Billing quota returned after a successful chat message
+      properties:
+        freeLimit: { type: integer, description: "Plan free-message cap (1 free / 3 trial / 10 mid / 20 premium)" }
+        freeMessagesUsed: { type: integer }
+        remainingFree: { type: integer }
+        balance: { type: number, description: "USD balance after any deduction" }
+        billedAs:
+          type: string
+          enum: [free, paid]
+          description: "`paid` messages cost $0.15 each after free quota"
+
+    CompatibilityChatContext:
+      type: object
+      required: [mode, compatibility, personAName, personBName, personADob, personBDob]
+      properties:
+        mode:
+          type: string
+          enum: [compatibility]
+        compatibility:
+          type: object
+          additionalProperties: true
+          description: Compatibility matrix metrics for the pair
+        personAName: { type: string }
+        personBName: { type: string }
+        personADob: { type: string, format: date }
+        personBDob: { type: string, format: date }
+
+    PersonalChatContext:
+      type: object
+      properties:
+        mode:
+          type: string
+          enum: [personal]
+
+    CompatibilityReportContent:
+      type: object
+      description: JSON stored in compatibility_reports.content after generation
+      properties:
+        title: { type: string }
+        summary: { type: string }
+        karmicScore: { type: integer }
+        karmicLabel: { type: string }
+        sections:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string, enum: [connection, strengths, friction, timing, growth] }
+              title: { type: string }
+              highlight: { type: string }
+              explorePrompt: { type: string }
+              deepTopics:
+                type: array
+                items: { type: string }
+        aiStarterQuestions:
+          type: array
+          items: { type: string }
+        strengths:
+          type: array
+          items: { type: string }
+        frictionPoints:
+          type: array
+          items: { type: string }
+        timingInsight: { type: string }
+
+paths:
+  /quiz-lead:
+    post:
+      operationId: postQuizLead
+      tags: [Quiz & Leads]
+      summary: Submit quiz lead
+      description: |
+        Captures quiz email + answers, upserts `quiz_leads`, creates or updates auth account,
+        and triggers reading generation. Does not require a logged-in user.
+      security:
+        - BearerAuth: []
+          ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, answers]
+              properties:
+                email:
+                  type: string
+                  format: email
+                answers:
+                  type: object
+                  additionalProperties: true
+                  description: Quiz answers (name, birthdate, etc.)
+                utm_source: { type: string, nullable: true }
+                utm_medium: { type: string, nullable: true }
+                utm_campaign: { type: string, nullable: true }
+      responses:
+        '200':
+          description: Lead saved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lead_id: { type: string, format: uuid }
+        '400':
+          description: Invalid email
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error: { type: string, example: invalid_email }
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    properties:
+                      error: { type: string, example: db_error }
+                  - type: object
+                    properties:
+                      error: { type: string, example: internal_error }
+
+  /generate-reading:
+    post:
+      operationId: postGenerateReading
+      tags: [Readings & PDF]
+      summary: Generate AI reading
+      description: |
+        Generates a personalized destiny reading for a user. Typically invoked internally
+        (service role) after quiz completion or payment. Triggers PDF generation on success.
+      security:
+        - BearerAuth: []
+          ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId]
+              properties:
+                userId:
+                  type: string
+                  format: uuid
+                leadId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                topic:
+                  type: string
+                  nullable: true
+                planType:
+                  type: string
+                  description: Accepted for backwards compatibility; ignored (always standard)
+      responses:
+        '200':
+          description: Reading generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  readingId: { type: string, format: uuid }
+        '500':
+          description: Generation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /get-reading-status:
+    post:
+      operationId: postGetReadingStatus
+      tags: [Readings & PDF]
+      summary: Poll reading status after Stripe checkout
+      description: |
+        Resolves user from Stripe checkout session and returns reading status.
+        May trigger reading generation if not yet started.
+      security:
+        - BearerAuth: []
+          ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sessionId]
+              properties:
+                sessionId:
+                  type: string
+                  description: Stripe Checkout Session ID
+      responses:
+        '200':
+          description: Status response
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    properties:
+                      status:
+                        type: string
+                        enum: [ready, generating, processing, not_found, error]
+                      pdfReady: { type: boolean }
+                      reason:
+                        type: string
+                        enum:
+                          - stripe_session_not_found
+                          - no_email_in_session
+                          - user_not_created_yet
+                          - reading_not_started_yet
+                  - type: object
+                    properties:
+                      error: { type: string }
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /generate-pdf:
+    post:
+      operationId: postGeneratePdf
+      tags: [Readings & PDF]
+      summary: Generate reading PDF
+      description: Builds PDF from reading content, uploads to storage, and emails the user.
+      security:
+        - BearerAuth: []
+          ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId, readingId]
+              properties:
+                userId: { type: string, format: uuid }
+                readingId: { type: string, format: uuid }
+      responses:
+        '200':
+          description: PDF generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  pdfUrl: { type: string, format: uri }
+        '400':
+          description: Missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /download-pdf:
+    post:
+      operationId: postDownloadPdf
+      tags: [Readings & PDF]
+      summary: Download reading PDF
+      description: Returns the PDF file for the authenticated user's reading.
+      security:
+        - BearerAuth: []
+          ApiKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                readingId:
+                  type: string
+                  format: uuid
+                  description: Optional — defaults to latest reading for user
+      responses:
+        '200':
+          description: PDF file
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code: { type: string, example: unauthorized }
+                  message: { type: string }
+        '403':
+          description: Forbidden
+        '404':
+          description: Reading not found
+        '409':
+          description: PDF not ready
+
+  /generate-insights:
+    post:
+      operationId: postGenerateInsights
+      tags: [AI Insights]
+      summary: Generate matrix AI insights
+      description: |
+        Runs the multi-pass RAG analysis pipeline for a destiny matrix.
+        Requires authenticated user. Rate limited to 10 requests/hour.
+      security:
+        - BearerAuth: []
+          ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [birthDate, matrix, language]
+              properties:
+                birthDate:
+                  type: string
+                  format: date
+                  example: "1990-05-15"
+                matrix:
+                  $ref: '#/components/schemas/MatrixValues'
+                name:
+                  type: string
+                language:
+                  type: string
+                  enum: [en, ru]
+                matrixId:
+                  type: string
+      responses:
+        '200':
+          description: Insights generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  insight: { type: string }
+                  fromCache: { type: boolean }
+                  sources:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/KBSource'
+                  ragStats:
+                    $ref: '#/components/schemas/RAGStats'
+                  structuredAnalysis:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items: { type: string }
+                  pipelineStats:
+                    type: object
+                  error: { type: string }
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '429':
+          description: Rate limit exceeded
+
+  /chat-with-kb:
+    post:
+      operationId: postChatWithKb
+      tags: [Chat]
+      summary: Chat with knowledge base
+      description: |
+        Sends a message grounded in the knowledge base. Supports two modes via `chatContext`:
+
+        - **personal** (default) — individual destiny matrix chat
+        - **compatibility** — pair chat using combined matrix + compatibility metrics
+
+        Billing: free messages per plan (1/3/10/20), then $0.15/message from balance.
+        Returns `usage` on success. Requires authenticated user.
+      security:
+        - BearerAuth: []
+          ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message, matrix]
+              properties:
+                message: { type: string }
+                matrix:
+                  $ref: '#/components/schemas/MatrixValues'
+                name: { type: string }
+                history:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ChatMessage'
+                birthDate: { type: string, format: date }
+                language:
+                  type: string
+                  default: en
+                sessionId: { type: string }
+                sessionName: { type: string }
+                chatContext:
+                  oneOf:
+                    - $ref: '#/components/schemas/PersonalChatContext'
+                    - $ref: '#/components/schemas/CompatibilityChatContext'
+                  description: Omit or use mode=personal for matrix chat; mode=compatibility for pair chat
+      responses:
+        '200':
+          description: Chat response (or limit reached — check error field)
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    properties:
+                      answer: { type: string }
+                      usage:
+                        $ref: '#/components/schemas/ChatUsageInfo'
+                  - type: object
+                    properties:
+                      error:
+                        type: string
+                        enum: [LIMIT_REACHED]
+                      message: { type: string }
+        '400':
+          description: Missing message
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  answer: { type: string }
+                  error: { type: string }
+
+  /text-to-speech:
+    post:
+      operationId: postTextToSpeech
+      tags: [AI Insights]
+      summary: Text to speech (ElevenLabs)
+      description: Converts text to audio via ElevenLabs API. Returns MPEG audio stream.
+      security:
+        - BearerAuth: []
+          ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text: { type: string }
+                model_id:
+                  type: string
+                  default: eleven_flash_v2_5
+                voice_id:
+                  type: string
+                  description: ElevenLabs voice ID (optional)
+      responses:
+        '200':
+          description: Audio stream
+          content:
+            audio/mpeg:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Missing text
+        '500':
+          description: TTS error
+
+  /generate-compatibility-report:
+    post:
+      operationId: postGenerateCompatibilityReport
+      tags: [Compatibility]
+      summary: Generate compatibility deep-dive report
+      description: |
+        Requires Deep-Dive plan access (premium plan or $9.99 upsell purchase).
+        Creates an interactive compatibility report with section teasers and AI starter questions.
+        Report content is stored in `compatibility_reports.content` — see CompatibilityReportContent schema.
+      security:
+        - BearerAuth: []
+          ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [personADob, personBDob, compatibility, combinedMatrix]
+              properties:
+                personAName: { type: string }
+                personBName: { type: string }
+                personADob: { type: string, format: date }
+                personBDob: { type: string, format: date }
+                compatibility:
+                  type: object
+                  additionalProperties: true
+                combinedMatrix:
+                  type: object
+                  additionalProperties: true
+                language:
+                  type: string
+                  enum: [en, ru]
+                  default: en
+      responses:
+        '200':
+          description: Report ready
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  reportId: { type: string, format: uuid }
+                  status: { type: string, enum: [ready, processing, failed] }
+        '401':
+          description: Unauthorized
+        '403':
+          description: Deep-Dive not available on current plan
+        '400':
+          description: Missing required compatibility data
+        '500':
+          description: Report generation failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error: { type: string }
+                  reportId: { type: string, format: uuid }
+
+  /create-checkout-session:
+    post:
+      operationId: postCreateCheckoutSession
+      tags: [Payments]
+      summary: Create Stripe checkout session
+      description: |
+        Creates a Stripe Checkout session for subscription or balance recharge.
+        Works for logged-in users (JWT) and guests (anon key).
+      security:
+        - BearerAuth: []
+          ApiKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                planId:
+                  type: string
+                  enum:
+                    - trial_1week
+                    - plan_4week
+                    - premium_12week
+                    - discovery
+                    - growth
+                    - premium
+                  description: Required when mode=subscription
+                amount:
+                  type: integer
+                  description: Amount in cents (required for recharge mode)
+                mode:
+                  type: string
+                  enum: [subscription, payment]
+                  default: subscription
+                  description: Use `payment` for balance recharge (one-time)
+                language:
+                  type: string
+                  default: en
+                leadId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                siteUrl:
+                  type: string
+                  format: uri
+                  description: Client origin for redirect URLs
+      responses:
+        '200':
+          description: Checkout session created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri
+                    description: Stripe Checkout URL
+        '400':
+          description: Invalid request
+
+  /cancel-subscription:
+    post:
+      operationId: postCancelSubscription
+      tags: [Payments]
+      summary: Cancel own subscription
+      description: Schedules cancellation at period end for the authenticated user.
+      security:
+        - BearerAuth: []
+          ApiKeyAuth: []
+      responses:
+        '200':
+          description: Cancellation scheduled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  cancel_at: { type: string, format: date-time }
+        '401':
+          description: Unauthorized
+        '404':
+          description: No subscription found
+
+  /admin-cancel-subscription:
+    post:
+      operationId: postAdminCancelSubscription
+      tags: [Payments]
+      summary: Admin cancel user subscription
+      description: Admin-only. Schedules cancellation at period end for a target user.
+      security:
+        - BearerAuth: []
+          ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId]
+              properties:
+                userId: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Cancellation scheduled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  cancel_at: { type: string, format: date-time }
+        '401':
+          description: Unauthorized
+        '403':
+          description: Admin access required
+
+  /upsell-b:
+    post:
+      operationId: postUpsellB
+      tags: [Upsell]
+      summary: Upsell B — check, charge, purchase, or mark offered
+      description: |
+        Compatibility Deep-Dive add-on ($9.99). Actions via `action` field:
+        - `check` (default) — eligibility after Stripe checkout session
+        - `charge` — off-session payment from post-checkout upsell page (requires sessionId + userId)
+        - `purchaseStandalone` — logged-in purchase from Compatibility page (JWT required, no sessionId)
+        - `markOffered` — skip offer permanently (requires userId)
+      security:
+        - BearerAuth: []
+          ApiKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [check, charge, markOffered, purchaseStandalone]
+                  default: check
+                sessionId:
+                  type: string
+                  description: Stripe Checkout Session ID (required for check/charge)
+                userId:
+                  type: string
+                  format: uuid
+                  description: Required for charge and markOffered (not for purchaseStandalone)
+                markOffered:
+                  type: boolean
+                  description: Legacy flag — same as action=markOffered
+      responses:
+        '200':
+          description: Action result
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    description: Check response
+                    properties:
+                      eligible: { type: boolean }
+                      reason:
+                        type: string
+                        enum:
+                          - invalid_session_id
+                          - no_email
+                          - no_session_id
+                          - user_not_ready
+                          - already_offered
+                          - already_purchased
+                          - subscription_not_ready
+                          - premium_plan
+                          - error
+                      retry: { type: boolean }
+                      userId: { type: string }
+                      email: { type: string }
+                      planType: { type: string }
+                      subscription_purchase:
+                        type: object
+                        properties:
+                          session_id: { type: string }
+                          plan_type: { type: string }
+                          amount: { type: number }
+                          currency: { type: string }
+                  - type: object
+                    description: Charge response
+                    properties:
+                      success: { type: boolean }
+                      paymentIntentId: { type: string }
+                      addon: { type: string }
+                      amount: { type: number }
+                  - type: object
+                    description: Mark offered response
+                    properties:
+                      success: { type: boolean }
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '402':
+          description: Card declined (charge action)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Session/user mismatch or plan not eligible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User or subscription not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Already purchased or offer already used
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /upsell-check:
+    post:
+      operationId: postUpsellCheck
+      tags: [Upsell]
+      summary: Upsell check (deprecated)
+      description: Deprecated alias for `upsell-b` with action=check.
+      deprecated: true
+      security:
+        - BearerAuth: []
+          ApiKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sessionId: { type: string }
+      responses:
+        '200':
+          description: Same as upsell-b check
+
+  /upsell-compatibility:
+    post:
+      operationId: postUpsellCompatibility
+      tags: [Upsell]
+      summary: Upsell charge (deprecated)
+      description: Deprecated alias for `upsell-b` with action=charge.
+      deprecated: true
+      security:
+        - BearerAuth: []
+          ApiKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sessionId: { type: string }
+                userId: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Same as upsell-b charge
+
+  /search-knowledge:
+    post:
+      operationId: postSearchKnowledge
+      tags: [Knowledge Base]
+      summary: Semantic knowledge search
+      description: Searches document chunks via vector similarity. User JWT or service role.
+      security:
+        - BearerAuth: []
+          ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [query]
+              properties:
+                query: { type: string }
+                limit:
+                  type: integer
+                  default: 5
+                threshold:
+                  type: number
+                  default: 0.5
+                language:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+                  query: { type: string }
+                  count: { type: integer }
+        '401':
+          description: Unauthorized
+
+  /upload-document:
+    post:
+      operationId: postUploadDocument
+      tags: [Knowledge Base]
+      summary: Upload document to knowledge base
+      description: |
+        Ingests PDF or text into the vector knowledge base. Service role required.
+
+        Accepts `multipart/form-data` (file field) or JSON with inline content.
+      security:
+        - BearerAuth: []
+          ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                language:
+                  type: string
+                  default: en
+                source_url:
+                  type: string
+                  format: uri
+          application/json:
+            schema:
+              type: object
+              required: [content, filename]
+              properties:
+                content: { type: string }
+                filename: { type: string }
+                content_type:
+                  type: string
+                  default: text/plain
+                language:
+                  type: string
+                  default: en
+                source_url:
+                  type: string
+                  format: uri
+      responses:
+        '201':
+          description: Document ingested
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  document:
+                    type: object
+                    properties:
+                      id: { type: string, format: uuid }
+                      filename: { type: string }
+                      language: { type: string }
+                      total_chunks: { type: integer }
+                      text_length: { type: integer }
+        '401':
+          description: Service role required
+
+  /setup-assistant:
+    post:
+      operationId: postSetupAssistant
+      tags: [Assistant Admin]
+      summary: Create OpenAI assistant
+      description: Creates Russian matrix assistant and stores config. Service role required.
+      security:
+        - BearerAuth: []
+          ApiKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                model:
+                  type: string
+                  default: gpt-4o
+                name:
+                  type: string
+      responses:
+        '201':
+          description: Assistant created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  message: { type: string }
+                  assistant:
+                    type: object
+                    properties:
+                      language: { type: string }
+                      assistant_id: { type: string }
+                      assistant_name: { type: string }
+                      model: { type: string }
+                      config_id: { type: string, format: uuid }
+
+  /manage-assistant:
+    get:
+      operationId: listAssistants
+      tags: [Assistant Admin]
+      summary: List assistant configurations
+      description: Service role required.
+      security:
+        - BearerAuth: []
+          ApiKeyAuth: []
+      responses:
+        '200':
+          description: Assistant list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assistants:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: string, format: uuid }
+                        assistant_id: { type: string }
+                        assistant_name: { type: string }
+                        model: { type: string }
+                        language: { type: string }
+                        system_prompt: { type: string }
+                        is_active: { type: boolean }
+                        created_at: { type: string, format: date-time }
+                        updated_at: { type: string, format: date-time }
+    put:
+      operationId: updateAssistant
+      tags: [Assistant Admin]
+      summary: Update assistant configuration
+      description: Service role required.
+      security:
+        - BearerAuth: []
+          ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [config_id]
+              properties:
+                config_id: { type: string, format: uuid }
+                name: { type: string }
+                model: { type: string }
+                instructions: { type: string }
+                is_active: { type: boolean }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  assistant: { type: object }
+    delete:
+      operationId: deleteAssistant
+      tags: [Assistant Admin]
+      summary: Delete assistant
+      description: Service role required.
+      security:
+        - BearerAuth: []
+          ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [config_id]
+              properties:
+                config_id: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  deleted: { type: string, format: uuid }
+
+  /stripe-webhook:
+    post:
+      operationId: postStripeWebhook
+      tags: [Webhooks & Internal]
+      summary: Stripe webhook handler
+      description: |
+        Receives Stripe events. Verified via `stripe-signature` header. Not for direct client use.
+
+        Handled event types:
+        - `checkout.session.completed` — save subscription, balance recharge, send emails
+        - `invoice.created`, `invoice.paid`, `invoice.payment_succeeded` — renew subscription
+        - `customer.subscription.created`, `customer.subscription.updated` — sync subscription state
+        - `customer.subscription.deleted` — downgrade user to free plan
+      security:
+        - StripeSignature: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Stripe Event object
+      responses:
+        '200':
+          description: Event processed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  received: { type: boolean, example: true }
+        '400':
+          description: Invalid or missing signature
+        '500':
+          description: Processing error
+
+  /sync-mixpanel:
+    post:
+      operationId: postSyncMixpanel
+      tags: [Webhooks & Internal]
+      summary: Sync Mixpanel analytics to Supabase
+      description: Internal cron job. Fetches daily stats from Mixpanel and upserts to DB.
+      security:
+        - BearerAuth: []
+          ApiKeyAuth: []
+      responses:
+        '200':
+          description: Sync complete
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  stats:
+                    type: object
+                    properties:
+                      date: { type: string, format: date }
+                      new_users: { type: integer }
+                      active_users: { type: integer }
+        '400':
+          description: Missing env vars or sync failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

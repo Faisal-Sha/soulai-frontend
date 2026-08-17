@@ -1,0 +1,171 @@
+:root {
+  --reading-bg: #0F0F0F;
+  --reading-page-bg: #1A1230;
+  /* Deep Purple */
+  --reading-gold: #D4AF7A;
+  --reading-text-white: #F5E6FF;
+  --reading-text-muted: rgba(245, 230, 255, 0.6);
+  --reading-accent-purple: #4A2C6D;
+  --reading-card-bg: rgba(255, 255, 255, 0.05);
+}
+
+.report-viewer-root {
+  background: radial-gradient(circle at top, #1a1a1a 0%, #050505 100%) !important;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Page Base */
+.report-page-wrapper {
+  background-color: var(--reading-page-bg) !important;
+  color: var(--reading-text-white) !important;
+  border: 1px solid rgba(212, 175, 122, 0.2) !important;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 793.7pt;
+  /* A4 Width */
+  min-height: 1122.5pt;
+  /* A4 Height - use min-height to allow content growth */
+  box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.8);
+  flex-shrink: 0;
+}
+
+/* Typography Overrides */
+.report-page-wrapper h1 {
+  font-size: 48px !important;
+  line-height: 1.1 !important;
+}
+
+.report-page-wrapper h2 {
+  font-size: 28px !important;
+  line-height: 1.2 !important;
+  font-family: 'Outfit', 'Playfair Display', serif;
+  color: var(--reading-gold) !important;
+  letter-spacing: -0.01em;
+}
+
+.report-page-wrapper p,
+.report-page-wrapper .text-2xl,
+.report-page-wrapper .text-xl {
+  font-size: 16px !important;
+  color: var(--reading-text-white) !important;
+  line-height: 1.6 !important;
+  font-weight: 300;
+}
+
+/* Background Accents */
+.report-page-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(74, 44, 109, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(212, 175, 122, 0.05) 0%, transparent 40%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.report-page-wrapper>* {
+  position: relative;
+  z-index: 1;
+}
+
+/* Section specific styling */
+.section-title-container {
+  border-bottom: 1px solid rgba(212, 175, 122, 0.3);
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+}
+
+.section-label {
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--reading-gold);
+  margin-bottom: 0.5rem;
+}
+
+/* Callout Box (What this means for you) */
+.meaning-callout {
+  background: rgba(212, 175, 122, 0.08);
+  border-left: 4px solid var(--reading-gold);
+  padding: 1.5rem;
+  border-radius: 0 1rem 1rem 0;
+  margin-top: 2rem;
+}
+
+.meaning-callout h4 {
+  color: var(--reading-gold);
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  margin-bottom: 0.75rem;
+}
+
+/* Scrollbar styling */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 122, 0.3);
+  border-radius: 10px;
+}
+
+/* Decorative elements */
+.ornament {
+  color: var(--reading-gold);
+  opacity: 0.5;
+  font-size: 1.2rem;
+}
+
+/* Print Overrides */
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  body {
+    background: white !important;
+    margin: 0;
+    padding: 0;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .report-page-wrapper {
+    box-shadow: none !important;
+    border: none !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    page-break-after: always !important;
+    margin: 0 !important;
+    padding: 2.54cm !important;
+    /* Standard 1 inch margins */
+    background-color: var(--reading-page-bg) !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  #page-container {
+    padding: 0 !important;
+    gap: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+
+  .report-viewer-root {
+    background: white !important;
+    padding: 0 !important;
+  }
+}

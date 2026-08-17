@@ -1,0 +1,687 @@
+/* 05.1 · Paywall — Figma DEV 437:3238 */
+
+@import '../../styles/soul-tokens.css';
+
+.soul-pw {
+  --pw-text-white: var(--soul-text-white);
+  --pw-text-soft: var(--soul-text-soft);
+  --pw-text-dark: var(--soul-text-primary);
+  --pw-text-muted: var(--soul-text-muted);
+  --pw-ui: var(--soul-font-ui);
+  --pw-display: var(--soul-font-display);
+
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  width: 100vw;
+  width: 100dvw;
+  height: 100%;
+  height: 100dvh;
+  background: #746c5e;
+  color: var(--pw-text-white);
+  font-family: var(--pw-ui);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+.soul-pw__bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.soul-pw__bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.soul-pw__bg-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.soul-pw__frame {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  max-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.soul-pw__scrim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 144% 67% at 50% 0%,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0.25) 59%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  opacity: 0.8;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.soul-pw__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 24px 24px 40px;
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* Soft SOUL scrollbar (mobile content + desktop panes) */
+.soul-pw__content,
+.soul-pw__offer,
+.soul-pw__aside {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 253, 250, 0.32) transparent;
+}
+
+.soul-pw__content::-webkit-scrollbar,
+.soul-pw__offer::-webkit-scrollbar,
+.soul-pw__aside::-webkit-scrollbar {
+  width: 6px;
+}
+
+.soul-pw__content::-webkit-scrollbar-track,
+.soul-pw__offer::-webkit-scrollbar-track,
+.soul-pw__aside::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 16px 0;
+}
+
+.soul-pw__content::-webkit-scrollbar-thumb,
+.soul-pw__offer::-webkit-scrollbar-thumb,
+.soul-pw__aside::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 253, 250, 0.18) 0%,
+    rgba(255, 253, 250, 0.38) 50%,
+    rgba(255, 253, 250, 0.18) 100%
+  );
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.soul-pw__content::-webkit-scrollbar-thumb:hover,
+.soul-pw__offer::-webkit-scrollbar-thumb:hover,
+.soul-pw__aside::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 253, 250, 0.5);
+}
+
+.soul-pw__offer,
+.soul-pw__aside {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.soul-pw__header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 48px;
+}
+
+.soul-pw__hero {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.soul-pw__title {
+  margin: 0;
+  max-width: 241px;
+  font-family: var(--pw-ui);
+  font-weight: 500;
+  font-size: 28px;
+  line-height: 37px;
+  letter-spacing: -1.12px;
+  color: var(--pw-text-white);
+}
+
+.soul-pw__body {
+  margin: 0;
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 400;
+  color: var(--pw-text-soft);
+}
+
+.soul-pw__card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  margin-bottom: 12px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid #fff;
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  box-shadow: 0 24px 48px rgba(48, 40, 32, 0.15);
+  box-sizing: border-box;
+}
+
+.soul-pw__price-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.soul-pw__card-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 26px;
+  letter-spacing: -0.2px;
+  color: var(--pw-text-dark);
+}
+
+.soul-pw__card-sub {
+  margin: 0;
+  font-size: 16px;
+  line-height: 22px;
+  color: var(--pw-text-muted);
+}
+
+.soul-pw__price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.soul-pw__price {
+  font-family: var(--pw-display);
+  font-size: 43px;
+  line-height: 1;
+  color: #26221c;
+}
+
+.soul-pw__price-then {
+  font-size: 15px;
+  color: var(--pw-text-muted);
+}
+
+.soul-pw__rule {
+  width: 100%;
+  height: 0;
+  margin: 0;
+  border: none;
+  border-top: 1px solid rgba(58, 54, 46, 0.12);
+}
+
+.soul-pw__timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+}
+
+.soul-pw__timeline::before {
+  content: '';
+  position: absolute;
+  left: 8.5px;
+  top: 20px;
+  bottom: 20px;
+  width: 1px;
+  background: #c8c2b6;
+}
+
+.soul-pw__step {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  position: relative;
+}
+
+.soul-pw__step-icon {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+}
+
+.soul-pw__step-icon img {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.soul-pw__step-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.soul-pw__step-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+  color: var(--pw-text-dark);
+}
+
+.soul-pw__step-body {
+  margin: 0;
+  font-size: 16px;
+  line-height: 22px;
+  color: var(--pw-text-muted);
+}
+
+.soul-pw__guarantee {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 16px;
+  margin: 12px 0;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-sizing: border-box;
+}
+
+.soul-pw__shield {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.soul-pw__guarantee p {
+  margin: 0;
+  flex: 1;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--pw-text-white);
+}
+
+.soul-pw__cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 12px 0 24px;
+}
+
+.soul-pw__cta-sub {
+  margin: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--pw-text-soft);
+}
+
+.soul-pw__social {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding-top: 24px;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.soul-pw__carousel {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  overflow: hidden;
+  align-items: stretch;
+}
+
+.soul-pw__quote {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid #fff;
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+  flex-shrink: 0;
+  min-height: 170px;
+}
+
+.soul-pw__quote--active {
+  width: calc(100% - 28px);
+  max-width: 342px;
+  animation: soul-pw-quote-in 0.45s ease;
+}
+
+.soul-pw__quote--peek {
+  /* Figma peek: bg white/50 + opacity 30 */
+  width: min(320px, 85%);
+  padding: 24px;
+  border-radius: 24px;
+  opacity: 0.3;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid #fff;
+  pointer-events: none;
+  user-select: none;
+}
+
+.soul-pw__stars {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.soul-pw__star--dim {
+  opacity: 0.28;
+}
+
+.soul-pw__quote-text {
+  margin: 0;
+  font-size: 16px;
+  line-height: 22px;
+  color: var(--pw-text-dark);
+}
+
+.soul-pw__quote-author {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--pw-text-muted);
+}
+
+.soul-pw__dots {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0 8px;
+}
+
+.soul-pw__dot {
+  width: 6px;
+  height: 6px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+}
+
+.soul-pw__dot.is-active {
+  background: #fff;
+}
+
+@keyframes soul-pw-quote-in {
+  from {
+    opacity: 0.35;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.soul-pw__stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 24px 0;
+}
+
+.soul-pw__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-sizing: border-box;
+}
+
+.soul-pw__stat-value {
+  margin: 0;
+  font-family: var(--pw-display);
+  font-size: 32px;
+  line-height: 1;
+  color: #fdfcfc;
+}
+
+.soul-pw__stat-label {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--pw-text-soft);
+  opacity: 0.8;
+}
+
+.soul-pw__faq {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px 0;
+}
+
+.soul-pw__faq-title {
+  margin: 0;
+  text-align: center;
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 37px;
+  letter-spacing: -1.12px;
+  color: var(--pw-text-white);
+}
+
+.soul-pw__faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.soul-pw__faq-item {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.soul-pw__faq-q {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 26px;
+  letter-spacing: -0.18px;
+  color: var(--pw-text-white);
+}
+
+.soul-pw__faq-chevron {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.soul-pw__faq-item.is-open .soul-pw__faq-chevron {
+  transform: rotate(180deg);
+}
+
+.soul-pw__faq-a {
+  margin: 0;
+  font-size: 16px;
+  line-height: 22px;
+  color: var(--pw-text-white);
+}
+
+.soul-pw__faq-rule {
+  width: 100%;
+  height: 0;
+  margin: 0;
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.soul-pw__footer {
+  padding: 24px 0 8px;
+  text-align: center;
+}
+
+.soul-pw__footer p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--pw-text-soft);
+}
+
+.soul-pw__footer a {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Desktop — two-column offer + social/FAQ (mobile unchanged) */
+@media (min-width: 900px) {
+  .soul-pw__content {
+    max-width: 1100px;
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    padding: clamp(24px, 4vh, 40px) clamp(32px, 5vw, 56px);
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: minmax(320px, 1fr) minmax(340px, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas:
+      'brand brand'
+      'offer aside';
+    column-gap: clamp(40px, 5vw, 72px);
+    row-gap: clamp(12px, 2vh, 20px);
+    align-items: stretch;
+  }
+
+  .soul-pw__header {
+    grid-area: brand;
+    margin-bottom: 0;
+  }
+
+  .soul-pw__offer {
+    grid-area: offer;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-right: 8px;
+    gap: 0;
+    justify-content: flex-start;
+  }
+
+  .soul-pw__aside {
+    grid-area: aside;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-right: 8px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .soul-pw__title {
+    max-width: none;
+    font-size: clamp(30px, 3vw, 40px);
+    line-height: 1.15;
+    letter-spacing: -1.4px;
+  }
+
+  .soul-pw__hero {
+    margin-bottom: 20px;
+  }
+
+  .soul-pw__card {
+    max-width: none;
+  }
+
+  .soul-pw__cta {
+    align-items: stretch;
+  }
+
+  .soul-pw__cta-sub {
+    text-align: left;
+  }
+
+  .soul-pw__social {
+    align-items: stretch;
+    padding-top: 0;
+  }
+
+  .soul-pw__quote--active {
+    width: 100%;
+    max-width: none;
+  }
+
+  .soul-pw__stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 20px 0;
+  }
+
+  .soul-pw__stat {
+    padding: 14px 10px;
+  }
+
+  .soul-pw__stat-value {
+    font-size: clamp(22px, 2vw, 28px);
+  }
+
+  .soul-pw__faq-title {
+    text-align: left;
+    font-size: clamp(24px, 2.4vw, 30px);
+  }
+
+  .soul-pw__footer {
+    text-align: left;
+    margin-top: auto;
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "routes": [
+    {
+      "route": "/assets/*",
+      "headers": {
+        "cache-control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "route": "/api-docs",
+      "rewrite": "/api-docs/index.html"
+    },
+    {
+      "route": "/openapi.yaml",
+      "headers": {
+        "content-type": "application/yaml"
+      }
+    },
+    {
+      "route": "/*",
+      "serve": "/index.html",
+      "statusCode": 200
+    }
+  ],
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/assets/*", "/api-docs/*", "/openapi.yaml", "/*.{css,scss,js,png,gif,ico,jpg,svg,yaml,yml}"]
+  },
+  "mimeTypes": {
+    ".json": "application/json"
+  }
+}

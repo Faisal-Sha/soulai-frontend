@@ -1,0 +1,772 @@
+/* Home — Figma DEV 625:1573 (+ Day one / trial / loading shells)
+ * Progress: UI live. NEXT product screen: Readings list + “Your pattern” detail.
+ */
+
+@import '../../styles/soul-tokens.css';
+@import '../../components/soul/soul-ui.css';
+
+.soul-home {
+  --home-ui: var(--soul-font-ui);
+  --home-display: var(--soul-font-display);
+
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  background: #746c5e;
+  color: #fff;
+  font-family: var(--home-ui);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* Figma _background — full-bleed ripple (covers viewport; matches chat pattern) */
+.soul-home__bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  background: #746c5e;
+}
+
+.soul-home__bg-tile {
+  position: absolute;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+}
+
+.soul-home__bg-tile img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+
+.soul-home__bg-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.soul-home__bg-tile--1 {
+  top: 0;
+  height: 100%;
+}
+
+.soul-home__bg-tile--2 {
+  top: 52%;
+  height: 60%;
+}
+
+.soul-home__bg-tile--2 img {
+  transform: rotate(180deg) scaleX(-1);
+}
+
+.soul-home__bg-tile--3,
+.soul-home__bg-tile--4 {
+  display: none;
+}
+
+.soul-home__scrim {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: min(100dvh, 900px);
+  z-index: 1;
+  background: radial-gradient(
+    ellipse 100% 70% at 50% 38%,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0.22) 55%,
+    transparent 100%
+  );
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.soul-home__dock-scrim {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 133px;
+  z-index: 4;
+  background: linear-gradient(180deg, rgba(108, 91, 79, 0) 0%, #6c5b4f 100%);
+  pointer-events: none;
+}
+
+.soul-home__scroll {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 253, 250, 0.32) transparent;
+  scrollbar-gutter: stable;
+}
+
+.soul-home__scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.soul-home__scroll::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 12px 0;
+}
+
+.soul-home__scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 253, 250, 0.28);
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+.soul-home__scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 253, 250, 0.45);
+  background-clip: padding-box;
+}
+
+.soul-home__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: calc(20px + env(safe-area-inset-top, 0px)) 24px 12px;
+}
+
+.soul-home__header-nav {
+  display: none;
+}
+
+.soul-home__note {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px 24px 32px;
+}
+
+.soul-home__note-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.soul-home__eyebrow {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: rgba(241, 237, 229, 0.7);
+}
+
+.soul-home__headline {
+  margin: 0;
+  font-size: clamp(22px, 5.5vw, 24px);
+  font-weight: 500;
+  line-height: 1.33;
+  letter-spacing: -1.2px;
+  color: #fff;
+}
+
+.soul-home__sub {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 26px;
+  letter-spacing: -0.18px;
+  color: #f4efe6;
+}
+
+/* Note loading skeleton — Figma 625:3382 */
+.soul-home__skeleton {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  max-width: 342px;
+  padding-top: 0;
+}
+
+.soul-home__skeleton-bar {
+  display: block;
+  flex-shrink: 0;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.18);
+  animation: soul-home-pulse 1.35s ease-in-out infinite;
+}
+
+.soul-home__skeleton-bar--eyebrow {
+  width: 140px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.soul-home__skeleton-bar--h1 {
+  width: 100%;
+  height: 26px;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.soul-home__skeleton-bar--h2 {
+  width: min(300px, 88%);
+  height: 26px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.soul-home__skeleton-bar--h3 {
+  width: min(210px, 62%);
+  height: 26px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.soul-home__skeleton-label {
+  margin: 10px 0 0;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 18px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+@keyframes soul-home-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.soul-home__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.soul-home__action-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.soul-home__chapter {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: rgba(244, 239, 230, 0.45);
+}
+
+.soul-home__chapter button {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #f4efe6;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-position: from-font;
+  cursor: pointer;
+}
+
+/* Trial ending notice — Figma 694:2664 */
+.soul-home__trial {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 24px 0;
+  padding: 12px 16px;
+  box-sizing: border-box;
+  border-radius: 16px;
+  background: rgba(47, 44, 37, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.soul-home__trial-copy {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.soul-home__trial-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  color: #fff;
+}
+
+.soul-home__trial-detail {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 18px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.soul-home__trial-manage {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+}
+
+.soul-home__trial-manage:hover {
+  text-decoration: underline;
+}
+
+.soul-home__shelf {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 0 24px 32px;
+}
+
+.soul-home__divider {
+  height: 1px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.28);
+  border: none;
+  margin: 0;
+}
+
+.soul-home__cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.soul-home__card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  min-height: 135px;
+  padding: 24px;
+  box-sizing: border-box;
+  border-radius: 24px;
+  background: #e9e5e1;
+  border: 1px solid #fff;
+  box-shadow: 0 24px 48px rgba(48, 40, 32, 0.15);
+  color: #3a362e;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  font: inherit;
+}
+
+.soul-home__card:hover,
+.soul-home__card:focus-visible {
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.soul-home__card-body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: flex-start;
+  flex: 1;
+  min-width: 0;
+  max-width: calc(100% - 100px);
+}
+
+.soul-home__card-title {
+  margin: 0;
+  font-family: var(--home-display);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 27px;
+  letter-spacing: -0.2px;
+  color: #3a362e;
+}
+
+.soul-home__card-meta {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: #777169;
+}
+
+.soul-home__progress {
+  width: 128px;
+  height: 4px;
+  border-radius: 2px;
+  background: #c8c2b6;
+  overflow: hidden;
+}
+
+.soul-home__progress > span {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: #746c5e;
+}
+
+.soul-home__card-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 110px;
+  height: 110px;
+  pointer-events: none;
+}
+
+.soul-home__card-icon img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Figma 3d-icon: rotate-180 + -scale-y → faces left */
+  transform: rotate(180deg) scaleY(-1);
+  /* Soft contact shadow under the glass icon */
+  filter: drop-shadow(0 8px 5px rgba(48, 40, 32, 0.28))
+    drop-shadow(0 3px 2px rgba(48, 40, 32, 0.14));
+}
+
+.soul-home__install {
+  margin: 0 24px 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px;
+  box-sizing: border-box;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.24);
+  border: 1px solid #fff;
+  box-shadow: 0 24px 48px rgba(48, 40, 32, 0.15);
+  width: calc(100% - 48px);
+  text-align: left;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+}
+
+.soul-home__install-mark {
+  position: relative;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #666053 5%, #3a362e 100%);
+  box-shadow: inset 0.7px 0.7px 1px rgba(255, 255, 255, 0.7);
+}
+
+.soul-home__install-mark img {
+  width: 28px;
+  height: 28px;
+  display: block;
+}
+
+.soul-home__install-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.soul-home__install-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 22px;
+}
+
+.soul-home__install-sub {
+  margin: 2px 0 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.soul-home__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 0 24px 16px;
+}
+
+.soul-home__footer-tag {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.soul-home__footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+}
+
+.soul-home__footer-links a,
+.soul-home__footer-links button {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  line-height: 20px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.soul-home__footer-links a:hover,
+.soul-home__footer-links button:hover {
+  text-decoration: underline;
+}
+
+.soul-home__footer-email {
+  margin: 0;
+  color: #fff;
+  font-size: 14px;
+  line-height: 20px;
+  text-decoration: none;
+}
+
+.soul-home__footer-copy {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: rgba(241, 237, 229, 0.7);
+}
+
+.soul-home__nav {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  padding: 0 24px calc(12px + env(safe-area-inset-bottom, 0px));
+  pointer-events: none;
+}
+
+.soul-home__nav > * {
+  pointer-events: auto;
+}
+
+@media (min-width: 900px) {
+  .soul-home__scroll {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding-bottom: 24px;
+  }
+
+  .soul-home__header {
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    width: 100%;
+    max-width: none;
+    min-height: 72px;
+    padding: 16px clamp(28px, 4vw, 56px);
+    box-sizing: border-box;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(20, 16, 12, 0.22);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .soul-home__header-nav {
+    display: flex;
+    justify-content: flex-end;
+    flex: 1;
+  }
+
+  .soul-home__top-nav.soul-nav {
+    height: auto;
+    padding: 0;
+    border: none;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: none;
+    gap: 4px;
+  }
+
+  .soul-home__top-nav .soul-nav__item {
+    flex-direction: row;
+    width: auto;
+    min-height: 40px;
+    padding: 8px 16px;
+    gap: 8px;
+    border-radius: 999px;
+    font-size: 13px;
+    line-height: 1;
+    color: rgba(255, 253, 250, 0.72);
+  }
+
+  .soul-home__top-nav .soul-nav__item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+  }
+
+  .soul-home__top-nav .soul-nav__item img {
+    width: 18px;
+    height: 18px;
+    filter: brightness(0) invert(1);
+    opacity: 0.85;
+  }
+
+  .soul-home__top-nav .soul-nav__item:hover img,
+  .soul-home__top-nav .soul-nav__item--active img {
+    opacity: 1;
+  }
+
+  .soul-home__top-nav .soul-nav__item--active {
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+  }
+
+  .soul-home__nav--mobile,
+  .soul-home__dock-scrim {
+    display: none;
+  }
+
+  /* Full-bleed content — same gutters as header */
+  .soul-home__trial,
+  .soul-home__note,
+  .soul-home__shelf,
+  .soul-home__footer {
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+    box-sizing: border-box;
+    padding-left: clamp(28px, 4vw, 56px);
+    padding-right: clamp(28px, 4vw, 56px);
+  }
+
+  .soul-home__trial {
+    margin-top: 28px;
+    width: 100%;
+  }
+
+  .soul-home__note {
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+
+  .soul-home__headline {
+    font-size: clamp(28px, 2.6vw, 36px);
+    line-height: 1.25;
+    letter-spacing: -1.4px;
+    max-width: min(34ch, 100%);
+  }
+
+  .soul-home__sub {
+    font-size: 20px;
+    line-height: 30px;
+    max-width: min(48ch, 100%);
+  }
+
+  .soul-home__shelf {
+    padding-bottom: 40px;
+  }
+
+  .soul-home__cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(12px, 1.5vw, 20px);
+  }
+
+  .soul-home__card {
+    min-height: 210px;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 28px 24px 24px;
+  }
+
+  .soul-home__card-body {
+    max-width: none;
+    flex: 1;
+  }
+
+  .soul-home__card-icon {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    top: auto;
+    transform: none;
+    width: 96px;
+    height: 96px;
+    opacity: 0.95;
+  }
+
+  /* PWA / install — extra side inset vs shelf/footer */
+  .soul-home__install {
+    width: auto;
+    max-width: none;
+    margin: 0 clamp(48px, 8vw, 120px) 40px;
+    padding: 24px 28px;
+    box-sizing: border-box;
+  }
+
+  .soul-home__footer {
+    padding-bottom: 20px;
+  }
+
+  .soul-home__footer-links {
+    gap: 12px 28px;
+  }
+}
+
+/* Mid desktop: keep 3 cards if space; stack only when tight */
+@media (min-width: 900px) and (max-width: 999px) {
+  .soul-home__cards {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .soul-home__card {
+    min-height: 148px;
+    flex-direction: row;
+    align-items: center;
+    padding: 24px;
+  }
+
+  .soul-home__card-body {
+    max-width: calc(100% - 100px);
+  }
+
+  .soul-home__card-icon {
+    top: 50%;
+    bottom: auto;
+    right: 12px;
+    transform: translateY(-50%);
+    width: 110px;
+    height: 110px;
+  }
+}

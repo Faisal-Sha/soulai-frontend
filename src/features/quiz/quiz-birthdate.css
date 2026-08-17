@@ -1,0 +1,305 @@
+/* 02.3 · Quiz · Birthdate — Figma DEV 437:2852 */
+
+@import '../../styles/soul-tokens.css';
+@import './soul-field-input.css';
+
+.soul-bd {
+  --bd-text-white: var(--soul-text-white);
+  --bd-text-soft: var(--soul-text-soft);
+  --bd-ui: var(--soul-font-ui);
+
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  width: 100vw;
+  width: 100dvw;
+  height: 100%;
+  height: 100dvh;
+  background: #746c5e;
+  color: var(--bd-text-white);
+  font-family: var(--bd-ui);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+.soul-bd__bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.soul-bd__bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.soul-bd__bg-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.soul-bd__frame {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  max-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.soul-bd__scrim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 144% 67% at 50% 0%,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0.25) 59%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  opacity: 0.8;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.soul-bd__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-sizing: border-box;
+}
+
+.soul-bd__header {
+  display: flex;
+  align-items: center;
+  /* Figma Frame 58: 24 top + 20 brand + 24 bottom = 68 */
+  padding: 24px;
+  flex-shrink: 0;
+}
+
+.soul-bd__progress-wrap {
+  padding: 8px 24px;
+  flex-shrink: 0;
+}
+
+.soul-bd__progress-wrap .soul-progress__seg {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.soul-bd__progress-wrap .soul-progress__seg--on {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.soul-bd__progress-wrap .soul-progress__seg--on:nth-child(1),
+.soul-bd__progress-wrap .soul-progress__seg--on:nth-child(2) {
+  background: #fff;
+}
+
+.soul-bd__hero {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 28px 24px 40px;
+  flex-shrink: 0;
+}
+
+.soul-bd__title {
+  margin: 0;
+  font-family: var(--bd-ui);
+  font-weight: 500;
+  font-size: clamp(24px, 7vw, 28px);
+  line-height: 1.32;
+  letter-spacing: -1.12px;
+  color: var(--bd-text-white);
+}
+
+.soul-bd__subtitle {
+  margin: 0;
+  font-family: var(--bd-ui);
+  font-weight: 400;
+  font-size: clamp(14px, 4vw, 16px);
+  line-height: 1.375;
+  color: var(--bd-text-soft);
+}
+
+.soul-bd__form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 0 24px;
+  flex-shrink: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.soul-bd__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.soul-bd__label {
+  font-family: var(--bd-ui);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.soul-bd__input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 64px;
+  padding: 0 16px 0 28px;
+  border: 1px solid transparent;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.16);
+  box-sizing: border-box;
+}
+
+.soul-bd__input-wrap--invalid {
+  border-color: #e07a6a;
+}
+
+.soul-bd__input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--bd-text-white);
+  font-family: var(--bd-ui);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 22px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.soul-bd__input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.soul-bd__cal-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.soul-bd__cal-btn:hover,
+.soul-bd__cal-btn:focus-visible {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.soul-bd__native {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.soul-bd__error {
+  margin: -12px 0 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: #e07a6a;
+}
+
+.soul-bd__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+}
+
+.soul-bd__actions .soul-btn {
+  width: 100%;
+}
+
+.soul-bd__actions .soul-btn:disabled {
+  background: #4a453f;
+  color: #ada69d;
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+.soul-bd__privacy {
+  margin: 0;
+  font-family: var(--bd-ui);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--bd-text-soft);
+  text-align: center;
+  max-width: 342px;
+}
+
+.soul-bd__spacer {
+  flex: 1 1 auto;
+  min-height: 12px;
+}
+
+@media (max-height: 740px) {
+  .soul-bd__header {
+    padding: 16px 24px 24px;
+  }
+
+  .soul-bd__hero {
+    padding: 16px 24px 24px;
+    gap: 10px;
+  }
+
+  .soul-bd__input-wrap {
+    height: 56px;
+    padding-left: 20px;
+  }
+
+  .soul-bd__form {
+    gap: 16px;
+  }
+}
+
+@media (min-width: 900px) {
+  .soul-bd__content {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: clamp(24px, 4vh, 40px) clamp(32px, 5vw, 56px);
+  }
+
+  .soul-bd__header,
+  .soul-bd__progress-wrap,
+  .soul-bd__hero,
+  .soul-bd__form {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}

@@ -1,0 +1,34 @@
+project_id = "prlbfqczucqqvrvxxxfs"
+
+[functions.generate-insights]
+verify_jwt = false
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.quiz-lead]
+verify_jwt = false
+
+[functions.create-checkout-session]
+verify_jwt = false
+
+[functions.generate-reading]
+verify_jwt = false
+
+[functions.generate-pdf]
+verify_jwt = false
+
+[functions.download-pdf]
+verify_jwt = false
+
+[functions.upsell-b]
+verify_jwt = false
+
+[functions.upsell-check]
+verify_jwt = false
+
+[functions.upsell-compatibility]
+verify_jwt = false
+
+[functions.generate-compatibility-report]
+verify_jwt = true

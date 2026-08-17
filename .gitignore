@@ -1,0 +1,45 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+.env
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.zip
+Destiny docs
+Energy Docs
+
+meeting.notes.txt
+stripe email enabling.PNG
+resendAPI.txt
+backups/
+elevenlab api.txt
+Next quiz version
+.kiro
+soul-ai-rag-edgefunctions
+soulai_pricing_dark.html
+.env.development
+.env.production
+supabase token & link.txt
+soul-ai-rag-edge-functions/
+docs/
+python_destiny_matrix/
