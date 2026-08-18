@@ -28,18 +28,15 @@ dist-ssr
 Destiny docs
 Energy Docs
 
-meeting.notes.txt
-stripe email enabling.PNG
-resendAPI.txt
+# Local notes, keys, and scratch files (not committed)
+local-notes/
+
 backups/
-elevenlab api.txt
 Next quiz version
 .kiro
 soul-ai-rag-edgefunctions
-soulai_pricing_dark.html
 .env.development
 .env.production
-supabase token & link.txt
 soul-ai-rag-edge-functions/
 docs/
 python_destiny_matrix/
