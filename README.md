@@ -10,14 +10,15 @@ Transform raw time-series and user input data into actionable, personalized insi
 
 ```
 root
-├─ src/                 # React web UI layer (presentation + hooks)
+├─ src/                 # React web UI layer (presentation + hooks) — edit here
+├─ public/              # Static assets copied into dist as-is (images, favicon, hosting configs)
+├─ dist/                # Generated production build (do not edit; gitignored)
 ├─ packages/
 │  ├─ core/            # Pure business/domain logic (stateless, tested)
 │  ├─ data/            # API clients, persistence abstractions
 │  ├─ ai/              # Prompt templates, guardrails, evaluation harness
 │  └─ mobile-shared/   # (Planned) Cross-platform view models & adapters
 ├─ scripts/             # Operational scripts (e.g., data ingestion to Azure AI)
-├─ public/              # Static assets
 ├─ docs/                # Architecture, AI, mobile, security, roadmap
 ├─ .github/
 │  ├─ workflows/        # CI/CD (build, test, lint, security scans)
@@ -112,17 +113,35 @@ WHERE user_id = '<USER_UUID>';
 
 ```bash
 npm install
-npm run dev
-npm run typecheck
+npm run dev              # Local Vite dev server (uses src/, not dist/)
 npm run lint
 npm test
+npm run test:watch
 ```
+
+### Build Output (`dist/`)
+
+`dist/` is the **compiled production site**, not source code. Vite creates it when you run a build command. Hosting (Azure Static Web Apps, nginx, etc.) serves this folder.
+
+| Command | Result |
+|---|---|
+| `npm run build` | Production build → `dist/` |
+| `npm run build:azure` | Production build for Azure |
+| `npm run build:dev` | Development-mode build → `dist/` |
+| `npm run preview` | Serves the existing `dist/` locally |
+
+Typical contents after a build:
+
+- `index.html` — entry page that loads hashed JS/CSS
+- `assets/` — minified bundles (main app + code-split chunks such as QuizPage)
+- Static files copied from `public/` (images, favicon, `robots.txt`, `openapi.yaml`, `web.config`, `staticwebapp.config.json`)
+- `api-docs/` — Swagger UI
+
+`dist/` is listed in `.gitignore` and must not be committed. Delete it anytime; `npm run build` recreates it. Do not edit files inside `dist/` — change `src/` or `public/` instead.
 
 ### Suggested Scripts (Planned)
 
 ```bash
-npm run build            # Production build
-npm run test:watch       # Watch mode tests
 npm run coverage         # Coverage report
 npm run e2e:mobile       # Detox (future)
 npm run ai:evaluate      # AI prompt regression suite (future)
