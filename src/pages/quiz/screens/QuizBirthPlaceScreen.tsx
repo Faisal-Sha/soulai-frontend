@@ -1,25 +1,37 @@
 import { useEffect, useRef, useState } from 'react'
 import { SoulBrand, SoulButton, SoulProgress } from '@/components/soul'
-import { BIRTH_PLACE_OPTIONS } from '@/lib/birthPlaces'
+import { useCitySearch } from '../hooks/useCitySearch'
+import { getCityDisplayMeta, type CitySearchResult } from '../services/citySearch'
+import type { BirthPlaceData } from '../types'
 import '../quiz-birthplace.css'
 import bgBirthPlace from '../assets/onboarding/bg-birthplace.png'
 
-const PLACE_OPTIONS = BIRTH_PLACE_OPTIONS
-
 interface QuizBirthPlaceScreenProps {
   value: string | undefined
-  onChange: (v: string) => void
+  onPlaceChange: (label: string, place: BirthPlaceData | null) => void
   onContinue: () => void
   canProceed: boolean
 }
 
+function toBirthPlaceData(result: CitySearchResult): BirthPlaceData {
+  return {
+    label: result.label,
+    city: result.city,
+    country: result.country,
+    countryCode: result.countryCode,
+    state: result.state,
+    latitude: result.latitude,
+    longitude: result.longitude,
+  }
+}
+
 /**
  * Figma DEV · 02.3 · Quiz · Place of birth (node 437:2940)
- * Combobox — pick from the list or type any place.
+ * Combobox — Photon city search as you type, or enter any place manually.
  */
 export default function QuizBirthPlaceScreen({
   value = '',
-  onChange,
+  onPlaceChange,
   onContinue,
   canProceed,
 }: QuizBirthPlaceScreenProps) {
@@ -29,12 +41,11 @@ export default function QuizBirthPlaceScreen({
 
   const query = value.trim()
   const queryLower = query.toLowerCase()
-  const filtered = PLACE_OPTIONS.filter((p) =>
-    !queryLower || p.toLowerCase().includes(queryLower),
-  )
-  const exactMatch = PLACE_OPTIONS.some((p) => p.toLowerCase() === queryLower)
+  const { results, loading, error } = useCitySearch(query)
+
+  const exactMatch = results.some((r) => r.label.toLowerCase() === queryLower)
   const showCustom = query.length >= 2 && !exactMatch
-  const showList = open && (filtered.length > 0 || showCustom)
+  const showList = open && (loading || error || results.length > 0 || showCustom)
 
   useEffect(() => {
     const t = window.setTimeout(() => inputRef.current?.focus(), 120)
@@ -49,8 +60,8 @@ export default function QuizBirthPlaceScreen({
     return () => document.removeEventListener('mousedown', onDoc)
   }, [])
 
-  const pick = (place: string) => {
-    onChange(place)
+  const pick = (label: string, place: BirthPlaceData | null) => {
+    onPlaceChange(label, place)
     setOpen(false)
   }
 
@@ -100,7 +111,7 @@ export default function QuizBirthPlaceScreen({
                   placeholder="City, Country"
                   value={value}
                   onChange={(e) => {
-                    onChange(e.target.value)
+                    onPlaceChange(e.target.value, null)
                     setOpen(true)
                   }}
                   onFocus={() => setOpen(true)}
@@ -132,30 +143,47 @@ export default function QuizBirthPlaceScreen({
 
               {showList && (
                 <ul id="soul-bp-list" className="soul-bp__list" role="listbox">
+                  {loading && query.length >= 2 && (
+                    <li className="soul-bp__list-status" aria-live="polite">
+                      Searching…
+                    </li>
+                  )}
+                  {error && !loading && (
+                    <li className="soul-bp__list-status soul-bp__list-status--error">
+                      Could not load cities. Type your place manually.
+                    </li>
+                  )}
                   {showCustom && (
                     <li role="option" aria-selected={false}>
                       <button
                         type="button"
                         className="soul-bp__option soul-bp__option--custom"
                         onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => pick(query)}
+                        onClick={() => pick(query, null)}
                       >
                         Use &ldquo;{query}&rdquo;
                       </button>
                     </li>
                   )}
-                  {filtered.slice(0, 40).map((opt) => (
-                    <li key={opt} role="option" aria-selected={opt === value}>
-                      <button
-                        type="button"
-                        className="soul-bp__option"
-                        onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => pick(opt)}
-                      >
-                        {opt}
-                      </button>
-                    </li>
-                  ))}
+                  {results.map((opt) => {
+                    const meta = getCityDisplayMeta(opt)
+                    const key = `${opt.latitude}-${opt.longitude}-${opt.city}`
+                    return (
+                      <li key={key} role="option" aria-selected={opt.label === value}>
+                        <button
+                          type="button"
+                          className="soul-bp__option"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => pick(opt.label, toBirthPlaceData(opt))}
+                        >
+                          <span className="soul-bp__option-label">{opt.city}</span>
+                          {meta ? (
+                            <span className="soul-bp__option-meta">{meta}</span>
+                          ) : null}
+                        </button>
+                      </li>
+                    )
+                  })}
                 </ul>
               )}
             </div>

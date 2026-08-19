@@ -289,7 +289,7 @@ export default function QuizShell() {
       return (
         <QuizBirthPlaceScreen
           value={typeof answers['birth-place'] === 'string' ? answers['birth-place'] : undefined}
-          onChange={v => engine.setAnswer('birth-place', v)}
+          onPlaceChange={engine.setBirthPlace}
           onContinue={handleContinue}
           canProceed={engine.canProceed()}
         />
@@ -443,7 +443,7 @@ export default function QuizShell() {
           return (
             <QuizBirthPlaceScreen
               value={typeof answers['birth-place'] === 'string' ? answers['birth-place'] : undefined}
-              onChange={v => engine.setAnswer('birth-place', v)}
+              onPlaceChange={engine.setBirthPlace}
               onContinue={handleContinue}
               canProceed={engine.canProceed()}
             />

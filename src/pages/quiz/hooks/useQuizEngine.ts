@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { QUIZ_FLOW, QUESTION_TYPES } from '../data/quizFlow'
 import { readFunnelState, patchFunnelState } from '../lib/funnelAnalytics'
 import { isValidBirthdate } from '../lib/dateValidation'
-import type { QuizAnswers, QuizAnswerValue, QuizScreen } from '../types'
+import type { QuizAnswers, QuizAnswerValue, QuizScreen, BirthPlaceData } from '../types'
 
 const LS_STATE = 'soul_v7_state' // bumped: FigJam frontend remap (email before analyzing + new steps)
 const LS_IDX_LEGACY = 'soul-idx'
@@ -166,6 +166,16 @@ export function useQuizEngine() {
     })
   }, [])
 
+  const setBirthPlace = useCallback((label: string, place: BirthPlaceData | null) => {
+    setAnswers(prev => {
+      const next: QuizAnswers = { ...prev, 'birth-place': label }
+      if (place) next['birth-place-data'] = place
+      else delete next['birth-place-data']
+      answersRef.current = next
+      return next
+    })
+  }, [])
+
   const checkCanProceed = useCallback(() => {
     return canProceed(screen, answers)
   }, [screen, answers])
@@ -190,6 +200,7 @@ export function useQuizEngine() {
     questionIndex,
     totalQuestions,
     setAnswer,
+    setBirthPlace,
     goNext,
     goBack,
     goToIndex,

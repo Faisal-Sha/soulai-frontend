@@ -92,10 +92,22 @@ export interface QuizAnswers {
   'birth-time-known'?: string
   'birth-time'?: string
   'birth-place'?: string
+  /** Structured place from Photon when user picks a suggestion */
+  'birth-place-data'?: BirthPlaceData
   ready?: string
   name?: string
   email?: string
   'portrait-color'?: string
+}
+
+export interface BirthPlaceData {
+  label: string
+  city: string
+  country?: string
+  countryCode?: string
+  state?: string
+  latitude: number
+  longitude: number
 }
 
 export type QuizAnswerValue =
@@ -103,6 +115,7 @@ export type QuizAnswerValue =
   | string[]
   | number
   | boolean
+  | BirthPlaceData
   | { day: string; month: string; year: string }
   | undefined
 

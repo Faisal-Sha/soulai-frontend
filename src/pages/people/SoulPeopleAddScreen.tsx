@@ -4,7 +4,8 @@ import { SoulBrand, SoulButton, SoulField } from '@/components/soul'
 import iconCalendar from '@/components/soul/assets/icon-calendar.svg'
 import iconClock from '@/components/soul/assets/icon-clock.svg'
 import iconChevronDown from '@/components/soul/assets/icon-chevron-down.svg'
-import { BIRTH_PLACE_OPTIONS } from '@/lib/birthPlaces'
+import { useCitySearch } from '@/pages/quiz/hooks/useCitySearch'
+import { getCityDisplayMeta } from '@/pages/quiz/services/citySearch'
 import {
   isValidBirthdate,
   type BirthdateValue,
@@ -94,12 +95,10 @@ export function SoulPeopleAddScreen() {
 
   const query = place.trim()
   const queryLower = query.toLowerCase()
-  const filtered = BIRTH_PLACE_OPTIONS.filter(
-    (p) => !queryLower || p.toLowerCase().includes(queryLower),
-  )
-  const exactMatch = BIRTH_PLACE_OPTIONS.some((p) => p.toLowerCase() === queryLower)
+  const { results: cityResults, loading: cityLoading, error: cityError } = useCitySearch(query)
+  const exactMatch = cityResults.some((r) => r.label.toLowerCase() === queryLower)
   const showCustom = query.length >= 2 && !exactMatch
-  const showPlaceList = placeOpen && (filtered.length > 0 || showCustom)
+  const showPlaceList = placeOpen && (cityLoading || cityError || cityResults.length > 0 || showCustom)
 
   const canSubmit =
     name.trim().length > 0 && dobValid && !timeInvalid
@@ -381,6 +380,12 @@ export function SoulPeopleAddScreen() {
                   className="soul-people__place-list"
                   role="listbox"
                 >
+                  {cityLoading && query.length >= 2 && (
+                    <li className="soul-people__place-status">Searching…</li>
+                  )}
+                  {cityError && !cityLoading && (
+                    <li className="soul-people__place-status">Could not load cities. Type manually.</li>
+                  )}
                   {showCustom && (
                     <li role="option" aria-selected={false}>
                       <button
@@ -393,18 +398,27 @@ export function SoulPeopleAddScreen() {
                       </button>
                     </li>
                   )}
-                  {filtered.slice(0, 40).map((opt) => (
-                    <li key={opt} role="option" aria-selected={opt === place}>
-                      <button
-                        type="button"
-                        className="soul-people__place-option"
-                        onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => pickPlace(opt)}
-                      >
-                        {opt}
-                      </button>
-                    </li>
-                  ))}
+                  {cityResults.map((opt) => {
+                    const meta = getCityDisplayMeta(opt)
+                    const key = `${opt.latitude}-${opt.longitude}-${opt.city}`
+                    return (
+                      <li key={key} role="option" aria-selected={opt.label === place}>
+                        <button
+                          type="button"
+                          className="soul-people__place-option"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => pickPlace(opt.label)}
+                        >
+                          <span>{opt.city}</span>
+                          {meta && (
+                            <span style={{ opacity: 0.6, fontSize: '13px', marginLeft: 6 }}>
+                              {meta}
+                            </span>
+                          )}
+                        </button>
+                      </li>
+                    )
+                  })}
                 </ul>
               )}
             </div>
