@@ -1,6 +1,5 @@
 import { createRoot } from "react-dom/client";
 import { registerSW } from "virtual:pwa-register";
-import { LanguageProvider } from "@/contexts/LanguageContext";
 import { initMetaPixel } from "@/features/quiz/lib/metaPixel";
 import App from "./App.tsx";
 import "./index.css";
@@ -10,8 +9,4 @@ initMetaPixel();
 
 registerSW({ immediate: true });
 
-createRoot(document.getElementById("root")!).render(
-  <LanguageProvider>
-    <App />
-  </LanguageProvider>
-);
+createRoot(document.getElementById("root")!).render(<App />);
