@@ -10,7 +10,7 @@ import {
   trackCheckoutStarted,
   trackPaywallPaymentFailed,
   trackPaywallPaymentInfoAdded,
-} from '@/features/quiz/lib/funnelAnalytics'
+} from '@/pages/quiz/lib/funnelAnalytics'
 
 /** Canonical Stripe SKU for the single-plan offer (issue #31) */
 export const SINGLE_PLAN_STRIPE_ID = 'full_access_7day'

@@ -3,8 +3,6 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { useUser } from '@/hooks/useUser'
-import { features } from '@/config/features'
-import { PageLoader } from '@/components/LoadingSpinner'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,20 +24,20 @@ import {
   type AgentThread,
 } from '@/lib/soulAgentApi'
 import { toast } from 'sonner'
-import '../features/agent/agent-chat.css'
-import bgChat from '../features/agent/assets/bg-chat.png'
-import orbChat from '../features/agent/assets/orb-chat.png'
-import iconMenu from '../features/agent/assets/icon-menu.svg'
-import iconSave from '../features/agent/assets/icon-save.svg'
-import iconSaved from '../features/agent/assets/icon-saved.svg'
-import iconChapter from '../features/agent/assets/icon-chapter.svg'
-import iconCopy from '../features/agent/assets/icon-copy.svg'
-import iconBack from '../features/agent/assets/icon-back.svg'
-import iconNewChat from '../features/agent/assets/icon-new-chat.svg'
-import iconChevron from '../features/agent/assets/icon-chevron.svg'
-import iconCheck from '../features/agent/assets/icon-check.svg'
-import iconRetry from '../features/agent/assets/icon-retry.svg'
-import { TopUpSheet, TopUpSuccessPill, type TopUpSheetMode } from '../features/agent/TopUpSheet'
+import './agent-chat.css'
+import bgChat from './assets/bg-chat.png'
+import orbChat from './assets/orb-chat.png'
+import iconMenu from './assets/icon-menu.svg'
+import iconSave from './assets/icon-save.svg'
+import iconSaved from './assets/icon-saved.svg'
+import iconChapter from './assets/icon-chapter.svg'
+import iconCopy from './assets/icon-copy.svg'
+import iconBack from './assets/icon-back.svg'
+import iconNewChat from './assets/icon-new-chat.svg'
+import iconChevron from './assets/icon-chevron.svg'
+import iconCheck from './assets/icon-check.svg'
+import iconRetry from './assets/icon-retry.svg'
+import { TopUpSheet, TopUpSuccessPill, type TopUpSheetMode } from './TopUpSheet'
 
 const DESKTOP_MQ = '(min-width: 900px)'
 const SUGGESTIONS = ['Money this year', 'Why do I pull away?', 'What am I avoiding?'] as const
@@ -263,8 +261,8 @@ function MessageActions({ content }: { content: string }) {
  * Wired: threads, history, send, delete. Top-up / limits = UI shell for now.
  */
 export default function AgentPage() {
-  const { user, subscription, isPremium, loading } = useUser()
-  const previewMode = !features.auth
+  const { user, subscription, isPremium } = useUser()
+  const previewMode = true
   const userId = user?.id
   const navigate = useNavigate()
   const location = useLocation()
@@ -662,9 +660,7 @@ export default function AgentPage() {
     else if (tab === 'profile') navigate('/account')
   }
 
-  if (features.auth && (loading || !userId)) {
-    return <PageLoader />
-  }
+  // V2 is open — no auth gate until login ships.
 
   const showWelcome = messages !== null && messages.length === 0 && !thinking
   const lastAssistantIdx =

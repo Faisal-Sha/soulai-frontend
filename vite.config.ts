@@ -120,12 +120,14 @@ export default defineConfig(() => ({
     }),
   ].filter(Boolean),
   resolve: {
-    alias: {
-      "@": path.resolve(import.meta.dirname, "./src"),
-    },
+    alias: [
+      { find: '@/features', replacement: path.resolve(import.meta.dirname, './src/pages') },
+      { find: '@', replacement: path.resolve(import.meta.dirname, './src') },
+    ],
   },
   test: {
     globals: true,
     environment: "jsdom",
+    exclude: ["**/node_modules/**", "**/dist/**", "src/legacy/**"],
   },
 }));

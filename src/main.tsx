@@ -1,6 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { registerSW } from "virtual:pwa-register";
-import { initMetaPixel } from "@/features/quiz/lib/metaPixel";
+import { initMetaPixel } from "@/pages/quiz/lib/metaPixel";
 import App from "./App.tsx";
 import "./index.css";
 

@@ -8,7 +8,7 @@ import { BIRTH_PLACE_OPTIONS } from '@/lib/birthPlaces'
 import {
   isValidBirthdate,
   type BirthdateValue,
-} from '@/features/quiz/lib/dateValidation'
+} from '@/pages/quiz/lib/dateValidation'
 import './soul-people.css'
 import bgRipple from '../home/assets/bg-ripple.png'
 import iconChevron from './assets/icon-chevron.svg'
