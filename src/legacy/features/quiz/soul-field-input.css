@@ -1,0 +1,82 @@
+/* Shared SOUL field input polish — caret + selection (no harsh black focus bar) */
+
+.soul-field-input,
+.soul-qn__input,
+.soul-bd__input,
+.soul-bt__input,
+.soul-bp__input,
+.soul-em__input {
+  caret-color: #fffdfa;
+  color-scheme: dark;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.soul-field-input::selection,
+.soul-qn__input::selection,
+.soul-bd__input::selection,
+.soul-bt__input::selection,
+.soul-bp__input::selection,
+.soul-em__input::selection {
+  background: rgba(233, 196, 106, 0.45);
+  color: #fffdfa;
+}
+
+.soul-field-input::-moz-selection,
+.soul-qn__input::-moz-selection,
+.soul-bd__input::-moz-selection,
+.soul-bt__input::-moz-selection,
+.soul-bp__input::-moz-selection,
+.soul-em__input::-moz-selection {
+  background: rgba(233, 196, 106, 0.45);
+  color: #fffdfa;
+}
+
+.soul-field-input:focus,
+.soul-field-input:focus-visible,
+.soul-qn__input:focus,
+.soul-qn__input:focus-visible,
+.soul-bd__input:focus,
+.soul-bd__input:focus-visible,
+.soul-bt__input:focus,
+.soul-bt__input:focus-visible,
+.soul-bp__input:focus,
+.soul-bp__input:focus-visible,
+.soul-em__input:focus,
+.soul-em__input:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: transparent;
+}
+
+.soul-bd__input-wrap:focus-within,
+.soul-bt__input-wrap:focus-within,
+.soul-bp__input-wrap:focus-within,
+.soul-em__input-wrap:focus-within {
+  box-shadow: none;
+  outline: none;
+}
+
+/* Kill Windows/Chrome autofill black/yellow slabs */
+.soul-field-input:-webkit-autofill,
+.soul-field-input:-webkit-autofill:hover,
+.soul-field-input:-webkit-autofill:focus,
+.soul-qn__input:-webkit-autofill,
+.soul-qn__input:-webkit-autofill:hover,
+.soul-qn__input:-webkit-autofill:focus,
+.soul-bd__input:-webkit-autofill,
+.soul-bd__input:-webkit-autofill:hover,
+.soul-bd__input:-webkit-autofill:focus,
+.soul-bt__input:-webkit-autofill,
+.soul-bt__input:-webkit-autofill:hover,
+.soul-bt__input:-webkit-autofill:focus,
+.soul-bp__input:-webkit-autofill,
+.soul-bp__input:-webkit-autofill:hover,
+.soul-bp__input:-webkit-autofill:focus,
+.soul-em__input:-webkit-autofill,
+.soul-em__input:-webkit-autofill:hover,
+.soul-em__input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #fffdfa;
+  caret-color: #fffdfa;
+  box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.16) inset;
+  transition: background-color 99999s ease-out;
+}

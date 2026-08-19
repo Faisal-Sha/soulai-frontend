@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { useUser } from '@/hooks/useUser'
+import { features } from '@/config/features'
 import { PageLoader } from '@/components/LoadingSpinner'
 import {
   AlertDialog,
@@ -263,12 +264,13 @@ function MessageActions({ content }: { content: string }) {
  */
 export default function AgentPage() {
   const { user, subscription, isPremium, loading } = useUser()
+  const previewMode = !features.auth
   const userId = user?.id
   const navigate = useNavigate()
   const location = useLocation()
   const [searchParams] = useSearchParams()
   const navSeed = seedFromNavState(location.state)
-  const openFreshChat = wantsNewChatFromNav(location.state)
+  const openFreshChat = wantsNewChatFromNav(location.state) || previewMode
 
   const [threads, setThreads] = useState<AgentThread[]>([])
   const [currentThreadId, setCurrentThreadId] = useState<string | null>(() =>
@@ -657,10 +659,10 @@ export default function AgentPage() {
     if (tab === 'home') navigate('/')
     else if (tab === 'readings') navigate('/readings')
     else if (tab === 'people') navigate('/people')
-    else if (tab === 'profile') navigate('/profile')
+    else if (tab === 'profile') navigate('/account')
   }
 
-  if (loading || !userId) {
+  if (features.auth && (loading || !userId)) {
     return <PageLoader />
   }
 
@@ -885,7 +887,7 @@ export default function AgentPage() {
                     description: 'Billing resume flow comes next — not wired yet.',
                   })
                 }
-                onOpenProfile={() => navigate('/profile')}
+                onOpenProfile={() => navigate('/account')}
               />
             ) : null}
 

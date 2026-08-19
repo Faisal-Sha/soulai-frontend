@@ -1,0 +1,139 @@
+/**
+ * SOUL+AI design tokens — sourced from Figma WEB-APP (DEV)
+ * fileKey: Er6qBY73Oy3mlqcxNv5CNB
+ *
+ * Use on .quiz-shell / .soul-ob (and optionally :root via index.css HSL mirrors).
+ * Prefer these names for new screens; quiz-* aliases keep existing components working.
+ */
+
+:root,
+.soul-tokens {
+  /* ── Color · surfaces ── */
+  --soul-bg-screen: #fdfcfc;
+  --soul-bg-primary: #746c5e;
+  --soul-bg-base: #aca497;
+  --soul-bg-chat: #aca497;
+  --soul-bg-light: #c8c2b6;
+
+  /* ── Color · text ── */
+  --soul-text-primary: #3a362e;
+  --soul-text-secondary: #777169;
+  --soul-text-muted: #777169;
+  --soul-text-placeholder: #8a847a;
+  --soul-text-link-pressed: #777169;
+  --soul-text-white: #ffffff;
+  --soul-text-soft: #f1ede5;
+  --soul-text-on-dark: #ffffff;
+  --soul-text-on-dark-secondary: #ffffffcc;
+  --soul-text-on-dark-tertiary: #f1ede5b2;
+  --soul-text-on-dark-muted: #f4efe6;
+  --soul-text-on-dark-footer: #f1ede5cc;
+  --soul-brand-logo: #fffdfa;
+
+  /* ── Color · buttons ── */
+  --soul-button-primary: #26221c;
+  --soul-button-primary-hover: #1c1b1a;
+  --soul-button-primary-pressed: #3a362e;
+  --soul-button-primary-disabled: #4a453f;
+  --soul-button-primary-disabled-text: #ada69d;
+  --soul-button-secondary: #f1ede5;
+  --soul-button-secondary-pressed: #e4dacb;
+  --soul-button-outline-border: #e3e1df;
+  --soul-button-outline-hover: #f7f6f4;
+  --soul-button-outline-pressed: #efedea;
+  --soul-button-outline-disabled-text: #a59f97;
+  --soul-button-error: #ff3b30;
+  --soul-shadow-button-hover: 0 6px 20px rgba(0, 0, 0, 0.12);
+
+  /* ── Color · status ── */
+  --soul-error: #e54040;
+  --soul-error-text: #f25959;
+  --soul-success: #40cc73;
+
+  /* ── Color · input (Components · Input Field) ── */
+  --soul-input-bg: rgba(0, 0, 0, 0.16);
+  --soul-input-bg-hover: rgba(0, 0, 0, 0.2);
+  --soul-input-bg-focus: rgba(0, 0, 0, 0.16);
+  --soul-input-bg-disabled: rgba(0, 0, 0, 0.08);
+  --soul-input-bg-readonly: rgba(0, 0, 0, 0.1);
+  --soul-input-border: rgba(255, 255, 255, 0);
+  --soul-input-border-hover: rgba(255, 255, 255, 0.2);
+  --soul-input-border-focus: rgba(255, 255, 255, 0.35);
+  --soul-input-border-error: #e54040;
+  --soul-input-border-success: #40cc73;
+  --soul-input-fg: rgba(255, 255, 255, 0.95);
+  --soul-input-placeholder: rgba(255, 255, 255, 0.7);
+  --soul-input-disabled: rgba(255, 255, 255, 0.38);
+  --soul-input-label: rgba(255, 255, 255, 0.8);
+  --soul-input-icon: rgba(255, 255, 255, 0.6);
+  --soul-input-radius: 16px;
+  --soul-input-height-md: 56px;
+  --soul-input-height-lg: 64px;
+  --soul-shadow-input-focus: 0 0 6px 2px rgba(255, 255, 255, 0.4);
+
+  /* ── Color · icons ── */
+  --soul-icon-primary: #3a362e;
+  --soul-icon-on-dark: #ffffff;
+  --soul-icon-inactive: #736e66;
+
+  /* ── Color · stroke ── */
+  --soul-stroke-default: #e4dacb;
+  --soul-stroke-subtle: #f5efe6;
+  --soul-stroke-accent: #a79b8c;
+  --soul-stroke-on-dark: #ffffff59;
+  --soul-border-frost: #ffffff59;
+
+  /* ── Color · cards / glass ── */
+  --soul-card-solid: #e9e5e1;
+  --soul-card-frost: #ffffff3d;
+  --soul-card-frost-border: #ffffff47;
+  --soul-composer-fill: #fffffff2;
+  --soul-nav-fill: #faf8f48c;
+  --soul-nav-stroke: #ffffff99;
+  --soul-overlay-ripple: #0000001a;
+
+  /* ── Color · accent / progress ── */
+  --soul-accent-gold: #e9c46a;
+  --soul-progress-fill: #c8c2b6;
+  --soul-progress-active: #1c1b1a;
+  --soul-progress-inactive: #e3e1df;
+
+  /* ── Typography families ── */
+  --soul-font-ui: 'Inter', system-ui, sans-serif;
+  --soul-font-display: 'Fraunces', Georgia, serif;
+
+  /* ── Type scale (SOUL+AI styles) ── */
+  --soul-type-brand-size: 14px;
+  --soul-type-brand-weight: 300;
+  --soul-type-brand-tracking: 2px;
+  --soul-type-heading-size: 24px;
+  --soul-type-heading-weight: 500;
+  --soul-type-heading-line: 32px;
+  --soul-type-heading-tracking: -1.2px;
+  --soul-type-title-size: 20px;
+  --soul-type-title-weight: 400;
+  --soul-type-title-line: 27px;
+  --soul-type-body-size: 14px;
+  --soul-type-body-line: 20px;
+  --soul-type-body-lg-size: 18px;
+  --soul-type-body-lg-line: 26px;
+  --soul-type-label-size: 15px;
+  --soul-type-button-size: 16px;
+  --soul-type-button-line: 22px;
+  --soul-type-tab-size: 10px;
+
+  /* ── Radii / elevation ── */
+  --soul-radius-sm: 10px;
+  --soul-radius-md: 16px;
+  --soul-radius-lg: 20px;
+  --soul-radius-xl: 24px;
+  --soul-radius-pill: 9999px;
+  --soul-shadow-card: 0 24px 48px rgba(48, 40, 32, 0.15);
+  --soul-shadow-nav: 0 10px 30px rgba(47, 44, 37, 0.16);
+  --soul-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* ── Layout ── */
+  --soul-mobile-width: 390px;
+  --soul-content-pad: 24px;
+  --soul-cta-height: 56px;
+}

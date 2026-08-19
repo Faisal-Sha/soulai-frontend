@@ -1,0 +1,391 @@
+/* 02.3 · Quiz · Birth time (+ Clarification) — Figma DEV 437:2879 / 437:2906 */
+
+@import '../../styles/soul-tokens.css';
+@import './soul-field-input.css';
+
+.soul-bt {
+  --bt-text-white: var(--soul-text-white);
+  --bt-text-soft: var(--soul-text-soft);
+  --bt-ui: var(--soul-font-ui);
+
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  width: 100vw;
+  width: 100dvw;
+  height: 100%;
+  height: 100dvh;
+  background: #746c5e;
+  color: var(--bt-text-white);
+  font-family: var(--bt-ui);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+.soul-bt__bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.soul-bt__bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.soul-bt__bg-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.soul-bt__frame {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  max-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.soul-bt__scrim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 144% 67% at 50% 0%,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0.25) 59%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  opacity: 0.8;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.soul-bt__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-sizing: border-box;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 253, 250, 0.32) transparent;
+}
+
+.soul-bt__content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.soul-bt__content::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 16px 0;
+}
+
+.soul-bt__content::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 253, 250, 0.18) 0%,
+    rgba(255, 253, 250, 0.38) 50%,
+    rgba(255, 253, 250, 0.18) 100%
+  );
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.soul-bt__content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 253, 250, 0.5);
+}
+
+.soul-bt__header {
+  display: flex;
+  align-items: center;
+  /* Figma Frame 58: 24 top + 20 brand + 24 bottom = 68 */
+  padding: 24px;
+  flex-shrink: 0;
+}
+
+.soul-bt__progress-wrap {
+  padding: 8px 24px;
+  flex-shrink: 0;
+}
+
+.soul-bt__progress-wrap .soul-progress__seg {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.soul-bt__progress-wrap .soul-progress__seg--on {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.soul-bt__progress-wrap .soul-progress__seg--on:nth-child(-n + 3) {
+  background: #fff;
+}
+
+.soul-bt__hero {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 28px 24px 40px;
+  flex-shrink: 0;
+}
+
+.soul-bt__title {
+  margin: 0;
+  font-family: var(--bt-ui);
+  font-weight: 500;
+  font-size: clamp(24px, 7vw, 28px);
+  line-height: 1.32;
+  letter-spacing: -1.12px;
+  color: var(--bt-text-white);
+}
+
+.soul-bt__subtitle {
+  margin: 0;
+  font-family: var(--bt-ui);
+  font-weight: 400;
+  font-size: clamp(14px, 4vw, 16px);
+  line-height: 1.375;
+  color: var(--bt-text-soft);
+}
+
+.soul-bt__form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 0 24px;
+  flex-shrink: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.soul-bt__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.soul-bt__label {
+  font-family: var(--bt-ui);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.soul-bt__input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 64px;
+  padding: 0 16px 0 28px;
+  border: 1px solid transparent;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.16);
+  box-sizing: border-box;
+}
+
+.soul-bt__input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--bt-text-white);
+  font-family: var(--bt-ui);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 22px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.soul-bt__input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.soul-bt__clock-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.soul-bt__clock-btn:hover,
+.soul-bt__clock-btn:focus-visible {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.soul-bt__native {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.soul-bt__helper {
+  margin: 0;
+  font-family: var(--bt-ui);
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.soul-bt__certainty {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.soul-bt__certainty-title {
+  margin: 0;
+  font-family: var(--bt-ui);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 26px;
+  letter-spacing: -0.18px;
+  color: var(--bt-text-white);
+}
+
+.soul-bt__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.soul-bt__chip.soul-chip {
+  height: 44px;
+  padding: 10px 20px;
+  font-size: 16px;
+  line-height: 22px;
+  box-sizing: border-box;
+}
+
+.soul-bt__chip.soul-chip--selected,
+.soul-bt__chip.soul-chip[aria-pressed='true'] {
+  font-family: var(--soul-font-display);
+  font-size: 15px;
+  border-radius: 24px;
+  box-shadow: 0 24px 24px rgba(48, 40, 32, 0.15);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+}
+
+.soul-bt__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  width: 100%;
+  padding-top: 0;
+}
+
+.soul-bt__actions .soul-btn {
+  width: 100%;
+}
+
+.soul-bt__actions .soul-btn:disabled {
+  background: #4a453f;
+  color: #ada69d;
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+.soul-bt__skip {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--bt-ui);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 22px;
+  color: var(--bt-text-white);
+  text-decoration: underline;
+  text-underline-position: from-font;
+  cursor: pointer;
+}
+
+.soul-bt__privacy {
+  margin: 0;
+  font-family: var(--bt-ui);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--bt-text-soft);
+  text-align: center;
+  max-width: 342px;
+}
+
+.soul-bt__spacer {
+  flex: 1 1 auto;
+  min-height: 12px;
+}
+
+@media (max-height: 740px) {
+  .soul-bt__header {
+    padding: 16px 24px 24px;
+  }
+
+  .soul-bt__hero {
+    padding: 16px 24px 24px;
+    gap: 10px;
+  }
+
+  .soul-bt__input-wrap {
+    height: 56px;
+    padding-left: 20px;
+  }
+
+  .soul-bt__form {
+    gap: 16px;
+  }
+
+  .soul-bt__actions {
+    gap: 12px;
+  }
+}
+
+@media (min-width: 900px) {
+  .soul-bt__content {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: clamp(24px, 4vh, 40px) clamp(32px, 5vw, 56px);
+  }
+
+  .soul-bt__header,
+  .soul-bt__progress-wrap,
+  .soul-bt__hero,
+  .soul-bt__form {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}

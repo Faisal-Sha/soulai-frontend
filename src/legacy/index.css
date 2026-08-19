@@ -1,0 +1,156 @@
+@import './styles/soul-tokens.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    font-size: 18px;
+
+    --background: 240 20% 98%;
+    --foreground: 240 10% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 10%;
+
+    --primary: 36 16% 13%; /* Espresso #26221c — SOUL+AI button/primary */
+    --primary-foreground: 40 33% 98%;
+    --primary-glow: 40 11% 41%; /* #746c5e */
+
+    --secondary: 40 29% 92%; /* #f1ede5 */
+    --secondary-foreground: 40 12% 20%; /* #3a362e */
+
+    --muted: 40 14% 90%;
+    --muted-foreground: 40 6% 45%; /* #777169-ish */
+
+    --accent: 42 74% 66%; /* Gold #e9c46a */
+    --accent-foreground: 40 12% 20%;
+
+    --mystical: 40 11% 41%; /* Taupe #746c5e */
+    --mystical-foreground: 0 0% 100%;
+
+    --gold: 42 74% 66%; /* #e9c46a */
+    --gold-foreground: 40 12% 20%;
+    --gold-light: 42 70% 78%;
+    --gold-bronze: 36 40% 42%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 20% 98%;
+
+    --border: 36 22% 85%; /* #e4dacb-ish */
+    --input: 36 22% 85%;
+    --ring: 36 16% 13%;
+
+    --radius: 1rem;
+
+    --glass-bg: 0 0% 100% / 0.7;
+    --glass-border: 0 0% 100% / 0.5;
+
+    /* Glass Styles for Light Mode */
+    --glass-bg-style: rgba(255, 255, 255, 0.7);
+    --glass-border-style: rgba(58, 54, 46, 0.12);
+    --glass-shadow-style: 0 8px 32px rgba(48, 40, 32, 0.12);
+
+    /* Gradients — warm taupe (SOUL+AI) */
+    --gradient-cosmic: linear-gradient(135deg, #fdfcfc 0%, #e9e5e1 100%);
+    --gradient-mystical: linear-gradient(135deg, #f1ede5 0%, #c8c2b6 100%);
+    --gradient-ethereal: linear-gradient(135deg, #faf8f4 0%, #aca497 100%);
+    --gradient-iridescent: linear-gradient(135deg, #f5efe6 0%, #e9c46a 100%);
+    --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.1) 100%);
+  }
+
+  .dark {
+    --background: 0 0% 2%;
+    --foreground: 0 0% 98%;
+
+    --card: 0 0% 4%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 0 0% 4%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 36 14% 18%;
+    --primary-foreground: 40 33% 98%;
+    --primary-glow: 40 10% 30%;
+
+    --secondary: 40 8% 16%;
+    --secondary-foreground: 40 20% 92%;
+
+    --muted: 40 6% 14%;
+    --muted-foreground: 40 8% 64%;
+
+    --accent: 42 74% 66%;
+    --accent-foreground: 40 12% 12%;
+
+    --mystical: 40 10% 35%;
+    --mystical-foreground: 0 0% 100%;
+
+    --gold: 42 74% 66%;
+    --gold-foreground: 40 12% 12%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 20% 98%;
+
+    --border: 40 8% 18%;
+    --input: 40 8% 18%;
+    --ring: 42 74% 66%;
+
+    --glass-bg: 0 0% 0% / 0.7;
+    --glass-border: 0 0% 100% / 0.2;
+
+    /* Glass Styles for Dark Mode */
+    --glass-bg-style: rgba(255, 255, 255, 0.15);
+    --glass-border-style: rgba(255, 255, 255, 0.2);
+    --glass-shadow-style: 0 8px 32px rgba(0, 0, 0, 0.3);
+
+    /* Gradients for Dark Mode - Neutral Black Scheme */
+    --gradient-cosmic: linear-gradient(135deg, #000000 0%, #0a0a0a 50%, #111111 100%);
+    --gradient-mystical: linear-gradient(135deg, #050505 0%, #121212 100%);
+    --gradient-ethereal: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+    --gradient-iridescent: linear-gradient(135deg, #080808 0%, #1c1c1c 100%);
+    --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+  }
+}
+
+/* Glassmorphism Utilities */
+.glass {
+  background: var(--glass-bg-style) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid var(--glass-border-style) !important;
+  box-shadow: var(--glass-shadow-style) !important;
+}
+
+.glass-frosted {
+  background: var(--glass-bg-style) !important;
+  backdrop-filter: blur(30px) saturate(1.8) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(1.8) !important;
+  border: 1px solid var(--glass-border-style) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 0 40px rgba(255, 255, 255, 0.1) !important;
+}
+
+.glass-intense {
+  background: var(--glass-bg-style) !important;
+  backdrop-filter: blur(40px) saturate(2) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(2) !important;
+  border: 1px solid var(--glass-border-style) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25), inset 0 0 60px rgba(255, 255, 255, 0.15) !important;
+}
+
+@layer base {
+  * {
+    @apply border-border break-words;
+  }
+
+  body {
+    @apply bg-background text-foreground overflow-x-hidden;
+  }
+}

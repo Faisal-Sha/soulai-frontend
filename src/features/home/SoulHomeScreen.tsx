@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import {
   SoulBrand,
@@ -41,6 +41,13 @@ function formatHomeDate(d = new Date()) {
   return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 }
 
+function variantFromUrl(param: string | null): SoulHomeVariant | null {
+  if (param === 'day1' || param === 'dayone') return 'day1'
+  if (param === 'trial') return 'trial'
+  if (param === 'loading') return 'loading'
+  return null
+}
+
 /**
  * SOUL+AI Home — Figma DEV 625:1573 (+ day-one / trial / loading)
  *
@@ -49,7 +56,7 @@ function formatHomeDate(d = new Date()) {
  * NEXT Figma slice: Account nested screens (Plan · Notifications · What I know).
  */
 export function SoulHomeScreen({
-  variant = 'default',
+  variant: variantProp,
   dayNumber = 12,
   chaptersDone = 3,
   chaptersTotal = 9,
@@ -60,6 +67,8 @@ export function SoulHomeScreen({
   trialDetail = '$5.99/month starts soon. Cancel anytime.',
 }: SoulHomeScreenProps) {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const variant = variantProp ?? variantFromUrl(searchParams.get('home')) ?? 'default'
   const [noteSaved, setNoteSaved] = useState(false)
   const loading = variant === 'loading'
   const day1 = variant === 'day1'

@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { features } from '@/config/features';
+import { isMissingRelationError } from '@/lib/supabaseErrors';
 
 export interface UserProfile {
   id: string;
@@ -119,23 +121,43 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           .select('*')
           .eq('user_id', userId)
           .maybeSingle(),
-        supabase.from('admins')
-          .select('role, is_active')
-          .eq('user_id', userId)
-          .maybeSingle()
+        features.admin
+          ? supabase.from('admins')
+              .select('role, is_active')
+              .eq('user_id', userId)
+              .maybeSingle()
+          : Promise.resolve({ data: null, error: null }),
       ]);
 
       // Reset network error on any successful communication
       setHasNetworkError(false);
 
-      if (profileRes.error) {
+      if (profileRes.error && isMissingRelationError(profileRes.error)) {
+        const authUser = userRef.current;
+        setProfile({
+          id: userId,
+          full_name: (authUser?.user_metadata?.full_name as string | undefined) ?? null,
+          email: authUser?.email ?? null,
+          avatar_url: (authUser?.user_metadata?.avatar_url as string | undefined) ?? null,
+        });
+      } else if (profileRes.error) {
         console.error('[UserProvider] Profile Fetch Error:', profileRes.error.message);
         if (profileRes.error.message.includes('fetch')) throw profileRes.error;
       } else if (profileRes.data) {
         setProfile(profileRes.data as any);
+      } else {
+        const authUser = userRef.current;
+        setProfile({
+          id: userId,
+          full_name: (authUser?.user_metadata?.full_name as string | undefined) ?? null,
+          email: authUser?.email ?? null,
+          avatar_url: (authUser?.user_metadata?.avatar_url as string | undefined) ?? null,
+        });
       }
 
-      if (subRes.error) {
+      if (subRes.error && isMissingRelationError(subRes.error)) {
+        setSubscription(null);
+      } else if (subRes.error) {
         console.error('[UserProvider] Subscription Fetch Error:', subRes.error.message);
         if (subRes.error.message.includes('fetch')) throw subRes.error;
       } else if (subRes.data) {
@@ -144,8 +166,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSubscription(null);
       }
 
-      if (adminRes.error) {
+      if (!features.admin || (adminRes.error && isMissingRelationError(adminRes.error))) {
+        setIsAdmin(false);
+        setAdminRole(null);
+      } else if (adminRes.error) {
         console.error('[UserProvider] Admin Fetch Error:', adminRes.error.message);
+        setIsAdmin(false);
+        setAdminRole(null);
       } else if (adminRes.data) {
         const admin = adminRes.data as any;
         setIsAdmin(!!admin.is_active);

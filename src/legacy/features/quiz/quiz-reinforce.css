@@ -1,0 +1,421 @@
+/* 02.1.1 · Quiz · Reinforcement — Figma DEV 437:2781 */
+
+@import '../../styles/soul-tokens.css';
+
+.soul-rf {
+  --rf-text-white: var(--soul-text-white);
+  --rf-text-soft: var(--soul-text-soft);
+  --rf-text-dark: var(--soul-text-primary);
+  --rf-text-muted: var(--soul-text-muted);
+  --rf-ui: var(--soul-font-ui);
+
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  width: 100vw;
+  width: 100dvw;
+  height: 100%;
+  height: 100dvh;
+  background: #746c5e;
+  color: var(--rf-text-white);
+  font-family: var(--rf-ui);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+.soul-rf__bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.soul-rf__bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.soul-rf__bg-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.soul-rf__frame {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  max-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.soul-rf__scrim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 144% 67% at 50% 0%,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0.25) 59%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  opacity: 0.8;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.soul-rf__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.soul-rf__header {
+  display: flex;
+  align-items: center;
+  padding: 24px;
+  flex-shrink: 0;
+}
+
+.soul-rf__progress-wrap {
+  padding: 8px 24px;
+  flex-shrink: 0;
+}
+
+.soul-rf__progress-wrap .soul-progress__seg {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.soul-rf__progress-wrap .soul-progress__seg--on {
+  background: #fff;
+}
+
+.soul-rf__left {
+  display: contents;
+}
+
+.soul-rf__hero {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 28px 24px 24px;
+  flex-shrink: 0;
+}
+
+.soul-rf__title {
+  margin: 0;
+  font-family: var(--rf-ui);
+  font-weight: 500;
+  font-size: 28px;
+  line-height: 37px;
+  letter-spacing: -1.12px;
+  color: var(--rf-text-white);
+}
+
+.soul-rf__subtitle {
+  margin: 0;
+  font-family: var(--rf-ui);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 22px;
+  color: var(--rf-text-soft);
+}
+
+.soul-rf__stage {
+  display: contents;
+}
+
+.soul-rf__orb-wrap {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 15px 0 16px;
+  box-sizing: border-box;
+}
+
+.soul-rf__orb {
+  width: 126px;
+  height: 126px;
+  object-fit: contain;
+  display: block;
+  mix-blend-mode: screen;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.soul-rf__proof-copy {
+  margin: 0;
+  padding: 24px 24px 0;
+  font-family: var(--rf-ui);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 22px;
+  color: var(--rf-text-white);
+  text-align: center;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.soul-rf__card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px;
+  margin: 24px auto 0;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid #fff;
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+  width: calc(100% - 48px);
+  max-width: 342px;
+  flex-shrink: 0;
+}
+
+.soul-rf__stars {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.soul-rf__star {
+  width: 14px;
+  height: 14px;
+  display: block;
+}
+
+.soul-rf__quote {
+  margin: 0;
+  font-family: var(--rf-ui);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 22px;
+  color: var(--rf-text-dark);
+}
+
+.soul-rf__author {
+  margin: 0;
+  font-family: var(--rf-ui);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--rf-text-muted);
+}
+
+.soul-rf__cta {
+  flex-shrink: 0;
+  padding: 24px 24px calc(16px + env(safe-area-inset-bottom, 0px));
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 16px;
+}
+
+.soul-rf__cta .soul-btn {
+  width: 100%;
+}
+
+.soul-rf__cta--desktop {
+  display: none;
+}
+
+.soul-rf__cta--mobile {
+  display: block;
+}
+
+/* Mobile visual order: hero → orb → proof → card → CTA */
+@media (max-width: 899px) {
+  .soul-rf__header {
+    order: 0;
+  }
+
+  .soul-rf__progress-wrap {
+    order: 1;
+  }
+
+  .soul-rf__hero {
+    order: 2;
+  }
+
+  .soul-rf__orb-wrap {
+    order: 3;
+  }
+
+  .soul-rf__proof-copy {
+    order: 4;
+  }
+
+  .soul-rf__card {
+    order: 5;
+  }
+
+  .soul-rf__cta--mobile {
+    order: 6;
+  }
+}
+
+@media (max-height: 700px) and (max-width: 899px) {
+  .soul-rf__header {
+    padding: 16px 24px 20px;
+  }
+
+  .soul-rf__hero {
+    padding: 20px 24px 16px;
+  }
+
+  .soul-rf__orb-wrap {
+    padding: 12px 0;
+  }
+
+  .soul-rf__orb {
+    width: 110px;
+    height: 110px;
+  }
+
+  .soul-rf__proof-copy {
+    padding-top: 16px;
+  }
+
+  .soul-rf__cta {
+    padding: 20px 24px calc(28px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (max-height: 580px) and (max-width: 899px) {
+  .soul-rf__orb-wrap {
+    display: none;
+  }
+}
+
+/* Desktop — welcome-style split, fit viewport, no scrollbar */
+@media (min-width: 900px) {
+  .soul-rf__content {
+    max-width: 1100px;
+    width: 100%;
+    margin: 0 auto;
+    padding: clamp(20px, 3vh, 36px) clamp(32px, 5vw, 56px);
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: minmax(280px, 1fr) minmax(300px, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-areas:
+      'brand brand'
+      'progress progress'
+      'left stage';
+    column-gap: clamp(40px, 5vw, 72px);
+    row-gap: clamp(10px, 1.5vh, 16px);
+    align-items: stretch;
+  }
+
+  .soul-rf__header {
+    grid-area: brand;
+    padding: 0;
+  }
+
+  .soul-rf__progress-wrap {
+    grid-area: progress;
+    padding: 0;
+    max-width: 480px;
+  }
+
+  .soul-rf__left {
+    grid-area: left;
+    display: flex;
+    flex-direction: column;
+    /* Pull Awesome + content toward the top */
+    justify-content: flex-start;
+    padding-top: clamp(4px, 1vh, 12px);
+    gap: clamp(14px, 2vh, 22px);
+    max-width: 480px;
+    min-height: 0;
+    align-self: stretch;
+  }
+
+  .soul-rf__hero {
+    padding: 0;
+    gap: clamp(10px, 1.4vh, 16px);
+  }
+
+  .soul-rf__title {
+    font-size: clamp(32px, 3.4vw, 42px);
+    line-height: 1.15;
+    letter-spacing: -1.4px;
+  }
+
+  .soul-rf__subtitle {
+    font-size: clamp(15px, 1.15vw, 17px);
+    line-height: 1.45;
+    max-width: 42ch;
+  }
+
+  /* Orb sits between the two text paragraphs */
+  .soul-rf__orb-wrap {
+    padding: clamp(4px, 1vh, 12px) 0;
+    justify-content: flex-start;
+  }
+
+  .soul-rf__orb {
+    width: clamp(100px, 11vw, 132px);
+    height: clamp(100px, 11vw, 132px);
+  }
+
+  .soul-rf__proof-copy {
+    padding: 0;
+    text-align: left;
+    font-size: clamp(15px, 1.1vw, 16px);
+  }
+
+  .soul-rf__cta--desktop {
+    display: block;
+    padding: clamp(8px, 1.5vh, 16px) 0 0;
+    max-width: 320px;
+    margin-top: 0;
+    margin-bottom: 16px;
+  }
+
+  .soul-rf__cta--desktop .soul-btn {
+    margin-bottom: 0;
+  }
+
+  .soul-rf__cta--mobile {
+    display: none;
+  }
+
+  /* Rating card — upper / center of the right column */
+  .soul-rf__stage {
+    grid-area: stage;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: clamp(48px, 10vh, 96px);
+    min-height: 0;
+    align-self: stretch;
+  }
+
+  .soul-rf__card {
+    margin: 0;
+    width: 100%;
+    max-width: min(360px, 100%);
+  }
+}

@@ -1,0 +1,622 @@
+/* 04.1 · Result · Free — Figma DEV 437:3106 */
+
+@import '../../styles/soul-tokens.css';
+
+.soul-rs {
+  --rs-text-white: var(--soul-text-white);
+  --rs-text-soft: var(--soul-text-soft);
+  --rs-text-dark: var(--soul-text-primary);
+  --rs-text-meta: #736e66;
+  --rs-ui: var(--soul-font-ui);
+  --rs-display: var(--soul-font-display);
+
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  width: 100vw;
+  width: 100dvw;
+  height: 100%;
+  height: 100dvh;
+  background: #746c5e;
+  color: var(--rs-text-white);
+  font-family: var(--rs-ui);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+.soul-rs__bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.soul-rs__bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.soul-rs__bg-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.soul-rs__frame {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  max-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.soul-rs__scrim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 144% 67% at 50% 0%,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0.25) 59%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  opacity: 0.8;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.soul-rs__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-sizing: border-box;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 253, 250, 0.32) transparent;
+}
+
+.soul-rs__content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.soul-rs__content::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 16px 0;
+}
+
+.soul-rs__content::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 253, 250, 0.18) 0%,
+    rgba(255, 253, 250, 0.38) 50%,
+    rgba(255, 253, 250, 0.18) 100%
+  );
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.soul-rs__content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 253, 250, 0.5);
+}
+
+.soul-rs__header {
+  display: flex;
+  align-items: center;
+  padding: 24px 24px 0;
+  flex-shrink: 0;
+}
+
+.soul-rs__hero {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 48px 24px 24px;
+  flex-shrink: 0;
+}
+
+.soul-rs__hero-top {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.soul-rs__meta {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--rs-text-soft);
+  opacity: 0.7;
+}
+
+.soul-rs__title {
+  margin: 0;
+  font-family: var(--rs-ui);
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 37px;
+  letter-spacing: -1.12px;
+  color: var(--rs-text-white);
+}
+
+.soul-rs__subtitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 22px;
+  color: var(--rs-text-soft);
+}
+
+.soul-rs__cards {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 24px 24px;
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.soul-rs__card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: none;
+  margin: 0 auto;
+  padding: 24px;
+  border-radius: var(--soul-radius-xl);
+  border: 1px solid #fff;
+  box-shadow: var(--soul-shadow-card);
+  box-sizing: border-box;
+}
+
+.soul-rs__card--free {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+}
+
+.soul-rs__card--locked {
+  position: relative;
+  /* Figma: rgba(255,255,255,0.5) + body blur — keep card opaque so blurred copy stays visible */
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  overflow: visible;
+  isolation: isolate;
+  /* Room for Unlock overlaid on lower body */
+  padding-bottom: 28px;
+}
+
+.soul-rs__card-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.soul-rs__card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.soul-rs__bead {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.soul-rs__bead-img {
+  position: absolute;
+  inset: -14.58% -25% -35.42% -25%;
+  width: auto;
+  height: auto;
+  max-width: none;
+}
+
+.soul-rs__bead-sheen {
+  position: absolute;
+  left: 3.07px;
+  top: 2.4px;
+  width: 5.6px;
+  height: 3.867px;
+}
+
+.soul-rs__bead-sheen img {
+  position: absolute;
+  inset: -25.86% -17.86%;
+  width: auto;
+  height: auto;
+  max-width: none;
+}
+
+.soul-rs__card-title {
+  margin: 0;
+  font-family: var(--rs-display);
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 22px;
+  color: var(--rs-text-dark);
+  font-variation-settings: 'SOFT' 0, 'WONK' 1;
+  white-space: nowrap;
+}
+
+.soul-rs__card-meta {
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--rs-text-meta);
+}
+
+.soul-rs__card-rule {
+  width: 100%;
+  height: 1px;
+  margin: 0;
+  border: none;
+  background: var(--soul-bg-base);
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+.soul-rs__card-body {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 22px;
+  color: #3a362e;
+}
+
+.soul-rs__card--free .soul-rs__card-body {
+  max-height: 88px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  text-overflow: ellipsis;
+}
+
+/* Progressive blur: light at top → stronger toward bottom */
+.soul-rs__locked-copy {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 16px;
+  isolation: isolate;
+}
+
+.soul-rs__locked-copy .soul-rs__card-body {
+  display: block;
+  max-height: none;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+  text-overflow: clip;
+  color: #3a362e;
+  user-select: none;
+}
+
+.soul-rs__card-body--clear {
+  position: relative;
+  z-index: 1;
+  /* First lines start with a light blur (not 0) */
+  filter: blur(1px);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 22%,
+    rgba(0, 0, 0, 0.5) 42%,
+    transparent 65%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 22%,
+    rgba(0, 0, 0, 0.5) 42%,
+    transparent 65%
+  );
+}
+
+.soul-rs__card-body--soft {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  margin: 0;
+  filter: blur(4.5px);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 8%,
+    #000 28%,
+    #000 55%,
+    transparent 80%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 8%,
+    #000 28%,
+    #000 55%,
+    transparent 80%
+  );
+  pointer-events: none;
+}
+
+.soul-rs__card-body--heavy {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  margin: 0;
+  filter: blur(9px);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 35%,
+    rgba(0, 0, 0, 0.4) 55%,
+    #000 75%,
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 35%,
+    rgba(0, 0, 0, 0.4) 55%,
+    #000 75%,
+    #000 100%
+  );
+  pointer-events: none;
+}
+
+.soul-rs__locked-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  width: 100%;
+  overflow: hidden;
+}
+
+.soul-rs__locked-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--rs-text-dark);
+  white-space: nowrap;
+}
+
+.soul-rs__lock {
+  flex-shrink: 0;
+  line-height: normal;
+  font-size: 14px;
+}
+
+.soul-rs__locked-more {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 18px;
+  color: var(--rs-text-meta);
+  white-space: nowrap;
+}
+
+.soul-rs__words-cta.soul-btn {
+  height: auto;
+  min-height: 44px;
+  padding: 12px 24px;
+  font-size: 14px;
+  line-height: 20px;
+  border: 1px solid var(--rs-text-dark);
+  justify-content: space-between;
+}
+
+.soul-rs__words-cta.soul-btn .soul-btn__icon {
+  margin-left: auto;
+}
+
+/* Unlock sits over lower body text — Figma Unlock Action */
+.soul-rs__unlock-pill {
+  position: absolute;
+  left: 50%;
+  bottom: 36px;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 97px;
+  height: 40px;
+  padding: 0 16px;
+  border: none;
+  border-radius: var(--soul-radius-pill);
+  background: #26221c;
+  color: #fff;
+  font-family: var(--rs-ui);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 22px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 150ms var(--soul-ease), transform 150ms var(--soul-ease);
+  z-index: 2;
+  opacity: 1;
+}
+
+.soul-rs__unlock-pill:hover {
+  background: var(--soul-button-primary-pressed);
+}
+
+.soul-rs__unlock-pill:active {
+  transform: translateX(-50%) scale(0.98);
+}
+
+.soul-rs__unlock-pill:focus-visible {
+  outline: 2px solid var(--rs-text-soft);
+  outline-offset: 3px;
+}
+
+.soul-rs__paywall {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.soul-rs__paywall-title {
+  margin: 0;
+  font-family: var(--rs-ui);
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 37px;
+  letter-spacing: -1.12px;
+  color: var(--rs-text-white);
+}
+
+.soul-rs__paywall-body {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 22px;
+  color: var(--rs-text-soft);
+}
+
+.soul-rs__checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-width: 294px;
+  color: var(--rs-text-white);
+}
+
+.soul-rs__check {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.soul-rs__tick {
+  flex-shrink: 0;
+  font-size: 14px;
+  line-height: normal;
+}
+
+.soul-rs__check > span:last-child {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.soul-rs__paywall-cta {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.soul-rs__paywall-sub {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--rs-text-soft);
+  text-align: center;
+  opacity: 0.8;
+}
+
+.soul-rs__footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 0 24px calc(24px + env(safe-area-inset-bottom, 0px));
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.soul-rs__save {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--rs-ui);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--rs-text-white);
+  text-decoration: underline;
+  text-underline-position: from-font;
+  opacity: 0.8;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.soul-rs__save:hover {
+  opacity: 1;
+}
+
+.soul-rs__legal {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--rs-text-white);
+  text-align: center;
+  opacity: 0.8;
+}
+
+.soul-rs__legal a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-position: from-font;
+}
+
+.soul-rs__legal a:hover {
+  opacity: 1;
+}
+
+@media (min-width: 480px) {
+  .soul-rs__card {
+    max-width: 342px;
+  }
+
+  .soul-rs__hero,
+  .soul-rs__paywall,
+  .soul-rs__cards,
+  .soul-rs__footer {
+    max-width: 390px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
