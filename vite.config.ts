@@ -1,5 +1,6 @@
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react-swc";
+import tailwindcss from "@tailwindcss/vite";
 import { VitePWA } from "vite-plugin-pwa";
 import path from "path";
 
@@ -38,6 +39,7 @@ export default defineConfig(() => ({
   },
   plugins: [
     react(),
+    tailwindcss(),
     apiDocsPlugin(),
     VitePWA({
       registerType: "autoUpdate",
@@ -119,7 +121,7 @@ export default defineConfig(() => ({
   ].filter(Boolean),
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@": path.resolve(import.meta.dirname, "./src"),
     },
   },
   test: {
