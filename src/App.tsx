@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
+import { UserProvider } from "./hooks/useUser";
 import { SoulHomeScreen } from "./pages/home/SoulHomeScreen";
 import QuizShell from "./pages/quiz/QuizShell";
 import { SoulReadingsScreen } from "./pages/readings/SoulReadingsScreen";
@@ -19,6 +20,11 @@ import { SoulAccountPlanScreen } from "./pages/account/SoulAccountPlanScreen";
 import { SoulAccountNotificationsScreen } from "./pages/account/SoulAccountNotificationsScreen";
 import { SoulAccountKnowScreen } from "./pages/account/SoulAccountKnowScreen";
 import { SoulAccountKnowAnswerScreen } from "./pages/account/SoulAccountKnowAnswerScreen";
+import { SoulLoginScreen } from "./pages/auth/SoulLoginScreen";
+import { SoulLoginEmailScreen } from "./pages/auth/SoulLoginEmailScreen";
+import { SoulLoginCheckScreen } from "./pages/auth/SoulLoginCheckScreen";
+import { SoulForgotPasswordScreen } from "./pages/auth/SoulForgotPasswordScreen";
+import { AuthCallbackScreen } from "./pages/auth/AuthCallbackScreen";
 import AgentPage from "./pages/agent/AgentPage";
 import Contact from "./pages/legal/Contact";
 import FAQ from "./pages/legal/FAQ";
@@ -52,6 +58,15 @@ function AppRoutes() {
       <Route path="/people/:personId/share" element={<SoulPeopleShareScreen />} />
       <Route path="/people/:personId" element={<SoulPeopleReportScreen />} />
 
+      <Route path="/login" element={<SoulLoginScreen />} />
+      <Route path="/login/email" element={<SoulLoginEmailScreen />} />
+      <Route path="/login/check" element={<SoulLoginCheckScreen />} />
+      <Route path="/login/callback" element={<AuthCallbackScreen />} />
+      <Route path="/login/link" element={<Navigate to="/login/email" replace />} />
+      <Route path="/forgot-password" element={<SoulForgotPasswordScreen />} />
+      <Route path="/auth" element={<Navigate to="/login" replace />} />
+      <Route path="/signup" element={<Navigate to="/quiz/welcome" replace />} />
+
       <Route path="/account" element={<SoulAccountScreen />} />
       <Route path="/account/plan" element={<SoulAccountPlanScreen />} />
       <Route path="/account/notifications" element={<SoulAccountNotificationsScreen />} />
@@ -75,7 +90,9 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <AppRoutes />
+          <UserProvider>
+            <AppRoutes />
+          </UserProvider>
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>

@@ -4,7 +4,6 @@ import { toast } from 'sonner'
 import { SoulBrand, SoulNav, type SoulNavTab } from '@/components/soul'
 import { useUser } from '@/hooks/useUser'
 import { supabase } from '@/integrations/supabase/client'
-import * as analytics from '@/lib/mixpanel'
 import './soul-account.css'
 import bgRipple from '../home/assets/bg-ripple.png'
 import iconArrow from './assets/icon-arrow.svg'
@@ -67,11 +66,10 @@ export function SoulAccountPlanScreen() {
     if (signingOut) return
     setSigningOut(true)
     try {
-      if (user) analytics.trackLogout(user.id)
       const { error } = await supabase.auth.signOut()
       if (error) throw error
       localStorage.removeItem('supabase.auth.token')
-      navigate('/auth', { replace: true })
+      navigate('/login', { replace: true })
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Could not sign out'
       toast.error(message)

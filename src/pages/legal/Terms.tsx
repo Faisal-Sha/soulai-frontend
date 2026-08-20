@@ -180,8 +180,6 @@ const Terms = () => (
   <LegalDocumentLayout
     title="Terms & Conditions"
     lastUpdated={LAST_UPDATED}
-    analyticsName="Terms & Conditions"
-    analyticsPath="/terms"
     relatedLink={{ label: "Privacy Policy", path: "/privacy" }}
     intro={
       <>
@@ -191,7 +189,7 @@ const Terms = () => (
             href="https://soulplus-ai.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary hover:underline underline-offset-2"
+            className="soul-legal__inline-link"
           >
             soulplus-ai.com
           </a>
@@ -199,7 +197,7 @@ const Terms = () => (
         </p>
         <p>
           By using the Services, you also agree to our{" "}
-          <Link to="/privacy" className="text-primary hover:underline underline-offset-2">
+          <Link to="/privacy" className="soul-legal__inline-link">
             Privacy Policy
           </Link>
           . Please read these Terms carefully. If you do not agree, you must not use the Services.

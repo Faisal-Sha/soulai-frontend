@@ -1,0 +1,312 @@
+/* Legal · Privacy · Terms — matches Account / Readings shell */
+
+@import '../../styles/soul-tokens.css';
+@import '../../components/soul/soul-ui.css';
+
+.soul-legal {
+  --legal-ui: var(--soul-font-ui);
+  --legal-display: var(--soul-font-display);
+
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  background: var(--soul-bg-primary);
+  color: var(--soul-text-on-dark);
+  font-family: var(--legal-ui);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+.soul-legal__bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  background: var(--soul-bg-primary);
+}
+
+.soul-legal__bg-tile {
+  position: absolute;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+}
+
+.soul-legal__bg-tile img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+
+.soul-legal__bg-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.soul-legal__bg-tile--1 {
+  top: 0;
+  height: 100%;
+}
+
+.soul-legal__bg-tile--2 {
+  top: 52%;
+  height: 60%;
+}
+
+.soul-legal__bg-tile--2 img {
+  transform: rotate(180deg) scaleX(-1);
+}
+
+.soul-legal__scrim {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: min(100dvh, 900px);
+  z-index: 1;
+  background: radial-gradient(
+    ellipse 100% 70% at 50% 38%,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0.22) 55%,
+    transparent 100%
+  );
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.soul-legal__dock-scrim {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 109px;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(108, 91, 79, 0) 0%, #6c5b4f 100%);
+}
+
+.soul-legal__scroll {
+  position: relative;
+  z-index: 3;
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding-bottom: calc(48px + env(safe-area-inset-bottom, 0px));
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 253, 250, 0.32) transparent;
+}
+
+.soul-legal__scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.soul-legal__scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 253, 250, 0.28);
+  border-radius: 999px;
+}
+
+.soul-legal__header {
+  display: flex;
+  align-items: center;
+  padding: 20px 24px;
+  padding-top: calc(20px + env(safe-area-inset-top, 0px));
+}
+
+.soul-legal__brand-link {
+  display: inline-flex;
+  text-decoration: none;
+  color: inherit;
+}
+
+.soul-legal__hero {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 24px 0;
+  max-width: 720px;
+  box-sizing: border-box;
+}
+
+.soul-legal__eyebrow {
+  margin: 0;
+  font-weight: 300;
+  font-size: 14px;
+  line-height: normal;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--soul-text-on-dark-tertiary);
+}
+
+.soul-legal__title {
+  margin: 0;
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 32px;
+  letter-spacing: -1.2px;
+  color: var(--soul-text-on-dark);
+}
+
+.soul-legal__meta {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--soul-text-on-dark-secondary);
+}
+
+.soul-legal__related {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--soul-text-on-dark-secondary);
+}
+
+.soul-legal__related-link {
+  display: inline;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--soul-text-soft);
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: color 150ms var(--soul-ease);
+}
+
+.soul-legal__related-link:hover,
+.soul-legal__related-link:focus-visible {
+  color: #fff;
+}
+
+.soul-legal__stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px 24px 0;
+  max-width: 720px;
+  box-sizing: border-box;
+}
+
+.soul-legal__card {
+  padding: 24px;
+  border-radius: var(--soul-radius-xl);
+  background: var(--soul-card-solid);
+  color: var(--soul-text-primary);
+  box-sizing: border-box;
+}
+
+.soul-legal__card--intro {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.soul-legal__card--intro p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--soul-text-secondary);
+}
+
+.soul-legal__inline-link {
+  color: var(--soul-text-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 150ms var(--soul-ease);
+}
+
+.soul-legal__inline-link:hover,
+.soul-legal__inline-link:focus-visible {
+  color: var(--soul-text-secondary);
+}
+
+.soul-legal__section-title {
+  margin: 0 0 16px;
+  font-family: var(--legal-display);
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 27px;
+  letter-spacing: -0.2px;
+  color: var(--soul-text-primary);
+}
+
+.soul-legal__paragraph {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--soul-text-secondary);
+}
+
+.soul-legal__paragraph:last-child {
+  margin-bottom: 0;
+}
+
+.soul-legal__list {
+  margin: 0 0 16px;
+  padding-left: 20px;
+  list-style: disc;
+}
+
+.soul-legal__list:last-child {
+  margin-bottom: 0;
+}
+
+.soul-legal__list li {
+  margin-bottom: 8px;
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--soul-text-secondary);
+}
+
+.soul-legal__list li:last-child {
+  margin-bottom: 0;
+}
+
+.soul-legal__subsection {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--soul-stroke-default);
+}
+
+.soul-legal__subsection:first-of-type {
+  margin-top: 4px;
+  padding-top: 0;
+  border-top: none;
+}
+
+.soul-legal__subsection-title {
+  margin: 0 0 12px;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 22px;
+  color: var(--soul-text-primary);
+}
+
+@media (min-width: 900px) {
+  .soul-legal__header,
+  .soul-legal__hero,
+  .soul-legal__stack {
+    padding-left: clamp(24px, 6vw, 80px);
+    padding-right: clamp(24px, 6vw, 80px);
+  }
+
+  .soul-legal__hero,
+  .soul-legal__stack {
+    margin-inline: auto;
+    width: 100%;
+  }
+}

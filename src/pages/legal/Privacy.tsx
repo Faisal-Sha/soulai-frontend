@@ -473,8 +473,6 @@ const Privacy = () => (
   <LegalDocumentLayout
     title="Privacy Policy"
     lastUpdated={LAST_UPDATED}
-    analyticsName="Privacy Policy"
-    analyticsPath="/privacy"
     relatedLink={{ label: "Terms & Conditions", path: "/terms" }}
     intro={
       <>
@@ -484,7 +482,7 @@ const Privacy = () => (
             href="https://soulplus-ai.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary hover:underline underline-offset-2"
+            className="soul-legal__inline-link"
           >
             soulplus-ai.com
           </a>{" "}
@@ -508,7 +506,7 @@ const Privacy = () => (
           Our Services may use cookies, mobile analytics, and other tracking technologies (including Yandex
           Metrica) to understand usage and improve the product, and may be used to personalize your
           experience. By continuing to use the Services, you accept the terms of this Privacy Policy, our{" "}
-          <Link to="/terms" className="text-primary hover:underline underline-offset-2">
+          <Link to="/terms" className="soul-legal__inline-link">
             Terms &amp; Conditions
           </Link>
           , and our Cookies Policy (where applicable). If you disable cookies or tracking, certain features

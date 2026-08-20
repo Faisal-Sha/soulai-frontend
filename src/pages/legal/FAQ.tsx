@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
-import * as analytics from '@/lib/mixpanel';
 
 const FAQS = [
   {
@@ -31,7 +30,6 @@ const FAQS = [
 
 const FAQ = () => {
   useEffect(() => {
-    analytics.trackPageView('FAQ', '/faq');
     window.scrollTo(0, 0);
   }, []);
 
