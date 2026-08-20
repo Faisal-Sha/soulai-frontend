@@ -156,6 +156,60 @@
   display: none;
 }
 
+/* Subscription ended notice — Figma 955:8631 */
+.soul-people__notice {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin: 12px 24px 0;
+  padding: 12px 16px;
+  box-sizing: border-box;
+  border-radius: 16px;
+  background: rgba(47, 44, 37, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.soul-people__notice-copy {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.soul-people__notice-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  color: #fff;
+}
+
+.soul-people__notice-detail {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 18px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.soul-people__notice-manage {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+}
+
+.soul-people__notice-manage:hover {
+  text-decoration: underline;
+}
+
+.soul-people__body--ended {
+  padding-top: 0;
+}
+
 .soul-people__intro {
   display: flex;
   flex-direction: column;
@@ -1230,6 +1284,7 @@
     display: none;
   }
 
+  .soul-people__notice,
   .soul-people__intro,
   .soul-people__body,
   .soul-people__form,

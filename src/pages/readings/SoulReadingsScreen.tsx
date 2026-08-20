@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
-import { SoulBrand, SoulNav, type SoulNavTab } from '@/components/soul'
+import { SoulBrand, SoulNav } from '@/components/soul'
 import {
   READING_CHAPTERS,
   type ReadingChapter,
@@ -36,20 +36,9 @@ export function SoulReadingsScreen({
     Math.round((chaptersRead / Math.max(1, chaptersTotal)) * 100),
   )
 
-  const onNav = (tab: SoulNavTab) => {
-    if (tab === 'readings') return
-    if (tab === 'home') navigate('/')
-    else if (tab === 'people') navigate('/people')
-    else if (tab === 'profile') navigate('/account')
-  }
-
   const openChapter = (chapter: ReadingChapter) => {
-    if (!isPremium) {
-      navigate('/rates')
-      return
-    }
     if (chapter.id === 'your-pattern') {
-      navigate('/readings/your-pattern')
+      navigate(isPremium ? '/readings/your-pattern' : '/readings/your-pattern?ended=1')
       return
     }
     toast.message(chapter.title, {
@@ -74,9 +63,16 @@ export function SoulReadingsScreen({
 
       <div className="soul-readings__scroll">
         <header className="soul-readings__header">
-          <SoulBrand />
+          <button
+            type="button"
+            className="soul-readings__brand"
+            onClick={() => navigate('/')}
+            aria-label="SOUL+AI home"
+          >
+            <SoulBrand />
+          </button>
           <div className="soul-readings__header-nav" aria-label="Desktop navigation">
-            <SoulNav active="readings" onChange={onNav} className="soul-readings__top-nav" />
+            <SoulNav variant="desktop" />
           </div>
         </header>
 
@@ -147,8 +143,8 @@ export function SoulReadingsScreen({
         </footer>
       </div>
 
-      <div className="soul-readings__dock">
-        <SoulNav active="readings" onChange={onNav} />
+      <div className="soul-readings__nav soul-readings__nav--mobile">
+        <SoulNav />
       </div>
     </div>
   )

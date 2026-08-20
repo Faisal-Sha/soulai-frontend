@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
-import { SoulBrand, SoulButton, SoulNav, SoulTextarea, type SoulNavTab } from '@/components/soul'
+import { SoulBrand, SoulButton, SoulNav, SoulTextarea } from '@/components/soul'
 import {
   findKnowQuestion,
   getKnowSections,
@@ -54,16 +54,6 @@ export function SoulAccountKnowAnswerScreen() {
   const totalInSection = section.questions.length
   const canSave = value.trim().length > 0
 
-  const onNav = (tab: SoulNavTab) => {
-    if (tab === 'profile') {
-      navigate('/account')
-      return
-    }
-    if (tab === 'home') navigate('/')
-    else if (tab === 'readings') navigate('/readings')
-    else if (tab === 'people') navigate('/people')
-  }
-
   const persist = () => {
     if (!canSave) return false
     writeKnowAnswer(question.id, value)
@@ -110,7 +100,7 @@ export function SoulAccountKnowAnswerScreen() {
             <SoulBrand />
           </div>
           <div className="soul-account__header-nav" aria-label="Desktop navigation">
-            <SoulNav active="profile" onChange={onNav} className="soul-account__top-nav" />
+            <SoulNav variant="desktop" />
           </div>
         </header>
 
@@ -185,7 +175,7 @@ export function SoulAccountKnowAnswerScreen() {
       </div>
 
       <div className="soul-account__nav soul-account__nav--mobile">
-        <SoulNav active="profile" onChange={onNav} />
+        <SoulNav />
       </div>
     </div>
   )

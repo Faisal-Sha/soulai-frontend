@@ -1,5 +1,5 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { SoulBrand, SoulButton, SoulNav, type SoulNavTab } from '@/components/soul'
+import { SoulBrand, SoulButton, SoulNav } from '@/components/soul'
 import { DEMO_PEOPLE } from './peopleData'
 import { PEOPLE_REPORT_META, PEOPLE_REPORT_SECTIONS } from './reportContent'
 import './soul-people.css'
@@ -17,16 +17,6 @@ export function SoulPeopleReportScreen() {
   const partnerName =
     DEMO_PEOPLE.find((p) => p.id === personId)?.name ||
     PEOPLE_REPORT_META.partnerName
-
-  const onNav = (tab: SoulNavTab) => {
-    if (tab === 'people') {
-      navigate('/people')
-      return
-    }
-    if (tab === 'home') navigate('/')
-    else if (tab === 'readings') navigate('/readings')
-    else if (tab === 'profile') navigate('/account')
-  }
 
   const talkSection = (title: string, body: string) => {
     navigate('/agent', {
@@ -77,7 +67,7 @@ export function SoulPeopleReportScreen() {
             <SoulBrand />
           </div>
           <div className="soul-people__header-nav" aria-label="Desktop navigation">
-            <SoulNav active="people" onChange={onNav} />
+            <SoulNav variant="desktop" />
           </div>
         </header>
 
@@ -150,7 +140,7 @@ export function SoulPeopleReportScreen() {
       </div>
 
       <div className="soul-people__nav soul-people__nav--mobile">
-        <SoulNav active="people" onChange={onNav} />
+        <SoulNav />
       </div>
     </div>
   )

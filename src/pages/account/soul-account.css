@@ -452,6 +452,63 @@
   gap: 0;
 }
 
+/* Frost cards — Account · Plan (860:3515) */
+.soul-account__card--frost {
+  background: rgba(255, 255, 255, 0.24);
+  border: 1px solid #fff;
+  box-shadow: 0 24px 48px rgba(48, 40, 32, 0.15);
+}
+
+.soul-account__card--frost .soul-account__card-title {
+  font-family: var(--soul-font-ui);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 26px;
+  letter-spacing: -0.18px;
+  color: #fff;
+}
+
+.soul-account__card--frost .soul-account__card-meta {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.soul-account__card--frost .soul-account__text-link {
+  color: #fff;
+}
+
+.soul-account__card--frost .soul-account__text-link img {
+  filter: brightness(0) invert(1);
+}
+
+.soul-account__card--frost.soul-account__card--rows {
+  padding: 24px;
+  gap: 16px;
+}
+
+.soul-account__card--frost .soul-account__row {
+  padding: 0;
+}
+
+.soul-account__card--frost .soul-account__row-label {
+  color: #fff;
+}
+
+.soul-account__card--frost .soul-account__row-hint,
+.soul-account__card--frost .soul-account__row-amount {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.soul-account__card--frost .soul-account__hairline {
+  background: rgba(58, 54, 46, 0.1);
+}
+
+.soul-account__billing-block {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
 .soul-account__row--billing {
   gap: 12px;
 }
@@ -590,6 +647,21 @@
   font-size: 12px;
   line-height: 16px;
   color: rgba(255, 255, 255, 0.6);
+}
+
+.soul-account__footnote--btn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.soul-account__footnote--btn:hover {
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .soul-account__install {

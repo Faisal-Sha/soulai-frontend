@@ -1,8 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { SoulBrand } from '@/components/soul'
+import { SoulBrand, SoulNav } from '@/components/soul'
+import { useUser } from '@/hooks/useUser'
+import { ResumeSheet } from '@/pages/home/ResumeSheet'
+import { useSoulSheetParams } from '@/pages/home/useSoulSheetParams'
 import { PATTERN_META, PATTERN_SECTIONS } from './patternContent'
+import { addUserSavedInsight } from '@/pages/insights/insightsStore'
 import './soul-pattern.css'
 import bgRipple from '../home/assets/bg-ripple.png'
 import patternHero from './assets/pattern-hero.png'
@@ -18,18 +22,46 @@ type MenuState = {
   text: string
 } | null
 
+const ENDED_STATUSES = new Set([
+  'canceled',
+  'cancelled',
+  'expired',
+  'inactive',
+  'unpaid',
+])
+
 /**
  * Figma DEV · Reading · Your pattern
  * Viewport 625:1991 · Action bar 625:2054 · Saved toast 625:2238
+ * Ended selection (Save + Copy only) 956:14807 → /readings/your-pattern?ended=1
  */
 export function SoulPatternChapterScreen() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const { subscription, isPremium } = useUser()
   const sheetRef = useRef<HTMLDivElement>(null)
   const articleRef = useRef<HTMLElement>(null)
   const [progress, setProgress] = useState(0.12)
   const [menu, setMenu] = useState<MenuState>(null)
   const [savedToast, setSavedToast] = useState(false)
   const toastTimer = useRef<number | null>(null)
+
+  const subscriptionEnded = useMemo(() => {
+    if (searchParams.get('ended') === '1' || searchParams.get('ended') === 'true') {
+      return true
+    }
+    const status = subscription?.status?.toLowerCase() ?? ''
+    return !isPremium && ENDED_STATUSES.has(status)
+  }, [searchParams, subscription?.status, isPremium])
+
+  const resumeExtra = useMemo(
+    () => (subscriptionEnded ? { ended: '1' } : undefined),
+    [subscriptionEnded],
+  )
+  const { resumeOpen, resumeMode, openResume, closeResume } = useSoulSheetParams(resumeExtra)
+
+  /** Figma 956:14807 — ended users keep Save/Copy, lose Ask about this */
+  const canAskAboutSelection = !subscriptionEnded
 
   const onScroll = useCallback(() => {
     const el = sheetRef.current
@@ -92,7 +124,7 @@ export function SoulPatternChapterScreen() {
       setMenu(null)
       return
     }
-    const menuW = 280
+    const menuW = canAskAboutSelection ? 280 : 168
     const left = Math.min(
       window.innerWidth - menuW - 12,
       Math.max(12, rect.left + rect.width / 2 - menuW / 2),
@@ -127,11 +159,16 @@ export function SoulPatternChapterScreen() {
 
   const onSave = () => {
     wrapSelectionMark()
+    const text = menu?.text ?? ''
     setMenu(null)
+    if (text.trim()) {
+      addUserSavedInsight({ quote: text, source: 'Your pattern' })
+    }
     showSavedToast()
   }
 
   const onAsk = () => {
+    if (!canAskAboutSelection) return
     const text = menu?.text ?? ''
     setMenu(null)
     navigate('/agent', {
@@ -155,6 +192,10 @@ export function SoulPatternChapterScreen() {
   }
 
   const talkThrough = () => {
+    if (subscriptionEnded) {
+      openResume('confirm')
+      return
+    }
     navigate('/agent', {
       state: {
         starter: 'Talk through my Pattern chapter with me.',
@@ -177,18 +218,25 @@ export function SoulPatternChapterScreen() {
         </div>
       </div>
 
-      <header className="soul-pattern__chrome">
-        <button type="button" className="soul-pattern__brand" onClick={() => navigate('/')}>
-          <SoulBrand />
-        </button>
-        <button
-          type="button"
-          className="soul-pattern__chrome-back"
-          onClick={() => navigate('/readings')}
-        >
-          ‹ Back to readings
-        </button>
-      </header>
+      <div className="soul-pattern__chrome-wrap">
+        <header className="soul-pattern__chrome">
+          <button type="button" className="soul-pattern__brand" onClick={() => navigate('/')}>
+            <SoulBrand />
+          </button>
+          <div className="soul-pattern__header-nav" aria-label="Desktop navigation">
+            <SoulNav variant="desktop" />
+          </div>
+        </header>
+        <div className="soul-pattern__chrome-bar">
+          <button
+            type="button"
+            className="soul-pattern__chrome-back"
+            onClick={() => navigate('/readings')}
+          >
+            ‹ Back to readings
+          </button>
+        </div>
+      </div>
 
       <div
         className="soul-pattern__sheet"
@@ -253,10 +301,12 @@ export function SoulPatternChapterScreen() {
                 <p className="soul-pattern__end-title">{PATTERN_META.finishedTitle}</p>
                 <p className="soul-pattern__end-meta">{PATTERN_META.finishedMeta}</p>
               </div>
-              <button type="button" className="soul-pattern__cta" onClick={talkThrough}>
-                Talk this chapter through
-                <img src={iconArrowLight} alt="" width={15} height={15} />
-              </button>
+              {!subscriptionEnded ? (
+                <button type="button" className="soul-pattern__cta" onClick={talkThrough}>
+                  Talk this chapter through
+                  <img src={iconArrowLight} alt="" width={15} height={15} />
+                </button>
+              ) : null}
 
               <button
                 type="button"
@@ -309,10 +359,16 @@ export function SoulPatternChapterScreen() {
                   </li>
                 ))}
               </ol>
-              <button type="button" className="soul-pattern__cta soul-pattern__cta--rail" onClick={talkThrough}>
-                Talk this through
-                <img src={iconArrowLight} alt="" width={15} height={15} />
-              </button>
+              {!subscriptionEnded ? (
+                <button
+                  type="button"
+                  className="soul-pattern__cta soul-pattern__cta--rail"
+                  onClick={talkThrough}
+                >
+                  Talk this through
+                  <img src={iconArrowLight} alt="" width={15} height={15} />
+                </button>
+              ) : null}
               <button
                 type="button"
                 className="soul-pattern__next"
@@ -335,7 +391,7 @@ export function SoulPatternChapterScreen() {
 
       {menu ? (
         <div
-          className="soul-pattern__menu"
+          className={`soul-pattern__menu${canAskAboutSelection ? '' : ' soul-pattern__menu--compact'}`}
           style={{ top: menu.top, left: menu.left }}
           role="toolbar"
           aria-label="Selection actions"
@@ -345,11 +401,15 @@ export function SoulPatternChapterScreen() {
             Save
           </button>
           <span className="soul-pattern__menu-div" aria-hidden="true" />
-          <button type="button" onClick={onAsk}>
-            <img src={iconAsk} alt="" width={14} height={14} />
-            Ask about this
-          </button>
-          <span className="soul-pattern__menu-div" aria-hidden="true" />
+          {canAskAboutSelection ? (
+            <>
+              <button type="button" onClick={onAsk}>
+                <img src={iconAsk} alt="" width={14} height={14} />
+                Ask about this
+              </button>
+              <span className="soul-pattern__menu-div" aria-hidden="true" />
+            </>
+          ) : null}
           <button type="button" onClick={() => void onCopy()}>
             <img src={iconCopy} alt="" width={14} height={14} />
             Copy
@@ -364,15 +424,20 @@ export function SoulPatternChapterScreen() {
             type="button"
             onClick={() => {
               setSavedToast(false)
-              toast.message('Saved insights', {
-                description: 'Insights list UI comes next.',
-              })
+              navigate('/insights')
             }}
           >
             View
           </button>
         </div>
       ) : null}
+
+      <ResumeSheet
+        open={resumeOpen}
+        mode={resumeMode}
+        onClose={closeResume}
+        onModeChange={openResume}
+      />
     </div>
   )
 }

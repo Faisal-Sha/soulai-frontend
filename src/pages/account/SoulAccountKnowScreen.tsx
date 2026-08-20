@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { SoulBrand, SoulNav, SoulTextLink, type SoulNavTab } from '@/components/soul'
+import { SoulBrand, SoulNav, SoulTextLink } from '@/components/soul'
 import { getKnowSections, knowProgress, type KnowQuestion } from './knowData'
 import './soul-account.css'
 import bgRipple from '../home/assets/bg-ripple.png'
@@ -14,16 +14,6 @@ export function SoulAccountKnowScreen() {
   const navigate = useNavigate()
   const sections = getKnowSections()
   const progress = knowProgress(sections)
-
-  const onNav = (tab: SoulNavTab) => {
-    if (tab === 'profile') {
-      navigate('/account')
-      return
-    }
-    if (tab === 'home') navigate('/')
-    else if (tab === 'readings') navigate('/readings')
-    else if (tab === 'people') navigate('/people')
-  }
 
   const onOpenQuestion = (q: KnowQuestion) => {
     navigate(`/account/know/${q.id}`)
@@ -58,7 +48,7 @@ export function SoulAccountKnowScreen() {
             <SoulBrand />
           </div>
           <div className="soul-account__header-nav" aria-label="Desktop navigation">
-            <SoulNav active="profile" onChange={onNav} className="soul-account__top-nav" />
+            <SoulNav variant="desktop" />
           </div>
         </header>
 
@@ -138,7 +128,7 @@ export function SoulAccountKnowScreen() {
       </div>
 
       <div className="soul-account__nav soul-account__nav--mobile">
-        <SoulNav active="profile" onChange={onNav} />
+        <SoulNav />
       </div>
     </div>
   )

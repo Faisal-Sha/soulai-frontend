@@ -13,7 +13,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { SoulBrand, SoulButton, SoulChip, SoulComposer, SoulNav, type SoulNavTab } from '@/components/soul'
+import { SoulBrand, SoulButton, SoulChip, SoulComposer, SoulNav } from '@/components/soul'
 import {
   deleteThread,
   fetchHistory,
@@ -38,11 +38,14 @@ import iconChevron from './assets/icon-chevron.svg'
 import iconCheck from './assets/icon-check.svg'
 import iconRetry from './assets/icon-retry.svg'
 import { TopUpSheet, TopUpSuccessPill, type TopUpSheetMode } from './TopUpSheet'
+import { ResumeSheet } from '@/pages/home/ResumeSheet'
+import { readResumeQuery, useSoulSheetParams } from '@/pages/home/useSoulSheetParams'
 
 const DESKTOP_MQ = '(min-width: 900px)'
 const SUGGESTIONS = ['Money this year', 'Why do I pull away?', 'What am I avoiding?'] as const
 /** UI shell until top-up / quota is wired to backend */
 const MESSAGES_LEFT_SHELL = 3
+const AGENT_RESUME_EXTRA = { gate: 'ended' }
 
 type AgentNavState = {
   starter?: string
@@ -187,7 +190,7 @@ function EndedGateCard({
       </div>
       <div className="soul-chat__gate-actions">
         <button type="button" className="soul-chat__gate-cta" onClick={onResume}>
-          Resume · $5.99/mo
+          Resume · $6.99/mo
         </button>
         <button type="button" className="soul-chat__gate-secondary" onClick={onOpenProfile}>
           Open my profile
@@ -302,6 +305,7 @@ export default function AgentPage() {
   const [cardLabel, setCardLabel] = useState('Visa ending 4242')
   const [showTopUpSuccess, setShowTopUpSuccess] = useState(false)
   const [showLimitNote, setShowLimitNote] = useState(false)
+  const { resumeOpen, resumeMode, openResume, closeResume } = useSoulSheetParams(AGENT_RESUME_EXTRA)
 
   const chatRef = useRef<HTMLDivElement>(null)
   const frameRef = useRef<HTMLDivElement>(null)
@@ -346,20 +350,29 @@ export default function AgentPage() {
 
   useEffect(() => {
     const param = searchParams.get('gate')
-    if (param === 'limit' || param === 'ended') {
-      setShellGate(param)
-      setGateCardHidden(false)
-      setShowLimitNote(false)
-      setShowTopUpSuccess(false)
-      if (param === 'limit') setMessagesLeft(0)
-      return
-    }
+    const resume = readResumeQuery(searchParams)
+
     if (searchParams.get('sheet') === 'topup') {
       setShellGate('limit')
       setMessagesLeft(0)
       setGateCardHidden(true)
       setTopUpOpen(true)
       setTopUpMode(searchParams.get('fail') === '1' ? 'declined' : 'pay')
+      return
+    }
+    if (param === 'limit') {
+      setShellGate(param)
+      setGateCardHidden(false)
+      setShowLimitNote(false)
+      setShowTopUpSuccess(false)
+      setMessagesLeft(0)
+      return
+    }
+    if (param === 'ended' || resume) {
+      setShellGate('ended')
+      setGateCardHidden(false)
+      setShowLimitNote(false)
+      setShowTopUpSuccess(false)
       return
     }
     const status = subscription?.status?.toLowerCase() ?? ''
@@ -653,13 +666,6 @@ export default function AgentPage() {
     void handleSend(retryMessage, { isRetry: true })
   }
 
-  const onNav = (tab: SoulNavTab) => {
-    if (tab === 'home') navigate('/')
-    else if (tab === 'readings') navigate('/readings')
-    else if (tab === 'people') navigate('/people')
-    else if (tab === 'profile') navigate('/account')
-  }
-
   // V2 is open — no auth gate until login ships.
 
   const showWelcome = messages !== null && messages.length === 0 && !thinking
@@ -779,7 +785,7 @@ export default function AgentPage() {
         </div>
 
         <div className="soul-chat__hist-nav">
-          <SoulNav active={null} onChange={onNav} />
+          <SoulNav />
         </div>
       </aside>
 
@@ -810,7 +816,7 @@ export default function AgentPage() {
               <SoulBrand />
             </div>
             <div className="soul-chat__header-nav" aria-label="Desktop navigation">
-              <SoulNav active={null} onChange={onNav} className="soul-chat__top-nav" />
+              <SoulNav variant="desktop" />
             </div>
           </header>
 
@@ -878,12 +884,8 @@ export default function AgentPage() {
 
             {showGateCard && shellGate === 'ended' ? (
               <EndedGateCard
-                onResume={() =>
-                  toast.message('Resume subscription', {
-                    description: 'Billing resume flow comes next — not wired yet.',
-                  })
-                }
-                onOpenProfile={() => navigate('/account')}
+                onResume={() => openResume('confirm')}
+                onOpenProfile={() => navigate('/account?ended=1')}
               />
             ) : null}
 
@@ -936,9 +938,16 @@ export default function AgentPage() {
             </p>
 
             <div className="soul-chat__nav-wrap">
-              <SoulNav active={null} onChange={onNav} />
+              <SoulNav />
             </div>
           </div>
+
+          <ResumeSheet
+            open={resumeOpen}
+            mode={resumeMode}
+            onClose={closeResume}
+            onModeChange={openResume}
+          />
 
           <TopUpSheet
             open={topUpOpen}

@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { SoulBrand, SoulNav, type SoulNavTab } from '@/components/soul'
+import { SoulBrand, SoulNav } from '@/components/soul'
+import { AddToHomeSheet } from '@/pages/home/AddToHomeSheet'
+import { useSoulSheetParams } from '@/pages/home/useSoulSheetParams'
 import './soul-account.css'
 import bgRipple from '../home/assets/bg-ripple.png'
 import iconArrowLight from '../readings/assets/icon-arrow-light.svg'
@@ -39,6 +41,7 @@ export function SoulAccountNotificationsScreen() {
   const [nudges, setNudges] = useState(true)
   const [morningTime] = useState('08:00')
   const [quietHours] = useState('22:00 — 08:00')
+  const { installOpen, openInstall, closeInstall } = useSoulSheetParams()
 
   const frequencyLabel = useMemo(() => {
     const row = FREQUENCY.find((f) => f.id === frequency)
@@ -53,16 +56,6 @@ export function SoulAccountNotificationsScreen() {
       /* ignore */
     }
   }, [frequencyLabel])
-
-  const onNav = (tab: SoulNavTab) => {
-    if (tab === 'profile') {
-      navigate('/account')
-      return
-    }
-    if (tab === 'home') navigate('/')
-    else if (tab === 'readings') navigate('/readings')
-    else if (tab === 'people') navigate('/people')
-  }
 
   const settingsDisabled = blocked
 
@@ -98,7 +91,7 @@ export function SoulAccountNotificationsScreen() {
             <SoulBrand />
           </div>
           <div className="soul-account__header-nav" aria-label="Desktop navigation">
-            <SoulNav active="profile" onChange={onNav} className="soul-account__top-nav" />
+            <SoulNav variant="desktop" />
           </div>
         </header>
 
@@ -127,7 +120,7 @@ export function SoulAccountNotificationsScreen() {
                 <button
                   type="button"
                   className="soul-account__install-link"
-                  onClick={() => toast.message('Install guide coming soon')}
+                  onClick={openInstall}
                 >
                   Show me how
                   <img src={iconArrowLight} alt="" width={14} height={14} />
@@ -251,16 +244,22 @@ export function SoulAccountNotificationsScreen() {
                 />
               </button>
             </div>
-            <p className="soul-account__footnote">
+            <button
+              type="button"
+              className="soul-account__footnote soul-account__footnote--btn"
+              onClick={openInstall}
+            >
               On iPhone, notifications only work once SOUL+AI is added to your home screen.
-            </p>
+            </button>
           </div>
         </div>
       </div>
 
       <div className="soul-account__nav soul-account__nav--mobile">
-        <SoulNav active="profile" onChange={onNav} />
+        <SoulNav />
       </div>
+
+      <AddToHomeSheet open={installOpen} onClose={closeInstall} />
     </div>
   )
 }

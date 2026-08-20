@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import { SoulBrand, SoulNav, type SoulNavTab } from '@/components/soul'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { SoulBrand, SoulNav } from '@/components/soul'
+import { useUser } from '@/hooks/useUser'
 import { DEMO_PEOPLE, initialFromName, type PeopleEntry } from './peopleData'
 import './soul-people.css'
 import bgRipple from '../home/assets/bg-ripple.png'
@@ -9,7 +10,23 @@ import iconChevronRight from './assets/icon-chevron-right.svg'
 type SoulPeopleScreenProps = {
   /** Override list; empty array = Empty state. Default: demo list. */
   people?: PeopleEntry[]
+  /** Force subscription-ended shell — Figma 955:8631 */
+  subscriptionEnded?: boolean
 }
+
+const ENDED_STATUSES = new Set([
+  'canceled',
+  'cancelled',
+  'expired',
+  'inactive',
+  'unpaid',
+])
+
+const ENDED_BANNER = {
+  title: 'Adding people is paused',
+  detail:
+    'Everything you already read stays open. To read a new pair, resume your subscription.',
+} as const
 
 /** Figma 796:3360 — dashed ring 40 + plus 18
  * Ring uses stroke/on-dark (#ffffff59); plus uses brand white (#fffdfa).
@@ -56,11 +73,20 @@ function AddSomeoneIcon() {
 
 /**
  * Figma WIP · People · Empty (744:1413) · List (744:1577)
+ * Subscription ended (955:8631) — `/people?ended=1`
  * Preview: `/people?people=empty` · `/people` (list demo)
  */
-export function SoulPeopleScreen({ people }: SoulPeopleScreenProps) {
+export function SoulPeopleScreen({ people, subscriptionEnded: endedProp }: SoulPeopleScreenProps) {
   const navigate = useNavigate()
   const [params] = useSearchParams()
+  const { subscription, isPremium } = useUser()
+
+  const subscriptionEnded = useMemo(() => {
+    if (endedProp) return true
+    if (params.get('ended') === '1' || params.get('ended') === 'true') return true
+    const status = subscription?.status?.toLowerCase() ?? ''
+    return !isPremium && ENDED_STATUSES.has(status)
+  }, [endedProp, params, subscription?.status, isPremium])
 
   const entries = useMemo(() => {
     if (people) return people
@@ -70,14 +96,8 @@ export function SoulPeopleScreen({ people }: SoulPeopleScreenProps) {
 
   const isEmpty = entries.length === 0
 
-  const onNav = (tab: SoulNavTab) => {
-    if (tab === 'people') return
-    if (tab === 'home') navigate('/')
-    else if (tab === 'readings') navigate('/readings')
-    else if (tab === 'profile') navigate('/account')
-  }
-
   const onAdd = () => {
+    if (subscriptionEnded) return
     navigate('/people/add')
   }
 
@@ -122,9 +142,21 @@ export function SoulPeopleScreen({ people }: SoulPeopleScreenProps) {
             <SoulBrand />
           </button>
           <div className="soul-people__header-nav" aria-label="Desktop navigation">
-            <SoulNav active="people" onChange={onNav} />
+            <SoulNav variant="desktop" />
           </div>
         </header>
+
+        {subscriptionEnded ? (
+          <div className="soul-people__notice" role="status">
+            <div className="soul-people__notice-copy">
+              <p className="soul-people__notice-title">{ENDED_BANNER.title}</p>
+              <p className="soul-people__notice-detail">{ENDED_BANNER.detail}</p>
+            </div>
+            <Link className="soul-people__notice-manage" to="/account/plan">
+              Manage
+            </Link>
+          </div>
+        ) : null}
 
         <section
           className={`soul-people__intro${isEmpty ? '' : ' soul-people__intro--list'}`}
@@ -147,19 +179,23 @@ export function SoulPeopleScreen({ people }: SoulPeopleScreenProps) {
         </section>
 
         <section
-          className={`soul-people__body${isEmpty ? '' : ' soul-people__body--list'}`}
+          className={`soul-people__body${isEmpty ? '' : ' soul-people__body--list'}${subscriptionEnded && !isEmpty ? ' soul-people__body--ended' : ''}`}
           aria-label={isEmpty ? 'Add someone' : 'People list'}
         >
-          <button type="button" className="soul-people__add" onClick={onAdd}>
-            <span className="soul-people__add-inner">
-              <AddSomeoneIcon />
-              <span className="soul-people__add-label">Add someone</span>
-            </span>
-          </button>
+          {!subscriptionEnded ? (
+            <button type="button" className="soul-people__add" onClick={onAdd}>
+              <span className="soul-people__add-inner">
+                <AddSomeoneIcon />
+                <span className="soul-people__add-label">Add someone</span>
+              </span>
+            </button>
+          ) : null}
 
           {!isEmpty ? (
             <>
-              <div className="soul-people__spacer" aria-hidden="true" />
+              {!subscriptionEnded ? (
+                <div className="soul-people__spacer" aria-hidden="true" />
+              ) : null}
               <ul className="soul-people__list">
                 {entries.map((entry) => (
                   <li key={entry.id} className="soul-people__list-item">
@@ -194,7 +230,7 @@ export function SoulPeopleScreen({ people }: SoulPeopleScreenProps) {
       </div>
 
       <div className="soul-people__nav soul-people__nav--mobile">
-        <SoulNav active="people" onChange={onNav} />
+        <SoulNav />
       </div>
     </div>
   )

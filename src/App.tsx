@@ -6,8 +6,9 @@ import { ThemeProvider } from "next-themes";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import { UserProvider } from "./hooks/useUser";
-import { SoulHomeScreen } from "./pages/home/SoulHomeScreen";
+import { SoulHomeRoute } from "./pages/home/SoulHomeRoute";
 import QuizShell from "./pages/quiz/QuizShell";
+import { SoulSavedInsightsScreen } from "./pages/insights/SoulSavedInsightsScreen";
 import { SoulReadingsScreen } from "./pages/readings/SoulReadingsScreen";
 import { SoulPatternChapterScreen } from "./pages/readings/SoulPatternChapterScreen";
 import { SoulPeopleScreen } from "./pages/people/SoulPeopleScreen";
@@ -42,7 +43,7 @@ const queryClient = new QueryClient();
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<SoulHomeScreen />} />
+      <Route path="/" element={<SoulHomeRoute />} />
 
       <Route path="/quiz" element={<Navigate to="/quiz/welcome" replace />} />
       <Route path="/quiz/*" element={<QuizShell />} />
@@ -51,6 +52,9 @@ function AppRoutes() {
 
       <Route path="/readings" element={<SoulReadingsScreen />} />
       <Route path="/readings/your-pattern" element={<SoulPatternChapterScreen />} />
+      <Route path="/insights" element={<SoulSavedInsightsScreen />} />
+      <Route path="/insights/open" element={<SoulSavedInsightsScreen variant="open" />} />
+      <Route path="/insights/empty" element={<SoulSavedInsightsScreen variant="empty" />} />
 
       <Route path="/people" element={<SoulPeopleScreen />} />
       <Route path="/people/add" element={<SoulPeopleAddScreen />} />

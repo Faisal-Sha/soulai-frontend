@@ -66,9 +66,12 @@
   transform: rotate(180deg) scaleX(-1);
 }
 
-.soul-pattern__chrome {
+.soul-pattern__chrome-wrap {
   position: relative;
   z-index: 2;
+}
+
+.soul-pattern__chrome {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -77,11 +80,19 @@
   padding-top: calc(20px + env(safe-area-inset-top, 0px));
 }
 
+.soul-pattern__chrome-bar {
+  display: none;
+}
+
 .soul-pattern__brand {
   padding: 0;
   border: none;
   background: none;
   cursor: pointer;
+}
+
+.soul-pattern__header-nav {
+  display: none;
 }
 
 .soul-pattern__chrome-back {
@@ -457,6 +468,12 @@
   flex-shrink: 0;
 }
 
+/* Ended subscription — Figma 956:14807 (Save + Copy only) */
+.soul-pattern__menu--compact button {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
 .soul-pattern__toast {
   position: fixed;
   z-index: 70;
@@ -502,17 +519,32 @@
 
 /* ── Desktop (≥900) ── */
 @media (min-width: 900px) {
-  .soul-pattern__chrome {
+  .soul-pattern__chrome-wrap {
     position: sticky;
     top: 0;
     z-index: 6;
-    min-height: 72px;
-    padding: 16px clamp(28px, 4vw, 56px);
-    box-sizing: border-box;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     background: rgba(20, 16, 12, 0.22);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
+  }
+
+  .soul-pattern__chrome {
+    min-height: 72px;
+    padding: 16px clamp(28px, 4vw, 56px) 8px;
+    box-sizing: border-box;
+  }
+
+  .soul-pattern__header-nav {
+    display: flex;
+    justify-content: flex-end;
+    flex: 1;
+  }
+
+  .soul-pattern__chrome-bar {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 clamp(28px, 4vw, 56px) 14px;
   }
 
   .soul-pattern__chrome-back {

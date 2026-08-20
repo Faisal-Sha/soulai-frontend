@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { SoulBrand, SoulNav, type SoulNavTab } from '@/components/soul'
+import { SoulBrand, SoulNav } from '@/components/soul'
 import { DEMO_PEOPLE, initialFromName } from './peopleData'
 import './soul-people.css'
 import bgRipple from '../home/assets/bg-ripple.png'
@@ -63,16 +63,6 @@ export function SoulPeopleGenerateScreen() {
     return () => window.clearTimeout(t)
   }, [enabledCount, navigate, personId])
 
-  const onNav = (tab: SoulNavTab) => {
-    if (tab === 'people') {
-      navigate('/people')
-      return
-    }
-    if (tab === 'home') navigate('/')
-    else if (tab === 'readings') navigate('/readings')
-    else if (tab === 'profile') navigate('/account')
-  }
-
   return (
     <div className="soul-people soul-people--generate">
       <div className="soul-people__bg" aria-hidden="true">
@@ -100,6 +90,9 @@ export function SoulPeopleGenerateScreen() {
               <img src={iconChevron} alt="" width={22} height={22} />
             </button>
             <SoulBrand />
+          </div>
+          <div className="soul-people__header-nav" aria-label="Desktop navigation">
+            <SoulNav variant="desktop" />
           </div>
         </header>
 
@@ -175,7 +168,7 @@ export function SoulPeopleGenerateScreen() {
       </div>
 
       <div className="soul-people__nav soul-people__nav--mobile">
-        <SoulNav active="people" onChange={onNav} />
+        <SoulNav />
       </div>
     </div>
   )

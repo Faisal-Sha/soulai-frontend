@@ -111,8 +111,15 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 24px;
-  padding-top: calc(20px + env(safe-area-inset-top, 0px));
+  gap: 24px;
+  padding: calc(20px + env(safe-area-inset-top, 0px)) 24px 12px;
+}
+
+.soul-readings__brand {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
 }
 
 .soul-readings__header-nav {
@@ -319,7 +326,7 @@
   color: var(--soul-text-on-dark-tertiary);
 }
 
-.soul-readings__dock {
+.soul-readings__nav {
   position: fixed;
   left: 0;
   right: 0;
@@ -327,38 +334,52 @@
   z-index: 4;
   display: flex;
   justify-content: center;
-  padding: 0 24px calc(4px + env(safe-area-inset-bottom, 0px));
+  padding: 0 24px calc(10px + env(safe-area-inset-bottom, 0px));
   pointer-events: none;
 }
 
-.soul-readings__dock .soul-nav {
+.soul-readings__nav > * {
   pointer-events: auto;
 }
 
 @media (min-width: 900px) {
-  .soul-readings__dock,
+  .soul-readings__scroll {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding-bottom: 48px;
+  }
+
+  .soul-readings__nav--mobile,
   .soul-readings__dock-scrim {
     display: none;
   }
 
-  .soul-readings__scroll {
-    padding-bottom: 40px;
-  }
-
   .soul-readings__header {
-    padding-left: clamp(24px, 6vw, 80px);
-    padding-right: clamp(24px, 6vw, 80px);
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    width: 100%;
+    min-height: 72px;
+    padding: 16px clamp(28px, 4vw, 56px);
+    box-sizing: border-box;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(20, 16, 12, 0.22);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
   }
 
   .soul-readings__header-nav {
-    display: block;
+    display: flex;
+    justify-content: flex-end;
+    flex: 1;
   }
 
   .soul-readings__intro,
   .soul-readings__chapters,
   .soul-readings__footer {
-    padding-left: clamp(24px, 6vw, 80px);
-    padding-right: clamp(24px, 6vw, 80px);
+    padding-left: clamp(28px, 4vw, 56px);
+    padding-right: clamp(28px, 4vw, 56px);
   }
 
   .soul-readings__chapters {
