@@ -674,13 +674,13 @@
   color: rgba(255, 255, 255, 0.55);
 }
 
-/* Generate · Pair (796:3815) */
+/* Generate · Pair — Figma 1017:3884 · 10.5s clip */
 .soul-people__scroll--generate {
   padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
 }
 
 .soul-people__intro--generate {
-  padding: 24px 24px 12px;
+  padding: 24px 24px 32px;
   gap: 10px;
 }
 
@@ -688,35 +688,65 @@
   color: rgba(255, 255, 255, 0.7);
 }
 
+.soul-people-gen__enter {
+  opacity: 0;
+}
+
+.soul-people-gen__enter--header {
+  animation: soul-people-gen-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.soul-people-gen__enter--title {
+  --gen-enter-y: 14px;
+  animation: soul-people-gen-up 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) 200ms both;
+}
+
+.soul-people-gen__enter--subtitle {
+  --gen-enter-y: 10px;
+  animation: soul-people-gen-up 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) 400ms both;
+}
+
+.soul-people-gen__enter--dock {
+  animation: soul-people-gen-fade 0.4s cubic-bezier(0.25, 0.1, 0.25, 1) 300ms both;
+}
+
+.soul-people-gen__enter--orb {
+  --gen-enter-y: 6px;
+  animation: soul-people-gen-up 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) 500ms both;
+}
+
+.soul-people-gen__enter--letter-self {
+  animation: soul-people-gen-letter 0.4s cubic-bezier(0.25, 0.1, 0.25, 1) 600ms both;
+}
+
+.soul-people-gen__enter--letter-other {
+  animation: soul-people-gen-letter 0.4s cubic-bezier(0.25, 0.1, 0.25, 1) 700ms both;
+}
+
+.soul-people-gen__enter--note {
+  --gen-enter-y: 10px;
+  animation: soul-people-gen-up 0.4s cubic-bezier(0.25, 0.1, 0.25, 1) 1000ms both;
+}
+
 .soul-people__pair {
   position: relative;
   width: 100%;
-  /* Tall enough for orbit (r 92 + letter 32) so discs don't clip title / checklist */
-  height: 256px;
-  margin: 36px auto 40px;
+  height: 176px;
+  margin: 0 auto;
   max-width: 342px;
-}
-
-/* One spin root: Mark rings + letter carriers revolve together */
-.soul-people__pair-spin {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 0;
-  height: 0;
-  z-index: 1;
-  animation: soul-people-orbit 16s linear infinite;
+  overflow: visible;
 }
 
 .soul-people__pair-mark {
   position: absolute;
-  left: 0;
-  top: 0;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
   width: 176px;
   height: 176px;
   margin: -88px 0 0 -88px;
-  opacity: 1;
   pointer-events: none;
+  animation: soul-people-mark 10.5s both;
 }
 
 .soul-people__pair-mark img {
@@ -726,37 +756,24 @@
   object-fit: contain;
 }
 
-.soul-people__pair-carrier {
+.soul-people__pair-letter {
   position: absolute;
-  left: 0;
-  top: 0;
+  top: 50%;
+  z-index: 3;
   width: 64px;
   height: 64px;
-  margin: -32px 0 0 -32px;
+  margin-top: -32px;
 }
 
-/* Sit on the Mark ring path — 2px further inside from ±88 */
-.soul-people__pair-carrier--self {
-  transform: translateX(-86px);
+.soul-people__pair-letter--self {
+  left: calc(50% - 120px);
 }
 
-.soul-people__pair-carrier--other {
-  transform: translateX(86px);
+.soul-people__pair-letter--other {
+  left: calc(50% + 56px);
 }
 
 .soul-people__pair-face {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: soul-people-orbit-counter 16s linear infinite;
-}
-
-/* Ellipse 11 — Figma: soft taupe frost disc + thin white stroke (0.8)
-   Avoid backdrop-filter here: parent orbit transform breaks it. */
-.soul-people__pair-letter {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -768,7 +785,9 @@
   background:
     linear-gradient(rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.24)),
     rgba(143, 134, 123, 0.72);
-  box-shadow: 0 10px 28px rgba(48, 40, 32, 0.14);
+  box-shadow:
+    -20px -20px 20px -5px rgba(255, 255, 255, 0.15) inset,
+    0 38.4px 76.8px rgba(48, 40, 32, 0.15);
   font-family: var(--soul-font-display);
   font-size: 22.4px;
   line-height: 1;
@@ -777,7 +796,14 @@
   user-select: none;
 }
 
-/* Static magnific orb — dead center of the rings */
+.soul-people__pair-face--self {
+  animation: soul-people-letter-shine-self 10.5s linear both;
+}
+
+.soul-people__pair-face--other {
+  animation: soul-people-letter-shine-other 10.5s linear both;
+}
+
 .soul-people__pair-orb-wrap {
   position: absolute;
   left: 50%;
@@ -799,19 +825,20 @@
   object-fit: cover;
   mix-blend-mode: screen;
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+  transform-origin: center center;
+  animation: soul-people-orb-spin 8s linear infinite;
 }
 
 .soul-people__checklist {
   list-style: none;
-  margin: 0;
-  padding: 12px 48px 0;
+  margin: 0 auto;
+  padding: 32px 48px 0;
   display: flex;
   flex-direction: column;
   gap: 8px;
   max-width: 390px;
   width: 100%;
   box-sizing: border-box;
-  margin-inline: auto;
 }
 
 .soul-people__check {
@@ -822,21 +849,27 @@
   font-size: 16px;
   line-height: 22px;
   color: #fff;
-  opacity: 0.35;
-  transition: opacity 480ms ease;
+  opacity: 0;
 }
 
-.soul-people__check--dim {
-  opacity: 0.35;
+.soul-people__check--1 {
+  animation: soul-people-check-1 10.5s both;
 }
 
-.soul-people__check--on {
-  opacity: 1;
+.soul-people__check--2 {
+  animation: soul-people-check-n 10.5s both;
 }
 
-.soul-people__check--current {
-  opacity: 1;
-  animation: soul-people-check-in 480ms ease;
+.soul-people__check--3 {
+  animation: soul-people-check-3 10.5s both;
+}
+
+.soul-people__check--4 {
+  animation: soul-people-check-4 10.5s both;
+}
+
+.soul-people__check--5 {
+  animation: soul-people-check-5 10.5s both;
 }
 
 .soul-people__check span:first-child {
@@ -856,41 +889,288 @@
   box-sizing: border-box;
 }
 
-@keyframes soul-people-orbit {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+@keyframes soul-people-orb-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-@keyframes soul-people-orbit-counter {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(-360deg);
-  }
+@keyframes soul-people-gen-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-@keyframes soul-people-check-in {
+@keyframes soul-people-gen-up {
   from {
-    opacity: 0.35;
+    opacity: 0;
+    transform: translateY(var(--gen-enter-y, 14px));
   }
   to {
     opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soul-people-gen-letter {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Mark: fade in, then five 180° steps with holds — Figma times on a 10.5s timeline */
+@keyframes soul-people-mark {
+  0% {
+    opacity: 0;
+    transform: rotate(0deg);
+    animation-timing-function: linear;
+  }
+  4.76% {
+    opacity: 0;
+    transform: rotate(0deg);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  8.57% {
+    opacity: 1;
+    transform: rotate(0deg);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  16.19% {
+    opacity: 1;
+    transform: rotate(180deg);
+    animation-timing-function: linear;
+  }
+  27.62% {
+    transform: rotate(180deg);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  35.24% {
+    transform: rotate(360deg);
+    animation-timing-function: linear;
+  }
+  46.67% {
+    transform: rotate(360deg);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  54.29% {
+    transform: rotate(540deg);
+    animation-timing-function: linear;
+  }
+  65.71% {
+    transform: rotate(540deg);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  73.33% {
+    transform: rotate(720deg);
+    animation-timing-function: linear;
+  }
+  84.76% {
+    transform: rotate(720deg);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  92.38% {
+    transform: rotate(900deg);
+    animation-timing-function: linear;
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(900deg);
+  }
+}
+
+@keyframes soul-people-check-1 {
+  0%,
+  9.52% {
+    opacity: 0;
+    transform: translateY(10px);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  13.33%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soul-people-check-n {
+  0%,
+  9.52% {
+    opacity: 0;
+    transform: translateY(10px);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  13.33% {
+    opacity: 0.3;
+    transform: translateY(0);
+    animation-timing-function: linear;
+  }
+  27.62% {
+    opacity: 0.3;
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  35.24%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soul-people-check-3 {
+  0%,
+  9.52% {
+    opacity: 0;
+    transform: translateY(10px);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  13.33% {
+    opacity: 0.3;
+    transform: translateY(0);
+    animation-timing-function: linear;
+  }
+  46.67% {
+    opacity: 0.3;
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  54.29%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soul-people-check-4 {
+  0%,
+  9.52% {
+    opacity: 0;
+    transform: translateY(10px);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  13.33% {
+    opacity: 0.3;
+    transform: translateY(0);
+    animation-timing-function: linear;
+  }
+  65.71% {
+    opacity: 0.3;
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  73.33%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soul-people-check-5 {
+  0%,
+  9.52% {
+    opacity: 0;
+    transform: translateY(10px);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  13.33% {
+    opacity: 0.3;
+    transform: translateY(0);
+    animation-timing-function: linear;
+  }
+  84.76% {
+    opacity: 0.3;
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  92.38%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soul-people-letter-shine-self {
+  0%,
+  14.29% {
+    box-shadow:
+      -20px -20px 20px -5px rgba(255, 255, 255, 0.15) inset,
+      0 38.4px 76.8px rgba(48, 40, 32, 0.15);
+  }
+  19.05% {
+    box-shadow:
+      0 -2.5px 20px -5px rgba(255, 255, 255, 0.55) inset,
+      0 38.4px 76.8px rgba(48, 40, 32, 0.15);
+  }
+  23.81%,
+  42.86% {
+    box-shadow:
+      20px 15px 20px -5px rgba(255, 255, 255, 0.15) inset,
+      0 38.4px 76.8px rgba(48, 40, 32, 0.15);
+  }
+  47.62% {
+    box-shadow:
+      0 -2.5px 20px -5px rgba(255, 255, 255, 0.55) inset,
+      0 38.4px 76.8px rgba(48, 40, 32, 0.15);
+  }
+  52.38%,
+  100% {
+    box-shadow:
+      -20px -20px 20px -5px rgba(255, 255, 255, 0.15) inset,
+      0 38.4px 76.8px rgba(48, 40, 32, 0.15);
+  }
+}
+
+@keyframes soul-people-letter-shine-other {
+  0%,
+  17.14% {
+    box-shadow:
+      -20px -20px 20px -5px rgba(255, 255, 255, 0.15) inset,
+      0 38.4px 76.8px rgba(48, 40, 32, 0.15);
+  }
+  21.9% {
+    box-shadow:
+      0 -2.5px 20px -5px rgba(255, 255, 255, 0.55) inset,
+      0 38.4px 76.8px rgba(48, 40, 32, 0.15);
+  }
+  26.67%,
+  45.71% {
+    box-shadow:
+      20px 15px 20px -5px rgba(255, 255, 255, 0.15) inset,
+      0 38.4px 76.8px rgba(48, 40, 32, 0.15);
+  }
+  50.48% {
+    box-shadow:
+      0 -2.5px 20px -5px rgba(255, 255, 255, 0.55) inset,
+      0 38.4px 76.8px rgba(48, 40, 32, 0.15);
+  }
+  55.24%,
+  100% {
+    box-shadow:
+      -20px -20px 20px -5px rgba(255, 255, 255, 0.15) inset,
+      0 38.4px 76.8px rgba(48, 40, 32, 0.15);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .soul-people__pair-spin,
-  .soul-people__pair-face {
+  .soul-people-gen__enter,
+  .soul-people-gen__enter--header,
+  .soul-people-gen__enter--title,
+  .soul-people-gen__enter--subtitle,
+  .soul-people-gen__enter--dock,
+  .soul-people-gen__enter--orb,
+  .soul-people-gen__enter--letter-self,
+  .soul-people-gen__enter--letter-other,
+  .soul-people-gen__enter--note,
+  .soul-people__pair-mark,
+  .soul-people__pair-orb,
+  .soul-people__pair-face--self,
+  .soul-people__pair-face--other,
+  .soul-people__check {
     animation: none;
-  }
-
-  .soul-people__check--current {
-    animation: none;
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -1300,11 +1580,10 @@
 
   .soul-people__pair {
     max-width: 390px;
-    /* Keep orbit slot from flex-shrinking; absolute discs need reserved height */
     flex-shrink: 0;
-    height: 256px;
-    min-height: 256px;
-    margin: 20px auto 24px;
+    height: 176px;
+    min-height: 176px;
+    margin: 12px auto 8px;
   }
 
   .soul-people__scroll--generate {

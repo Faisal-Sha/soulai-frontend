@@ -395,3 +395,138 @@
   line-height: 20px;
   color: rgba(241, 237, 229, 0.7);
 }
+
+/* Desktop only — mobile rules above stay 1:1 with Figma 390. */
+@media (min-width: 900px) {
+  .soul-legal {
+    font-size: 16px;
+    line-height: 26px;
+  }
+
+  .soul-legal__column {
+    max-width: 840px;
+  }
+
+  .soul-legal__header {
+    min-height: 72px;
+    padding: 20px clamp(28px, 4vw, 56px);
+    padding-top: calc(20px + env(safe-area-inset-top, 0px));
+  }
+
+  .soul-legal__header .soul-brand__mark {
+    width: 24px;
+    height: 24px;
+  }
+
+  .soul-legal__header .soul-brand__text {
+    font-size: 16px;
+  }
+
+  .soul-legal__spacer {
+    height: 28px;
+  }
+
+  .soul-legal__hero {
+    gap: 20px;
+    padding: 36px clamp(28px, 4vw, 56px) 32px;
+  }
+
+  .soul-legal__hero-head {
+    gap: 10px;
+  }
+
+  .soul-legal__meta {
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  .soul-legal__title,
+  .soul-legal h1.soul-legal__title {
+    font-size: 36px;
+    line-height: 44px;
+    letter-spacing: -1.44px;
+  }
+
+  .soul-legal__intro {
+    gap: 20px;
+    max-width: 62ch;
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  .soul-legal__card-wrap {
+    padding: 10px clamp(28px, 4vw, 56px);
+  }
+
+  .soul-legal__card-wrap:last-child {
+    padding-bottom: 32px;
+  }
+
+  .soul-legal__card {
+    padding: 32px 36px;
+    border-radius: 28px;
+  }
+
+  .soul-legal h2.soul-legal__section-title {
+    margin-bottom: 12px;
+    font-size: 22px;
+    line-height: 30px;
+    letter-spacing: -0.22px;
+  }
+
+  .soul-legal h3.soul-legal__subsection-title,
+  .soul-legal__subsection-title {
+    margin-bottom: 10px;
+    font-size: 18px;
+    line-height: 26px;
+  }
+
+  .soul-legal__card-wrap:last-child .soul-legal__section-title {
+    margin-bottom: 20px;
+  }
+
+  .soul-legal__paragraph,
+  .soul-legal__list li {
+    font-size: 16px;
+    line-height: 26px;
+  }
+
+  .soul-legal__paragraph + .soul-legal__paragraph,
+  .soul-legal__paragraph--after-list,
+  .soul-legal__list,
+  .soul-legal__list + .soul-legal__subsection,
+  .soul-legal__paragraph + .soul-legal__subsection {
+    margin-top: 24px;
+  }
+
+  .soul-legal__subsection {
+    margin-top: 20px;
+  }
+
+  .soul-legal__footer {
+    gap: 28px;
+    padding: 0 clamp(28px, 4vw, 56px) 56px;
+  }
+
+  .soul-legal__footer-links {
+    gap: 12px 28px;
+  }
+
+  .soul-legal__footer-tag,
+  .soul-legal__footer-links a,
+  .soul-legal__footer-email,
+  .soul-legal__footer-copy {
+    font-size: 16px;
+    line-height: 24px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .soul-legal__column {
+    max-width: 920px;
+  }
+
+  .soul-legal__card {
+    padding: 36px 40px;
+  }
+}

@@ -42,14 +42,16 @@ export default function OnboardingChatScreen({ onStart, onBack }: OnboardingChat
         <div className="soul-ob__scrim" aria-hidden="true" />
 
         <div className="soul-ob__content">
-          <header className="soul-ob__header">
+          <header className="soul-ob__header soul-ob-chat__enter soul-ob-chat__enter--header">
             <SoulBrand />
           </header>
 
           <div className="soul-ob__main">
             <section className="soul-ob__hero">
-              <h1 className="soul-ob__title">Looking for the right move for you? Ask me!</h1>
-              <p className="soul-ob__subtitle">
+              <h1 className="soul-ob__title soul-ob-chat__enter soul-ob-chat__enter--title">
+                Looking for the right move for you? Ask me!
+              </h1>
+              <p className="soul-ob__subtitle soul-ob-chat__enter soul-ob-chat__enter--subtitle">
                 My advice comes only from your patterns and your profile — nothing generic.
                 I&apos;ll show you the options; the choice is always yours.
               </p>
@@ -58,13 +60,13 @@ export default function OnboardingChatScreen({ onStart, onBack }: OnboardingChat
             <div className="soul-ob__stage soul-ob-chat__stage">
               <div className="soul-ob-chat__thread">
                 <div className="soul-ob-chat__row soul-ob-chat__row--user">
-                  <div className="soul-ob-chat__bubble soul-ob-chat__bubble--user">
+                  <div className="soul-ob-chat__bubble soul-ob-chat__bubble--user soul-ob-chat__enter soul-ob-chat__enter--user1">
                     Why do I always fall for the wrong people?
                   </div>
                 </div>
 
                 <div className="soul-ob-chat__row soul-ob-chat__row--mentor">
-                  <div className="soul-ob-chat__bubble soul-ob-chat__bubble--mentor">
+                  <div className="soul-ob-chat__bubble soul-ob-chat__bubble--mentor soul-ob-chat__enter soul-ob-chat__enter--mentor">
                     <p>
                       Because being needed feels safer to you than being chosen — so you pick
                       people you can rescue, and call it love, Jane.
@@ -74,11 +76,13 @@ export default function OnboardingChatScreen({ onStart, onBack }: OnboardingChat
                       Want to see where it starts?
                     </p>
                   </div>
-                  <p className="soul-ob-chat__mentor-label">Your mentor</p>
+                  <p className="soul-ob-chat__mentor-label soul-ob-chat__enter soul-ob-chat__enter--label">
+                    Your mentor
+                  </p>
                 </div>
 
                 <div className="soul-ob-chat__row soul-ob-chat__row--user">
-                  <div className="soul-ob-chat__bubble soul-ob-chat__bubble--user">
+                  <div className="soul-ob-chat__bubble soul-ob-chat__bubble--user soul-ob-chat__enter soul-ob-chat__enter--user2">
                     Wait — you actually caught that? Okay, let&apos;s get into it.
                   </div>
                 </div>
@@ -86,7 +90,11 @@ export default function OnboardingChatScreen({ onStart, onBack }: OnboardingChat
             </div>
 
             <div className="soul-ob__footer">
-              <div className="soul-ob__dots-wrap" role="tablist" aria-label="Onboarding slides">
+              <div
+                className="soul-ob__dots-wrap soul-ob-chat__enter soul-ob-chat__enter--dots"
+                role="tablist"
+                aria-label="Onboarding slides"
+              >
                 <button
                   type="button"
                   role="tab"
@@ -104,7 +112,7 @@ export default function OnboardingChatScreen({ onStart, onBack }: OnboardingChat
                 />
               </div>
 
-              <div className="soul-ob__cta">
+              <div className="soul-ob__cta soul-ob-chat__enter soul-ob-chat__enter--cta">
                 <SoulButton block onClick={onStart} aria-label="Start my reading">
                   Start my reading
                 </SoulButton>

@@ -129,16 +129,43 @@
   margin: 0;
   font-family: var(--wt-ui);
   font-weight: 500;
-  font-size: clamp(24px, 7vw, 28px);
-  line-height: 1.32;
+  font-size: 28px;
+  line-height: 37px;
   letter-spacing: -1.12px;
   color: var(--wt-text-white);
+}
+
+.soul-wt-enter {
+  opacity: 0;
+}
+
+.soul-wt-enter--header {
+  animation: soul-wt-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.soul-wt-enter--title {
+  --wt-enter-y: 14px;
+  animation: soul-wt-up 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) 200ms both;
+}
+
+.soul-wt-enter--orb {
+  --wt-enter-y: 8px;
+  animation: soul-wt-up 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) 500ms both;
+}
+
+.soul-wt-enter--label {
+  --wt-enter-y: 8px;
+  animation: soul-wt-up 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) 1000ms both;
+}
+
+.soul-wt-enter--dots {
+  --wt-enter-y: 6px;
+  animation: soul-wt-up 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) 1500ms both;
 }
 
 .soul-wt__mark-stage {
   position: relative;
   flex: 0 0 auto;
-  /* Tall enough for 176 Mark / hero so rings don’t crowd title / checklist */
   width: 176px;
   height: 176px;
   margin: 8px auto 16px;
@@ -147,8 +174,8 @@
 .soul-wt__mark-spin {
   position: absolute;
   inset: 0;
-  animation: soul-wt-orbit 16s linear infinite;
   pointer-events: none;
+  animation: soul-wt-mark 12s both;
 }
 
 .soul-wt__mark-rings {
@@ -179,21 +206,8 @@
   object-fit: cover;
   mix-blend-mode: screen;
   filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.18));
-}
-
-@keyframes soul-wt-orbit {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .soul-wt__mark-spin {
-    animation: none;
-  }
+  transform-origin: center center;
+  animation: soul-wt-orb-spin 8s linear infinite;
 }
 
 .soul-wt__checks {
@@ -210,14 +224,33 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  opacity: 0.5;
+  opacity: 0;
   font-size: 16px;
   line-height: 22px;
-  transition: opacity 280ms ease;
 }
 
-.soul-wt__check--on {
-  opacity: 1;
+.soul-wt__check--1 {
+  animation: soul-wt-check-1 12s both;
+}
+
+.soul-wt__check--2 {
+  animation: soul-wt-check-2 12s both;
+}
+
+.soul-wt__check--3 {
+  animation: soul-wt-check-3 12s both;
+}
+
+.soul-wt__check--4 {
+  animation: soul-wt-check-4 12s both;
+}
+
+.soul-wt__check--5 {
+  animation: soul-wt-check-5 12s both;
+}
+
+.soul-wt__check--6 {
+  animation: soul-wt-check-6 12s both;
 }
 
 .soul-wt__tick {
@@ -237,54 +270,41 @@
 
 .soul-wt__cards {
   position: relative;
-  height: 146px;
-  margin: 0 24px;
+  height: 122px;
+  margin: 16px 24px 0;
   flex-shrink: 0;
 }
 
 .soul-wt__card {
   position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
   display: flex;
   flex-direction: column;
   gap: 8px;
   box-sizing: border-box;
+  padding: 24px;
+  border-radius: 24px;
   color: var(--wt-text-dark);
   background: rgba(255, 255, 255, 0.7);
   border: 1px solid #fff;
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
-}
-
-.soul-wt__card--back {
-  left: 28px;
-  right: 28px;
-  top: 11px;
-  padding: 20px;
-  border-radius: 20px;
-  opacity: 0.6;
-  box-shadow: 0 20px 40px rgba(48, 40, 32, 0.15);
-  transform: scale(0.94);
-}
-
-.soul-wt__card--front {
-  left: 0;
-  right: 0;
-  top: 24px;
-  padding: 24px;
-  border-radius: 24px;
   box-shadow: 0 24px 48px rgba(48, 40, 32, 0.15);
-  animation: soul-wt-card-in 320ms ease both;
+  opacity: 0;
 }
 
-@keyframes soul-wt-card-in {
-  from {
-    opacity: 0.7;
-    transform: translateY(10px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+.soul-wt__card--1 {
+  animation: soul-wt-card-1 12s both;
+}
+
+.soul-wt__card--2 {
+  animation: soul-wt-card-2 12s both;
+}
+
+.soul-wt__card--3 {
+  animation: soul-wt-card-3 12s both;
 }
 
 .soul-wt__card-title {
@@ -303,15 +323,6 @@
   line-height: 22px;
 }
 
-.soul-wt__card--back .soul-wt__card-title {
-  font-size: 15px;
-}
-
-.soul-wt__card--back .soul-wt__card-body {
-  font-size: 12.5px;
-  line-height: 18px;
-}
-
 .soul-wt__dots {
   display: flex;
   justify-content: center;
@@ -323,15 +334,414 @@
 .soul-wt__dot {
   width: 6px;
   height: 6px;
-  padding: 0;
-  border: none;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.35);
-  cursor: pointer;
+  background: #fff;
+  opacity: 0.35;
 }
 
-.soul-wt__dot--active {
-  background: #fff;
+.soul-wt__dot--1 {
+  animation: soul-wt-dot-1 12s both;
+}
+
+.soul-wt__dot--2 {
+  animation: soul-wt-dot-2 12s both;
+}
+
+.soul-wt__dot--3 {
+  animation: soul-wt-dot-3 12s both;
+}
+
+@keyframes soul-wt-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes soul-wt-up {
+  from {
+    opacity: 0;
+    transform: translateY(var(--wt-enter-y, 14px));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soul-wt-orb-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Mark: fade in, then six 180° steps with holds — Figma 12s timeline */
+@keyframes soul-wt-mark {
+  0% {
+    opacity: 0;
+    transform: rotate(0deg);
+    animation-timing-function: linear;
+  }
+  4.17% {
+    opacity: 0;
+    transform: rotate(0deg);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  7.5% {
+    opacity: 1;
+    transform: rotate(0deg);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  14.17% {
+    opacity: 1;
+    transform: rotate(180deg);
+    animation-timing-function: linear;
+  }
+  24.17% {
+    transform: rotate(180deg);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  30.83% {
+    transform: rotate(360deg);
+    animation-timing-function: linear;
+  }
+  40.83% {
+    transform: rotate(360deg);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  47.5% {
+    transform: rotate(540deg);
+    animation-timing-function: linear;
+  }
+  57.5% {
+    transform: rotate(540deg);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  64.17% {
+    transform: rotate(720deg);
+    animation-timing-function: linear;
+  }
+  74.17% {
+    transform: rotate(720deg);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  80.83% {
+    transform: rotate(900deg);
+    animation-timing-function: linear;
+  }
+  90.83% {
+    transform: rotate(900deg);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  97.5% {
+    transform: rotate(1080deg);
+    animation-timing-function: linear;
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(1080deg);
+  }
+}
+
+@keyframes soul-wt-check-1 {
+  0%,
+  8.33% {
+    opacity: 0;
+    transform: translateY(10px);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  11.67%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soul-wt-check-2 {
+  0%,
+  8.33% {
+    opacity: 0;
+    transform: translateY(10px);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  11.67% {
+    opacity: 0.3;
+    transform: translateY(0);
+    animation-timing-function: linear;
+  }
+  24.17% {
+    opacity: 0.3;
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  30.83%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soul-wt-check-3 {
+  0%,
+  8.33% {
+    opacity: 0;
+    transform: translateY(10px);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  11.67% {
+    opacity: 0.3;
+    transform: translateY(0);
+    animation-timing-function: linear;
+  }
+  40.83% {
+    opacity: 0.3;
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  47.5%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soul-wt-check-4 {
+  0%,
+  8.33% {
+    opacity: 0;
+    transform: translateY(10px);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  11.67% {
+    opacity: 0.3;
+    transform: translateY(0);
+    animation-timing-function: linear;
+  }
+  57.5% {
+    opacity: 0.3;
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  64.17%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soul-wt-check-5 {
+  0%,
+  8.33% {
+    opacity: 0;
+    transform: translateY(10px);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  11.67% {
+    opacity: 0.3;
+    transform: translateY(0);
+    animation-timing-function: linear;
+  }
+  74.17% {
+    opacity: 0.3;
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  80.83%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soul-wt-check-6 {
+  0%,
+  8.33% {
+    opacity: 0;
+    transform: translateY(10px);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  11.67% {
+    opacity: 0.3;
+    transform: translateY(0);
+    animation-timing-function: linear;
+  }
+  90.83% {
+    opacity: 0.3;
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  97.5%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soul-wt-card-1 {
+  0%,
+  12.5% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  16.67% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    animation-timing-function: linear;
+  }
+  33.33% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  37.5% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.85);
+    animation-timing-function: linear;
+  }
+  86.25% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  90.42%,
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes soul-wt-card-2 {
+  0%,
+  36.25% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.96);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  40.42% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    animation-timing-function: linear;
+  }
+  58.33% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  62.5%,
+  100% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.85);
+  }
+}
+
+@keyframes soul-wt-card-3 {
+  0%,
+  61.25% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.96);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  65.42% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    animation-timing-function: linear;
+  }
+  83.33% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  87.5%,
+  100% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.85);
+  }
+}
+
+@keyframes soul-wt-dot-1 {
+  0%,
+  33.33% {
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  36.25% {
+    opacity: 0.35;
+    animation-timing-function: linear;
+  }
+  86.25% {
+    opacity: 0.35;
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  90.42%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes soul-wt-dot-2 {
+  0%,
+  36.25% {
+    opacity: 0.35;
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  40.42% {
+    opacity: 1;
+    animation-timing-function: linear;
+  }
+  58.33% {
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  61.25%,
+  100% {
+    opacity: 0.35;
+  }
+}
+
+@keyframes soul-wt-dot-3 {
+  0%,
+  61.25% {
+    opacity: 0.35;
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  65.42% {
+    opacity: 1;
+    animation-timing-function: linear;
+  }
+  83.33% {
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  86.25%,
+  100% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .soul-wt-enter,
+  .soul-wt-enter--header,
+  .soul-wt-enter--title,
+  .soul-wt-enter--orb,
+  .soul-wt-enter--label,
+  .soul-wt-enter--dots,
+  .soul-wt__mark-spin,
+  .soul-wt__orb,
+  .soul-wt__check,
+  .soul-wt__card,
+  .soul-wt__dot {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .soul-wt__card--2,
+  .soul-wt__card--3 {
+    opacity: 0;
+  }
+
+  .soul-wt__dot--2,
+  .soul-wt__dot--3 {
+    opacity: 0.35;
+  }
 }
 
 @media (max-height: 780px) {
@@ -374,9 +784,8 @@
     height: 120px;
   }
 
-  .soul-wt__card--front {
+  .soul-wt__card {
     padding: 18px;
-    top: 16px;
   }
 
   .soul-wt__dots {

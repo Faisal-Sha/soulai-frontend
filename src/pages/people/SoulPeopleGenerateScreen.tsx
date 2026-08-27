@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { SoulBrand, SoulNav } from '@/components/soul'
 import { DEMO_PEOPLE, initialFromName } from './peopleData'
@@ -16,20 +16,17 @@ const STEPS = [
   'The one thing worth changing',
 ] as const
 
-/** Delay between each checklist line lighting up */
-const STEP_MS = 1400
-/** Pause after the last line before leaving for the report */
+/** Figma 1017:3884 cohort — 10.5s play-once, then a short settle before the report */
+const SEQUENCE_MS = 10500
 const DONE_MS = 900
 
 /**
- * Figma WIP · People · Generate · Pair (796:3815)
- * Center glass orb stays fixed in the Mark/hero rings; initials ride the revolving rings.
+ * Figma DEV · People · Generate · Pair (1017:3884)
+ * Mark/hero steps 180° per checklist item; P / A stay on the ring; orb stays centered.
  */
 export function SoulPeopleGenerateScreen() {
   const navigate = useNavigate()
   const { personId = 'anna' } = useParams()
-  /** How many checklist lines are enabled (0 = all waiting). */
-  const [enabledCount, setEnabledCount] = useState(0)
 
   const name = useMemo(() => {
     const demo = DEMO_PEOPLE.find((p) => p.id === personId)
@@ -53,18 +50,17 @@ export function SoulPeopleGenerateScreen() {
   const otherInitial = initialFromName(name)
 
   useEffect(() => {
-    if (enabledCount >= STEPS.length) {
-      const t = window.setTimeout(() => {
-        navigate(`/people/${encodeURIComponent(personId)}`, { replace: true })
-      }, DONE_MS)
-      return () => window.clearTimeout(t)
-    }
-    const t = window.setTimeout(() => setEnabledCount((n) => n + 1), STEP_MS)
+    const t = window.setTimeout(() => {
+      navigate(`/people/${encodeURIComponent(personId)}`, { replace: true })
+    }, SEQUENCE_MS + DONE_MS)
     return () => window.clearTimeout(t)
-  }, [enabledCount, navigate, personId])
+  }, [navigate, personId])
 
   return (
-    <div className="soul-people soul-people--generate">
+    <div
+      className="soul-people soul-people--generate"
+      data-name="People · Generate · Pair"
+    >
       <div className="soul-people__bg" aria-hidden="true">
         <div className="soul-people__bg-tile soul-people__bg-tile--1">
           <img src={bgRipple} alt="" />
@@ -79,7 +75,7 @@ export function SoulPeopleGenerateScreen() {
       <div className="soul-people__dock-scrim" aria-hidden="true" />
 
       <div className="soul-people__scroll soul-people__scroll--generate">
-        <header className="soul-people__header soul-people__header--back">
+        <header className="soul-people__header soul-people__header--back soul-people-gen__enter soul-people-gen__enter--header">
           <div className="soul-people__header-left">
             <button
               type="button"
@@ -100,36 +96,23 @@ export function SoulPeopleGenerateScreen() {
           className="soul-people__intro soul-people__intro--generate"
           aria-labelledby="soul-people-gen-title"
         >
-          <h1 id="soul-people-gen-title" className="soul-people__title">
+          <h1
+            id="soul-people-gen-title"
+            className="soul-people__title soul-people-gen__enter soul-people-gen__enter--title"
+          >
             Reading you and {name}
           </h1>
-          <p className="soul-people__subtitle soul-people__subtitle--generate">
+          <p className="soul-people__subtitle soul-people__subtitle--generate soul-people-gen__enter soul-people-gen__enter--subtitle">
             Five parts. I take them in order.
           </p>
         </section>
 
         <div className="soul-people__pair" aria-hidden="true">
-          {/* Revolving muted rings — letters ride on the ring path */}
-          <div className="soul-people__pair-spin">
-            <div className="soul-people__pair-mark">
-              <img src={markHero} alt="" width={176} height={176} />
-            </div>
-
-            <div className="soul-people__pair-carrier soul-people__pair-carrier--self">
-              <div className="soul-people__pair-face">
-                <span className="soul-people__pair-letter">{selfInitial}</span>
-              </div>
-            </div>
-
-            <div className="soul-people__pair-carrier soul-people__pair-carrier--other">
-              <div className="soul-people__pair-face">
-                <span className="soul-people__pair-letter">{otherInitial}</span>
-              </div>
-            </div>
+          <div className="soul-people__pair-mark">
+            <img src={markHero} alt="" width={176} height={176} />
           </div>
 
-          {/* Magnific glass orb — fixed in the center of the rings */}
-          <div className="soul-people__pair-orb-wrap">
+          <div className="soul-people__pair-orb-wrap soul-people-gen__enter soul-people-gen__enter--orb">
             <img
               className="soul-people__pair-orb"
               src={glassOrb}
@@ -138,36 +121,35 @@ export function SoulPeopleGenerateScreen() {
               height={51}
             />
           </div>
+
+          <div className="soul-people__pair-letter soul-people__pair-letter--self soul-people-gen__enter soul-people-gen__enter--letter-self">
+            <span className="soul-people__pair-face soul-people__pair-face--self">
+              {selfInitial}
+            </span>
+          </div>
+
+          <div className="soul-people__pair-letter soul-people__pair-letter--other soul-people-gen__enter soul-people-gen__enter--letter-other">
+            <span className="soul-people__pair-face soul-people__pair-face--other">
+              {otherInitial}
+            </span>
+          </div>
         </div>
 
         <ul className="soul-people__checklist" aria-live="polite">
-          {STEPS.map((label, i) => {
-            const on = i < enabledCount
-            const current = i === enabledCount - 1
-            return (
-              <li
-                key={label}
-                className={[
-                  'soul-people__check',
-                  on ? 'soul-people__check--on' : 'soul-people__check--dim',
-                  current ? 'soul-people__check--current' : '',
-                ]
-                  .filter(Boolean)
-                  .join(' ')}
-              >
-                <span aria-hidden="true">✓</span>
-                <span>{label}</span>
-              </li>
-            )
-          })}
+          {STEPS.map((label, i) => (
+            <li key={label} className={`soul-people__check soul-people__check--${i + 1}`}>
+              <span aria-hidden="true">✓</span>
+              <span>{label}</span>
+            </li>
+          ))}
         </ul>
 
-        <p className="soul-people__gen-note">
+        <p className="soul-people__gen-note soul-people-gen__enter soul-people-gen__enter--note">
           This one takes a minute. You can leave — it will be here when you come back.
         </p>
       </div>
 
-      <div className="soul-people__nav soul-people__nav--mobile">
+      <div className="soul-people__nav soul-people__nav--mobile soul-people-gen__enter soul-people-gen__enter--dock">
         <SoulNav />
       </div>
     </div>

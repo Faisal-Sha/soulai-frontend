@@ -16,6 +16,7 @@ import { variantFromUrlParam } from './resolveHomeVariant'
 import { AddToHomeSheet } from './AddToHomeSheet'
 import { ResumeSheet } from './ResumeSheet'
 import { useSoulSheetParams } from './useSoulSheetParams'
+import { useHomeEnter } from './useHomeEnter'
 import './soul-home.css'
 import bgRipple from './assets/bg-ripple.png'
 import iconReadings from './assets/icon-readings.png'
@@ -99,6 +100,7 @@ export function SoulHomeScreen({
   const [savedToast, setSavedToast] = useState(false)
   const [welcomeDismissed, setWelcomeDismissed] = useState(false)
   const toastTimer = useRef<number | null>(null)
+  const homeRootRef = useRef<HTMLDivElement>(null)
 
   useEffect(
     () => () => {
@@ -206,8 +208,11 @@ export function SoulHomeScreen({
     showSavedToast()
   }
 
+  useHomeEnter(homeRootRef, [variant, noteLoading])
+
   return (
     <div
+      ref={homeRootRef}
       className={`soul-home${paymentConfirmation && !welcomeDismissed ? ' soul-home--welcome-open' : ''}${resumeOpen || installOpen ? ' soul-home--sheet-open' : ''}`}
     >
       <div className="soul-home__bg" aria-hidden="true">
@@ -232,7 +237,11 @@ export function SoulHomeScreen({
       <div className="soul-home__dock-scrim" aria-hidden="true" />
 
       <div className="soul-home__scroll">
-        <header className="soul-home__header">
+        <header
+          className="soul-home__header soul-home__enter soul-home__enter--header"
+          data-home-enter
+          data-home-enter-delay="0"
+        >
           <SoulBrand />
           <div className="soul-home__header-nav" aria-label="Desktop navigation">
             <SoulNav variant="desktop" />
@@ -240,7 +249,7 @@ export function SoulHomeScreen({
         </header>
 
         {unpaidLike ? (
-          <div className="soul-home__trial soul-home__trial--notice" role="status">
+          <div className="soul-home__trial soul-home__trial--notice soul-home__enter soul-home__enter--banner" role="status" data-home-enter data-home-enter-delay="150">
             <div className="soul-home__trial-copy">
               <p className="soul-home__trial-title">{UNPAID_BANNER.title}</p>
               <p className="soul-home__trial-detail">{UNPAID_BANNER.detail}</p>
@@ -252,7 +261,7 @@ export function SoulHomeScreen({
         ) : null}
 
         {trial ? (
-          <div className="soul-home__trial soul-home__trial--notice" role="status">
+          <div className="soul-home__trial soul-home__trial--notice soul-home__enter soul-home__enter--banner" role="status" data-home-enter data-home-enter-delay="150">
             <div className="soul-home__trial-copy">
               <p className="soul-home__trial-title">{trialTitle}</p>
               <p className="soul-home__trial-detail">{trialDetail}</p>
@@ -266,9 +275,11 @@ export function SoulHomeScreen({
         <section className="soul-home__note" aria-label="Today’s note">
           {noteLoading ? (
             <div
-              className={`soul-home__skeleton${paymentConfirmation ? ' soul-home__skeleton--offset' : ''}`}
+              className={`soul-home__skeleton${paymentConfirmation ? ' soul-home__skeleton--offset' : ''} soul-home__enter soul-home__enter--eyebrow`}
               aria-busy="true"
               aria-live="polite"
+              data-home-enter
+              data-home-enter-delay="200"
             >
               <span className="soul-home__skeleton-bar soul-home__skeleton-bar--eyebrow" />
               <span className="soul-home__skeleton-bar soul-home__skeleton-bar--h1" />
@@ -278,18 +289,38 @@ export function SoulHomeScreen({
             </div>
           ) : (
             <div className="soul-home__note-copy">
-              {!unpaidLike ? <p className="soul-home__eyebrow">{eyebrow}</p> : null}
-              <h1 className="soul-home__headline">
+              {!unpaidLike ? (
+                <p
+                  className="soul-home__eyebrow soul-home__enter soul-home__enter--eyebrow"
+                  data-home-enter
+                  data-home-enter-delay="200"
+                >
+                  {eyebrow}
+                </p>
+              ) : null}
+              <h1
+                className="soul-home__headline soul-home__enter soul-home__enter--headline"
+                data-home-enter
+                data-home-enter-delay="400"
+              >
                 {unpaidPool ? POOL_NOTE.headline : NOTE.headline}
               </h1>
-              <p className="soul-home__sub">
+              <p
+                className="soul-home__sub soul-home__enter soul-home__enter--sub"
+                data-home-enter
+                data-home-enter-delay="600"
+              >
                 {unpaidPool ? POOL_NOTE.sub : unpaid ? NOTE.unpaidSub : NOTE.sub}
               </p>
             </div>
           )}
 
           {!noteLoading ? (
-            <div className="soul-home__actions">
+            <div
+              className="soul-home__actions soul-home__enter soul-home__enter--actions"
+              data-home-enter
+              data-home-enter-delay="900"
+            >
               {unpaidLike ? (
                 <div className="soul-home__action-row">
                   <SoulButton showArrow onClick={onResume}>
@@ -321,9 +352,19 @@ export function SoulHomeScreen({
         </section>
 
         <section className="soul-home__shelf" aria-label="Your shelf">
-          <hr className="soul-home__divider" />
+          <hr
+            className="soul-home__divider soul-home__enter soul-home__enter--fade"
+            data-home-enter
+            data-home-enter-delay="1100"
+          />
           <div className="soul-home__cards">
-            <button type="button" className="soul-home__card" onClick={openReading}>
+            <button
+              type="button"
+              className="soul-home__card soul-home__enter soul-home__enter--card"
+              data-home-enter
+              data-home-enter-delay="1200"
+              onClick={openReading}
+            >
               <div className="soul-home__card-body">
                 <div>
                   <h2 className="soul-home__card-title">Your readings</h2>
@@ -341,7 +382,13 @@ export function SoulHomeScreen({
               </span>
             </button>
 
-            <button type="button" className="soul-home__card" onClick={openInsights}>
+            <button
+              type="button"
+              className="soul-home__card soul-home__enter soul-home__enter--card"
+              data-home-enter
+              data-home-enter-delay="1400"
+              onClick={openInsights}
+            >
               <div className="soul-home__card-body">
                 <div>
                   <h2 className="soul-home__card-title">Saved insights</h2>
@@ -356,7 +403,9 @@ export function SoulHomeScreen({
 
             <button
               type="button"
-              className="soul-home__card"
+              className="soul-home__card soul-home__enter soul-home__enter--card"
+              data-home-enter
+              data-home-enter-delay="1600"
               onClick={() => navigate('/people')}
             >
               <div className="soul-home__card-body">
@@ -371,10 +420,20 @@ export function SoulHomeScreen({
               </span>
             </button>
           </div>
-          <hr className="soul-home__divider" />
+          <hr
+            className="soul-home__divider soul-home__enter soul-home__enter--fade"
+            data-home-enter
+            data-home-enter-delay="1800"
+          />
         </section>
 
-        <button type="button" className="soul-home__install" onClick={openInstall}>
+        <button
+          type="button"
+          className="soul-home__install soul-home__enter soul-home__enter--install"
+          data-home-enter
+          data-home-enter-delay="1900"
+          onClick={openInstall}
+        >
           <span className="soul-home__install-mark">
             <img src={markApp} alt="" width={28} height={28} />
           </span>
@@ -389,7 +448,11 @@ export function SoulHomeScreen({
           </span>
         </button>
 
-        <footer className="soul-home__footer">
+        <footer
+          className="soul-home__footer soul-home__enter soul-home__enter--footer"
+          data-home-enter
+          data-home-enter-delay="2200"
+        >
           <hr className="soul-home__divider" />
           <p className="soul-home__footer-tag">
             Helping you unlock your potential through ancient wisdom and modern technology.

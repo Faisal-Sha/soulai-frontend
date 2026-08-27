@@ -121,7 +121,10 @@
   gap: 16px;
   padding: 48px 24px 32px;
   flex-shrink: 0;
-  animation: soul-ob-fade 280ms ease both;
+}
+
+.soul-ob--chat .soul-ob__hero {
+  animation: none;
 }
 
 .soul-ob__title {
@@ -148,7 +151,6 @@
   flex: 1 1 auto;
   min-height: 0;
   width: 100%;
-  animation: soul-ob-fade 280ms ease both;
 }
 
 @keyframes soul-ob-fade {
@@ -162,7 +164,61 @@
   }
 }
 
-/* Reading cards — top-anchored so tall copy grows down, never covers the peek */
+/* Reading entrance — Figma 1017:4476 */
+.soul-ob__enter {
+  opacity: 0;
+}
+
+.soul-ob__enter--header {
+  animation: soul-ob-enter-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.soul-ob__enter--title {
+  animation: soul-ob-enter-y 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) 200ms both;
+  --ob-enter-y: 14px;
+}
+
+.soul-ob__enter--subtitle {
+  animation: soul-ob-enter-y 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) 400ms both;
+  --ob-enter-y: 12px;
+}
+
+.soul-ob__enter--back {
+  animation: soul-ob-enter-back 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) 800ms both;
+}
+
+.soul-ob__enter--dots {
+  animation: soul-ob-enter-y 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) 1000ms both;
+  --ob-enter-y: 6px;
+}
+
+.soul-ob__enter--cta {
+  animation: soul-ob-enter-y 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) 1000ms both;
+  --ob-enter-y: 10px;
+}
+
+@keyframes soul-ob-enter-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes soul-ob-enter-y {
+  from {
+    opacity: 0;
+    transform: translateY(var(--ob-enter-y, 14px));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soul-ob-enter-back {
+  from { opacity: 0; }
+  to { opacity: 0.7; }
+}
+
+/* Single insight card — Figma 1017:4476 (no peek card behind) */
 .soul-ob__stack {
   position: relative;
   width: 100%;
@@ -182,23 +238,11 @@
 }
 
 .soul-ob__card--back {
-  top: 4%;
-  width: min(245px, 68%);
-  transform: translateX(-50%);
-  padding: 19px;
-  gap: 16px;
-  border-radius: 19px;
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(32px);
-  -webkit-backdrop-filter: blur(32px);
-  box-shadow: 0 19px 38px rgba(48, 40, 32, 0.15);
-  opacity: 0.7;
-  z-index: 1;
-  max-height: 72%;
+  display: none;
 }
 
 .soul-ob__card--front {
-  top: 18%;
+  top: 6%;
   width: min(310px, calc(100% - 40px));
   transform: translateX(-50%);
   padding: 24px;
@@ -211,17 +255,61 @@
   z-index: 2;
   cursor: pointer;
   max-height: 82%;
-  animation: soul-ob-card-in 280ms ease both;
 }
 
-@keyframes soul-ob-card-in {
+.soul-ob__card--enter-first {
+  animation: soul-ob-card-enter-first 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) 800ms both;
+}
+
+.soul-ob__card--enter {
+  animation: soul-ob-card-enter 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) both;
+}
+
+.soul-ob__card--exit {
+  animation: soul-ob-card-exit 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) both;
+}
+
+.soul-ob__card--hold {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+.soul-ob__card--gap {
+  opacity: 0;
+  transform: translateX(-50%) translateY(30px) scale(0.85);
+  pointer-events: none;
+}
+
+@keyframes soul-ob-card-enter-first {
   from {
-    opacity: 0.65;
+    opacity: 0;
     transform: translateX(-50%) translateY(14px) scale(0.96);
   }
   to {
     opacity: 1;
     transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes soul-ob-card-enter {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(30px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes soul-ob-card-exit {
+  from {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(30px) scale(0.85);
   }
 }
 
@@ -359,14 +447,14 @@
   padding: 0;
   border: none;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.35);
+  background: #fff;
+  opacity: 0.35;
   cursor: pointer;
-  transition: background 180ms ease, transform 180ms ease;
+  transition: opacity 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 .soul-ob__dot--active {
-  background: #fff;
-  transform: scale(1.05);
+  opacity: 1;
 }
 
 .soul-ob__dot:focus-visible {
@@ -404,7 +492,6 @@
   max-width: 340px;
   margin: 0 auto;
   min-height: 0;
-  animation: soul-ob-fade 280ms ease both;
 }
 
 .soul-ob-chat__row {
@@ -467,6 +554,96 @@
   color: #e2dcd1;
 }
 
+/* 01.2 Chat entrance — Figma 1017:4128 · 5s clip */
+.soul-ob-chat__enter {
+  opacity: 0;
+}
+
+.soul-ob-chat__enter--header {
+  animation: soul-ob-chat-header 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.soul-ob-chat__enter--title {
+  animation: soul-ob-chat-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 300ms both;
+}
+
+.soul-ob-chat__enter--subtitle {
+  animation: soul-ob-chat-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 500ms both;
+}
+
+.soul-ob-chat__enter--cta {
+  animation: soul-ob-chat-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) 500ms both;
+}
+
+.soul-ob-chat__enter--dots {
+  animation: soul-ob-chat-fade 0.5s cubic-bezier(0.16, 1, 0.3, 1) 600ms both;
+}
+
+.soul-ob-chat__enter--user1 {
+  animation: soul-ob-chat-user 0.6s cubic-bezier(0.25, 0.1, 0.25, 1) 1300ms both;
+}
+
+.soul-ob-chat__enter--mentor {
+  animation: soul-ob-chat-mentor 0.6s cubic-bezier(0.25, 0.1, 0.25, 1) 2200ms both;
+}
+
+.soul-ob-chat__enter--label {
+  animation: soul-ob-chat-fade 0.4s cubic-bezier(0.25, 0.1, 0.25, 1) 2900ms both;
+}
+
+.soul-ob-chat__enter--user2 {
+  animation: soul-ob-chat-user 0.6s cubic-bezier(0.25, 0.1, 0.25, 1) 3500ms both;
+}
+
+@keyframes soul-ob-chat-header {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soul-ob-chat-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soul-ob-chat-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes soul-ob-chat-user {
+  from {
+    opacity: 0;
+    transform: translate(20px, 6px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+@keyframes soul-ob-chat-mentor {
+  from {
+    opacity: 0;
+    transform: translate(-20px, 6px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+}
+
 @media (max-height: 740px) {
   .soul-ob-chat__thread {
     gap: 8px;
@@ -498,14 +675,8 @@
     gap: 12px;
   }
 
-  .soul-ob__card--back {
-    top: 2%;
-    padding: 14px;
-    gap: 10px;
-  }
-
   .soul-ob__card--front {
-    top: 14%;
+    top: 4%;
     padding: 18px;
     gap: 12px;
   }
@@ -524,12 +695,8 @@
 }
 
 @media (max-height: 620px) {
-  .soul-ob__card--back {
-    display: none;
-  }
-
   .soul-ob__card--front {
-    top: 8%;
+    top: 4%;
   }
 
   .soul-ob__subtitle {
@@ -677,34 +844,16 @@
   }
 
   .soul-ob__card--back {
-    display: flex;
-    width: min(280px, 70%);
-    top: 6%;
-    left: calc(50% - 20px);
-    padding: 20px;
-    transform: translateX(-50%) rotate(-3deg);
-    max-height: 78%;
+    display: none;
   }
 
   .soul-ob__card--front {
     width: min(340px, 82%);
-    top: 18%;
-    left: calc(50% + 12px);
+    top: 8%;
+    left: 50%;
     padding: 24px;
-    transform: translateX(-50%) rotate(1.5deg);
+    transform: translateX(-50%);
     max-height: 84%;
-    animation: soul-ob-card-in-desktop 280ms ease both;
-  }
-
-  @keyframes soul-ob-card-in-desktop {
-    from {
-      opacity: 0.7;
-      transform: translateX(-50%) translateY(14px) rotate(1.5deg) scale(0.97);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0) rotate(1.5deg) scale(1);
-    }
   }
 }
 
@@ -719,5 +868,44 @@
 
   .soul-ob__card--front {
     width: min(360px, 82%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .soul-ob__enter,
+  .soul-ob__enter--header,
+  .soul-ob__enter--title,
+  .soul-ob__enter--subtitle,
+  .soul-ob__enter--back,
+  .soul-ob__enter--dots,
+  .soul-ob__enter--cta,
+  .soul-ob__card--enter-first,
+  .soul-ob__card--enter,
+  .soul-ob__card--exit {
+    animation: none;
+  }
+
+  .soul-ob__enter--header,
+  .soul-ob__enter--title,
+  .soul-ob__enter--subtitle,
+  .soul-ob__enter--dots,
+  .soul-ob__enter--cta {
+    opacity: 1;
+    transform: none;
+  }
+
+  .soul-ob-chat__enter,
+  .soul-ob-chat__enter--header,
+  .soul-ob-chat__enter--title,
+  .soul-ob-chat__enter--subtitle,
+  .soul-ob-chat__enter--cta,
+  .soul-ob-chat__enter--dots,
+  .soul-ob-chat__enter--user1,
+  .soul-ob-chat__enter--mentor,
+  .soul-ob-chat__enter--label,
+  .soul-ob-chat__enter--user2 {
+    animation: none;
+    opacity: 1;
+    transform: none;
   }
 }

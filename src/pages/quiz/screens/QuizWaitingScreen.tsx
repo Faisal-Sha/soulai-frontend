@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { SoulBrand } from '@/components/soul'
 import '../quiz-waiting.css'
 import bgWaiting from '../assets/onboarding/bg-waiting.png'
@@ -20,17 +20,18 @@ const WAIT_CARDS = [
     body: 'Every morning, a short note on what today asks of you.',
   },
   {
-    title: 'A reading of your day',
-    body: 'Every morning, a short note on what today asks of you.',
+    title: 'Weekly reflection',
+    body: 'A quiet space to pause and look back on what mattered this week.',
   },
   {
-    title: 'Pattern check-ins',
-    body: 'Gentle nudges when old loops show up — so you can choose differently.',
+    title: 'Mindful moment',
+    body: 'A gentle reminder to breathe and reconnect with yourself today.',
   },
 ] as const
 
-const STEP_MS = 1400
-const CARD_MS = 3200
+/** Figma 1017:4418 cohort — 12s play-once, then a short settle */
+const SEQUENCE_MS = 12000
+const DONE_MS = 900
 
 interface QuizWaitingScreenProps {
   name?: string
@@ -38,32 +39,16 @@ interface QuizWaitingScreenProps {
 }
 
 /**
- * Figma DEV · 03.1 · Generate · Waiting (node 437:3056)
- * Center graphic: Mark / hero rings (176) + magnific glass orb (120).
+ * Figma DEV · 03.1 · Generate · Waiting (1017:4418)
+ * Mark/hero steps 180° per checklist item; glass orb spins continuously.
  */
 export default function QuizWaitingScreen({ name, onDone }: QuizWaitingScreenProps) {
-  const [doneCount, setDoneCount] = useState(1)
-  const [cardIdx, setCardIdx] = useState(1)
   const displayName = name?.trim() || 'friend'
 
   useEffect(() => {
-    if (doneCount >= CHECKS.length) {
-      const t = window.setTimeout(onDone, 900)
-      return () => window.clearTimeout(t)
-    }
-    const t = window.setTimeout(() => setDoneCount((n) => n + 1), STEP_MS)
+    const t = window.setTimeout(onDone, SEQUENCE_MS + DONE_MS)
     return () => window.clearTimeout(t)
-  }, [doneCount, onDone])
-
-  useEffect(() => {
-    const t = window.setInterval(() => {
-      setCardIdx((i) => (i + 1) % WAIT_CARDS.length)
-    }, CARD_MS)
-    return () => window.clearInterval(t)
-  }, [])
-
-  const front = WAIT_CARDS[cardIdx]
-  const back = WAIT_CARDS[(cardIdx + 1) % WAIT_CARDS.length]
+  }, [onDone])
 
   return (
     <div className="soul-wt" data-name="03.1 · Generate · Waiting">
@@ -76,15 +61,16 @@ export default function QuizWaitingScreen({ name, onDone }: QuizWaitingScreenPro
         <div className="soul-wt__scrim" aria-hidden="true" />
 
         <div className="soul-wt__content">
-          <header className="soul-wt__header">
+          <header className="soul-wt__header soul-wt-enter soul-wt-enter--header">
             <SoulBrand />
           </header>
 
           <section className="soul-wt__hero">
-            <h1 className="soul-wt__title">Building your profile, {displayName}…</h1>
+            <h1 className="soul-wt__title soul-wt-enter soul-wt-enter--title">
+              Building your profile, {displayName}…
+            </h1>
           </section>
 
-          {/* Mark / hero + magnific glass orb (Figma 437:3069 / 437:3072) */}
           <div className="soul-wt__mark-stage" aria-hidden="true">
             <div className="soul-wt__mark-spin">
               <img
@@ -95,7 +81,7 @@ export default function QuizWaitingScreen({ name, onDone }: QuizWaitingScreenPro
                 height={176}
               />
             </div>
-            <div className="soul-wt__orb-wrap">
+            <div className="soul-wt__orb-wrap soul-wt-enter soul-wt-enter--orb">
               <img
                 className="soul-wt__orb"
                 src={glassOrb}
@@ -106,46 +92,42 @@ export default function QuizWaitingScreen({ name, onDone }: QuizWaitingScreenPro
             </div>
           </div>
 
-          <ul className="soul-wt__checks">
-            {CHECKS.map((label, i) => {
-              const active = i < doneCount
-              return (
-                <li
-                  key={label}
-                  className={`soul-wt__check${active ? ' soul-wt__check--on' : ''}`}
-                >
-                  <span className="soul-wt__tick" aria-hidden="true">
-                    ✓
-                  </span>
-                  <span>{label}</span>
-                </li>
-              )
-            })}
+          <ul className="soul-wt__checks" aria-live="polite">
+            {CHECKS.map((label, i) => (
+              <li key={label} className={`soul-wt__check soul-wt__check--${i + 1}`}>
+                <span className="soul-wt__tick" aria-hidden="true">
+                  ✓
+                </span>
+                <span>{label}</span>
+              </li>
+            ))}
           </ul>
 
-          <p className="soul-wt__wait-label">While you wait</p>
+          <p className="soul-wt__wait-label soul-wt-enter soul-wt-enter--label">While you wait</p>
 
           <div className="soul-wt__cards">
-            <article className="soul-wt__card soul-wt__card--back" aria-hidden="true">
-              <h2 className="soul-wt__card-title">{back.title}</h2>
-              <p className="soul-wt__card-body">{back.body}</p>
-            </article>
-            <article className="soul-wt__card soul-wt__card--front" key={front.title}>
-              <h2 className="soul-wt__card-title">{front.title}</h2>
-              <p className="soul-wt__card-body">{front.body}</p>
-            </article>
+            {WAIT_CARDS.map((card, i) => (
+              <article
+                key={card.title}
+                className={`soul-wt__card soul-wt__card--${i + 1}`}
+              >
+                <h2 className="soul-wt__card-title">{card.title}</h2>
+                <p className="soul-wt__card-body">{card.body}</p>
+              </article>
+            ))}
           </div>
 
-          <div className="soul-wt__dots" role="tablist" aria-label="While you wait">
+          <div
+            className="soul-wt__dots soul-wt-enter soul-wt-enter--dots"
+            role="tablist"
+            aria-label="While you wait"
+          >
             {WAIT_CARDS.map((card, i) => (
-              <button
+              <span
                 key={card.title}
-                type="button"
                 role="tab"
-                aria-selected={i === cardIdx}
                 aria-label={card.title}
-                className={`soul-wt__dot${i === cardIdx ? ' soul-wt__dot--active' : ''}`}
-                onClick={() => setCardIdx(i)}
+                className={`soul-wt__dot soul-wt__dot--${i + 1}`}
               />
             ))}
           </div>
