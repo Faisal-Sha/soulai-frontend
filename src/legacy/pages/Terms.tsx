@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { LegalDocumentLayout, type LegalSection } from "@/components/LegalDocumentLayout";
 
-const LAST_UPDATED = "July 29, 2026";
+const LAST_UPDATED = "August 27, 2026";
 
 const sections: LegalSection[] = [
   {

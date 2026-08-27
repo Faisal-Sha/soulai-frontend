@@ -1,3 +1,6 @@
+/**
+ * Figma DEV · Terms & Conditions (996:3841)
+ */
 import { Link } from "react-router-dom";
 import { LegalDocumentLayout, type LegalSection } from "@/components/LegalDocumentLayout";
 
@@ -56,9 +59,7 @@ const sections: LegalSection[] = [
     subsections: [
       {
         title: "Termination of License",
-        paragraphs: [
-          "Unauthorized use automatically terminates the license granted under these Terms.",
-        ],
+        paragraphs: ["Unauthorized use automatically terminates the license granted under these Terms."],
       },
     ],
   },
@@ -78,8 +79,6 @@ const sections: LegalSection[] = [
     title: "9. Subscriptions, Billing & Cancellation",
     paragraphs: [
       "Certain features of the Services, including your full reading/report and ongoing AI companion access, are offered on a paid, auto-renewing subscription basis (which may include an initial trial period at a reduced price, as described at checkout).",
-    ],
-    items: [
       "By starting a trial or subscription, you authorize us (or our payment processor) to charge your chosen payment method the price shown at checkout, and, unless cancelled before the trial ends, the recurring subscription price shown at checkout, on a recurring basis until you cancel.",
       "Subscriptions automatically renew for successive periods of the same length unless you cancel before the end of the current period.",
       "You may cancel your subscription at any time through your account/subscription settings in the App, or by contacting us at the email address below; cancellation takes effect at the end of the current billing period unless otherwise required by law.",
@@ -180,7 +179,6 @@ const Terms = () => (
   <LegalDocumentLayout
     title="Terms & Conditions"
     lastUpdated={LAST_UPDATED}
-    relatedLink={{ label: "Privacy Policy", path: "/privacy" }}
     intro={
       <>
         <p>
