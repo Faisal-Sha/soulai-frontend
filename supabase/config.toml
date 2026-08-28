@@ -1,0 +1,10 @@
+# SoulPlus AI V2 backend.
+# Do not link this folder to the V1 project.
+# Setup: see supabase/README.md
+# From repo root: supabase link --project-ref <V2_PROJECT_REF>
+
+project_id = "soulplus-ai-v2"
+
+[functions.quiz-complete]
+enabled = true
+verify_jwt = false

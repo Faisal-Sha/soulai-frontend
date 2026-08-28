@@ -6,7 +6,7 @@ import './soul-people.css'
 import bgRipple from '../home/assets/bg-ripple.png'
 import iconChevron from './assets/icon-chevron.svg'
 import markHero from './assets/pair-mark-hero.svg'
-import glassOrb from './assets/pair-glass-orb.png'
+import { SoulGlassOrb } from '../quiz/SoulGlassOrb'
 
 const STEPS = [
   'Where the two of you meet',
@@ -113,13 +113,7 @@ export function SoulPeopleGenerateScreen() {
           </div>
 
           <div className="soul-people__pair-orb-wrap soul-people-gen__enter soul-people-gen__enter--orb">
-            <img
-              className="soul-people__pair-orb"
-              src={glassOrb}
-              alt=""
-              width={51}
-              height={51}
-            />
+            <SoulGlassOrb className="soul-people__pair-orb" width={51} height={51} />
           </div>
 
           <div className="soul-people__pair-letter soul-people__pair-letter--self soul-people-gen__enter soul-people-gen__enter--letter-self">

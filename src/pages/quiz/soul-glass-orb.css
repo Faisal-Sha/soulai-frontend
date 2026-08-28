@@ -1,0 +1,27 @@
+.soul-glass-orb {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  border-radius: 50%;
+  line-height: 0;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+}
+
+.soul-glass-orb__source {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.soul-glass-orb__media {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+}

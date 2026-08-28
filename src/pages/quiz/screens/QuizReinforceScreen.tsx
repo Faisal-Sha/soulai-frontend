@@ -1,8 +1,8 @@
 import { SoulBrand, SoulButton, SoulProgress } from '@/components/soul'
 import '../quiz-reinforce.css'
 import bgReinforce from '../assets/onboarding/bg-reinforce.png'
-import glassOrb from '../assets/onboarding/glass-orb.png'
 import starFill from '../assets/onboarding/icon-star-reinforce.svg'
+import { SoulGlassOrb } from '../SoulGlassOrb'
 import type { QuizAnswers } from '../types'
 
 interface QuizReinforceScreenProps {
@@ -44,7 +44,7 @@ export default function QuizReinforceScreen({ onNext }: QuizReinforceScreenProps
             </section>
 
             <div className="soul-rf__orb-wrap" aria-hidden="true">
-              <img className="soul-rf__orb" src={glassOrb} alt="" width={126} height={126} />
+              <SoulGlassOrb className="soul-rf__orb" width={126} height={126} />
             </div>
 
             <p className="soul-rf__proof-copy">

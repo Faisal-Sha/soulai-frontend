@@ -103,7 +103,7 @@ export function SoulAccountScreen() {
   const know = useMemo(() => knowProgress(getKnowSections()), [])
   const metaLine = useMemo(() => {
     const parts: string[] = []
-    if (DEMO.place) parts.push(DEMO.place)
+    parts.push(profile?.birth_place?.trim() || DEMO.place)
     if (profile?.dob) {
       try {
         parts.push(
@@ -119,9 +119,10 @@ export function SoulAccountScreen() {
     } else {
       parts.push(DEMO.birthDate)
     }
-    parts.push(DEMO.birthTime)
+    const time = profile?.birth_time?.slice(0, 5)
+    parts.push(time || DEMO.birthTime)
     return parts.join(' · ')
-  }, [profile?.dob])
+  }, [profile?.birth_place, profile?.birth_time, profile?.dob])
 
   const notificationsLine = readNotificationsLine()
 

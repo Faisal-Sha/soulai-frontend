@@ -711,8 +711,7 @@
 }
 
 .soul-people-gen__enter--orb {
-  --gen-enter-y: 6px;
-  animation: soul-people-gen-up 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) 500ms both;
+  animation: soul-people-gen-fade 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) 500ms both;
 }
 
 .soul-people-gen__enter--letter-self {
@@ -812,21 +811,12 @@
   width: 51px;
   height: 51px;
   margin: -25.5px 0 0 -25.5px;
-  border-radius: 50%;
-  overflow: hidden;
   pointer-events: none;
 }
 
 .soul-people__pair-orb {
   width: 51px;
   height: 51px;
-  display: block;
-  border-radius: 50%;
-  object-fit: cover;
-  mix-blend-mode: screen;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
-  transform-origin: center center;
-  animation: soul-people-orb-spin 8s linear infinite;
 }
 
 .soul-people__checklist {
@@ -889,11 +879,6 @@
   box-sizing: border-box;
 }
 
-@keyframes soul-people-orb-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
 @keyframes soul-people-gen-fade {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -906,7 +891,7 @@
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
   }
 }
 

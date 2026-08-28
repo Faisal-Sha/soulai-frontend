@@ -155,24 +155,6 @@
 .soul-rf__orb {
   width: 126px;
   height: 126px;
-  object-fit: contain;
-  display: block;
-  mix-blend-mode: screen;
-  border-radius: 50%;
-  flex-shrink: 0;
-  transform-origin: center center;
-  animation: soul-rf-orb-spin 8s linear infinite;
-}
-
-@keyframes soul-rf-orb-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .soul-rf__orb {
-    animation: none;
-  }
 }
 
 .soul-rf__proof-copy {

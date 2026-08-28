@@ -3,7 +3,7 @@ import { SoulBrand } from '@/components/soul'
 import '../quiz-waiting.css'
 import bgWaiting from '../assets/onboarding/bg-waiting.png'
 import markHero from '../assets/onboarding/mark-waiting.svg'
-import glassOrb from '../assets/onboarding/glass-orb.png'
+import { SoulGlassOrb } from '../SoulGlassOrb'
 
 const CHECKS = [
   'Reading what you told me',
@@ -40,7 +40,7 @@ interface QuizWaitingScreenProps {
 
 /**
  * Figma DEV · 03.1 · Generate · Waiting (1017:4418)
- * Mark/hero steps 180° per checklist item; glass orb spins continuously.
+ * Mark/hero steps 180° per checklist item; glass orb video loops in place.
  */
 export default function QuizWaitingScreen({ name, onDone }: QuizWaitingScreenProps) {
   const displayName = name?.trim() || 'friend'
@@ -82,13 +82,7 @@ export default function QuizWaitingScreen({ name, onDone }: QuizWaitingScreenPro
               />
             </div>
             <div className="soul-wt__orb-wrap soul-wt-enter soul-wt-enter--orb">
-              <img
-                className="soul-wt__orb"
-                src={glassOrb}
-                alt=""
-                width={120}
-                height={120}
-              />
+              <SoulGlassOrb className="soul-wt__orb" width={120} height={120} />
             </div>
           </div>
 

@@ -36,8 +36,7 @@ export function useLeadCapture() {
     setError(null)
 
     try {
-      // Call the Edge Function — handles DB upsert + Customer.io server-side
-      const { data, error: fnError } = await supabase.functions.invoke('quiz-lead', {
+      const { data, error: fnError } = await supabase.functions.invoke('quiz-complete', {
         body: {
           email,
           answers,
@@ -48,9 +47,9 @@ export function useLeadCapture() {
       })
 
       if (fnError) throw new Error(fnError.message)
-      if (!data?.lead_id) throw new Error('No lead_id returned')
+      const id: string | undefined = data?.profile_id
+      if (!id) throw new Error('No profile_id returned')
 
-      const id: string = data.lead_id
       setLeadId(id)
       try { localStorage.removeItem(LS_PENDING) } catch { /* ignore */ }
       return { leadId: id, error: null }

@@ -149,8 +149,7 @@
 }
 
 .soul-wt-enter--orb {
-  --wt-enter-y: 8px;
-  animation: soul-wt-up 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) 500ms both;
+  animation: soul-wt-fade 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) 500ms both;
 }
 
 .soul-wt-enter--label {
@@ -193,21 +192,12 @@
   width: 120px;
   height: 120px;
   margin: -60px 0 0 -60px;
-  border-radius: 50%;
-  overflow: hidden;
   pointer-events: none;
 }
 
 .soul-wt__orb {
-  display: block;
   width: 120px;
   height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  mix-blend-mode: screen;
-  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.18));
-  transform-origin: center center;
-  animation: soul-wt-orb-spin 8s linear infinite;
 }
 
 .soul-wt__checks {
@@ -363,13 +353,8 @@
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
   }
-}
-
-@keyframes soul-wt-orb-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
 }
 
 /* Mark: fade in, then six 180° steps with holds — Figma 12s timeline */

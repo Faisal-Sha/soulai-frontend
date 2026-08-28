@@ -13,12 +13,14 @@ import { supabase } from '@/integrations/supabase/client'
 
 export interface UserProfile {
   id: string
+  auth_user_id?: string | null
   full_name: string | null
   email: string | null
   avatar_url: string | null
   dob?: string | null
-  balance?: number
-  free_messages_count?: number
+  birth_place?: string | null
+  birth_time?: string | null
+  quiz_completed_at?: string | null
 }
 
 export interface UserSubscription {
@@ -73,19 +75,34 @@ function isPremiumSubscription(sub: UserSubscription | null) {
   )
 }
 
+function mapSoulProfile(row: Record<string, unknown> | null): UserProfile | null {
+  if (!row) return null
+  const birthDate = typeof row.birth_date === 'string' ? row.birth_date : null
+  return {
+    id: String(row.id),
+    auth_user_id: typeof row.auth_user_id === 'string' ? row.auth_user_id : null,
+    full_name: typeof row.full_name === 'string' ? row.full_name : null,
+    email: typeof row.email === 'string' ? row.email : null,
+    avatar_url: typeof row.avatar_url === 'string' ? row.avatar_url : null,
+    dob: birthDate,
+    birth_place: typeof row.birth_place === 'string' ? row.birth_place : null,
+    birth_time: typeof row.birth_time === 'string' ? row.birth_time : null,
+    quiz_completed_at: typeof row.quiz_completed_at === 'string' ? row.quiz_completed_at : null,
+  }
+}
+
 async function loadUserRows(userId: string) {
-  const [profileRes, subRes] = await Promise.all([
-    supabase
-      .from('profiles')
-      .select('id,full_name,email,avatar_url,dob,balance,free_messages_count')
-      .eq('id', userId)
-      .maybeSingle(),
-    supabase.from('subscriptions').select('*').eq('user_id', userId).maybeSingle(),
-  ])
+  const profileRes = await supabase
+    .from('soul_profiles')
+    .select(
+      'id,auth_user_id,full_name,email,avatar_url,birth_date,birth_place,birth_time,quiz_completed_at',
+    )
+    .eq('auth_user_id', userId)
+    .maybeSingle()
 
   return {
-    profile: (profileRes.data as UserProfile | null) ?? null,
-    subscription: (subRes.data as UserSubscription | null) ?? null,
+    profile: mapSoulProfile((profileRes.data as Record<string, unknown> | null) ?? null),
+    subscription: null as UserSubscription | null,
   }
 }
 
