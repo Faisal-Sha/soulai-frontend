@@ -1,12 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { toast } from 'sonner'
 import { SoulBrand, SoulButton, SoulNav, SoulTextarea } from '@/components/soul'
-import {
-  findKnowQuestion,
-  getKnowSections,
-  knowProgress,
-  writeKnowAnswer,
-} from './knowData'
+import { useKnowAnswers } from './useKnowAnswers'
 import './soul-account.css'
 import bgRipple from '../home/assets/bg-ripple.png'
 import iconArrowLight from '../readings/assets/icon-arrow-light.svg'
@@ -19,10 +15,11 @@ import iconBack from '../people/assets/icon-chevron.svg'
 export function SoulAccountKnowAnswerScreen() {
   const navigate = useNavigate()
   const { questionId = '' } = useParams()
-  const hit = useMemo(() => findKnowQuestion(questionId), [questionId])
+  const { lookup, progress, saveAnswer } = useKnowAnswers()
+  const hit = useMemo(() => lookup(questionId), [lookup, questionId])
 
   const [value, setValue] = useState(() => hit?.question.answer ?? '')
-  const [savedTick, setSavedTick] = useState(0)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     setValue(hit?.question.answer ?? '')
@@ -39,11 +36,6 @@ export function SoulAccountKnowAnswerScreen() {
     return () => window.clearTimeout(t)
   }, [questionId])
 
-  const progress = useMemo(
-    () => knowProgress(getKnowSections()),
-    [questionId, savedTick],
-  )
-
   if (!hit) {
     return <Navigate to="/account/know" replace />
   }
@@ -52,22 +44,30 @@ export function SoulAccountKnowAnswerScreen() {
   const remaining = section.questions.slice(index + 1)
   const doneInSection = section.questions.filter((q) => q.answer?.trim()).length
   const totalInSection = section.questions.length
-  const canSave = value.trim().length > 0
+  const canSave = value.trim().length > 0 && !saving
 
-  const persist = () => {
-    if (!canSave) return false
-    writeKnowAnswer(question.id, value)
-    setSavedTick((n) => n + 1)
-    return true
+  const persist = async () => {
+    if (!value.trim() || saving) return false
+    setSaving(true)
+    try {
+      await saveAnswer(question.id, value)
+      return true
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Could not save'
+      toast.error(message)
+      return false
+    } finally {
+      setSaving(false)
+    }
   }
 
-  const onSave = () => {
-    if (!persist()) return
+  const onSave = async () => {
+    if (!(await persist())) return
     navigate('/account/know', { replace: true })
   }
 
-  const onOpenRemaining = (id: string) => {
-    if (canSave) persist()
+  const onOpenRemaining = async (id: string) => {
+    if (value.trim()) await persist()
     navigate(`/account/know/${id}`)
   }
 
@@ -148,9 +148,9 @@ export function SoulAccountKnowAnswerScreen() {
                 block
                 className="soul-account__answer-save"
                 disabled={!canSave}
-                onClick={onSave}
+                onClick={() => void onSave()}
               >
-                Save
+                {saving ? 'Saving…' : 'Save'}
               </SoulButton>
             </article>
 
@@ -162,7 +162,7 @@ export function SoulAccountKnowAnswerScreen() {
                   <button
                     type="button"
                     className="soul-account__know-link soul-account__know-link--on-dark"
-                    onClick={() => onOpenRemaining(q.id)}
+                    onClick={() => void onOpenRemaining(q.id)}
                   >
                     {answered ? 'Update' : 'Answer'}
                     <img src={iconArrowLight} alt="" width={14} height={14} />

@@ -5,11 +5,16 @@ import type { Session } from '@supabase/supabase-js'
 import { supabase } from '@/integrations/supabase/client'
 import { AuthLayout } from './AuthLayout'
 import bgSignInEmail from './assets/bg-signin-email.png'
-import { getPostAuthPath, parseAuthCallbackError, readStoredAuth } from './authActions'
+import {
+  getPostAuthPath,
+  parseAuthCallbackError,
+  readStoredAuth,
+  resolveSignedInPath,
+} from './authActions'
 
 /**
- * Lands from Google / Apple / magic-link / reset emails.
- * Supabase writes the session from the URL; we route on the result.
+ * Lands from Google / Apple / magic-link.
+ * Finished quiz → home. Incomplete OAuth profile → quiz.
  */
 export function AuthCallbackScreen() {
   const navigate = useNavigate()
@@ -18,14 +23,20 @@ export function AuthCallbackScreen() {
   const done = useRef(false)
 
   useEffect(() => {
-    const next = getPostAuthPath(`?${params.toString()}`)
+    const requested = getPostAuthPath(`?${params.toString()}`)
     const { email, purpose } = readStoredAuth()
     const parsed = parseAuthCallbackError(window.location.search, window.location.hash)
 
-    const succeed = (session: Session) => {
+    const succeed = async (session: Session) => {
       if (done.current) return
       done.current = true
-      navigate(next, { replace: true })
+      setStatus('Opening your space…')
+      try {
+        const path = await resolveSignedInPath(session.user.id, requested)
+        navigate(path, { replace: true })
+      } catch {
+        navigate(requested, { replace: true })
+      }
     }
 
     const fail = (expired: boolean, message?: string) => {
@@ -47,16 +58,16 @@ export function AuthCallbackScreen() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' || event === 'PASSWORD_RECOVERY' || event === 'USER_UPDATED') {
-        if (session) succeed(session)
+        if (session) void succeed(session)
       }
     })
 
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) succeed(session)
+      if (session) void succeed(session)
       else setStatus('Waiting for your session…')
     })
 
-    const t = window.setTimeout(() => fail(true), 8000)
+    const t = window.setTimeout(() => fail(true), 12000)
 
     return () => {
       window.clearTimeout(t)

@@ -5,6 +5,7 @@ import { SoulButton } from '@/components/soul'
 import { AuthLayout } from './AuthLayout'
 import bgSignInEmail from './assets/bg-signin-email.png'
 import {
+  MAGIC_LINK_HOURS,
   authErrorMessage,
   getPostAuthPath,
   readStoredAuth,
@@ -55,7 +56,7 @@ export function SoulLoginCheckScreen() {
 
   const body = useMemo(() => {
     if (!email) return ''
-    return `I sent a link to ${email}. It works once and expires in 15 minutes.`
+    return `I sent a link to ${email}. It works once and expires in ${MAGIC_LINK_HOURS} hours.`
   }, [email])
 
   const resend = async () => {

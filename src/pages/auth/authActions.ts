@@ -3,6 +3,11 @@ import { supabase } from '@/integrations/supabase/client'
 export type OAuthProvider = 'google' | 'apple'
 export type AuthLinkPurpose = 'login' | 'reset'
 
+export const APP_HOME = '/'
+export const QUIZ_START = '/quiz/welcome'
+/** Magic-link lifetime. Must match supabase/config.toml [auth.email] otp_expiry. */
+export const MAGIC_LINK_HOURS = 24
+
 const EMAIL_KEY = 'soul-auth-email'
 const PURPOSE_KEY = 'soul-auth-purpose'
 
@@ -27,15 +32,40 @@ export function readStoredAuth(): { email: string; purpose: AuthLinkPurpose } {
 
 export function getPostAuthPath(search = window.location.search) {
   const redirect = new URLSearchParams(search).get('redirect')
-  if (redirect?.startsWith('/') && !redirect.startsWith('//')) return redirect
-  return '/'
+  if (
+    redirect?.startsWith('/') &&
+    !redirect.startsWith('//') &&
+    !redirect.startsWith('/login')
+  ) {
+    return redirect
+  }
+  return APP_HOME
 }
 
 export function authCallbackUrl(redirectPath?: string) {
   const url = new URL('/login/callback', window.location.origin)
   const next = redirectPath || getPostAuthPath()
-  if (next !== '/') url.searchParams.set('redirect', next)
+  if (next !== APP_HOME) url.searchParams.set('redirect', next)
   return url.toString()
+}
+
+export function isQuizComplete(profile: { quiz_completed_at?: string | null } | null | undefined) {
+  return Boolean(profile?.quiz_completed_at)
+}
+
+export function pathAfterSignIn(quizComplete: boolean, requested = APP_HOME) {
+  if (!quizComplete) return QUIZ_START
+  if (requested.startsWith('/quiz')) return APP_HOME
+  return requested || APP_HOME
+}
+
+export async function resolveSignedInPath(userId: string, requested = APP_HOME) {
+  const { data } = await supabase
+    .from('soul_profiles')
+    .select('quiz_completed_at')
+    .eq('auth_user_id', userId)
+    .maybeSingle()
+  return pathAfterSignIn(Boolean(data?.quiz_completed_at), requested)
 }
 
 export function authErrorMessage(err: unknown) {

@@ -21,11 +21,13 @@ import { SoulAccountPlanScreen } from "./pages/account/SoulAccountPlanScreen";
 import { SoulAccountNotificationsScreen } from "./pages/account/SoulAccountNotificationsScreen";
 import { SoulAccountKnowScreen } from "./pages/account/SoulAccountKnowScreen";
 import { SoulAccountKnowAnswerScreen } from "./pages/account/SoulAccountKnowAnswerScreen";
+import { SoulAccountBirthScreen } from "./pages/account/SoulAccountBirthScreen";
 import { SoulLoginScreen } from "./pages/auth/SoulLoginScreen";
 import { SoulLoginEmailScreen } from "./pages/auth/SoulLoginEmailScreen";
 import { SoulLoginCheckScreen } from "./pages/auth/SoulLoginCheckScreen";
 import { SoulForgotPasswordScreen } from "./pages/auth/SoulForgotPasswordScreen";
 import { AuthCallbackScreen } from "./pages/auth/AuthCallbackScreen";
+import { QuizGate } from "./pages/auth/QuizGate";
 import AgentPage from "./pages/agent/AgentPage";
 import Contact from "./pages/legal/Contact";
 import FAQ from "./pages/legal/FAQ";
@@ -76,6 +78,7 @@ function AppRoutes() {
       <Route path="/account/notifications" element={<SoulAccountNotificationsScreen />} />
       <Route path="/account/know" element={<SoulAccountKnowScreen />} />
       <Route path="/account/know/:questionId" element={<SoulAccountKnowAnswerScreen />} />
+      <Route path="/account/birth" element={<SoulAccountBirthScreen />} />
 
       <Route path="/contact" element={<Contact />} />
       <Route path="/faq" element={<FAQ />} />
@@ -95,7 +98,9 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <UserProvider>
-            <AppRoutes />
+            <QuizGate>
+              <AppRoutes />
+            </QuizGate>
           </UserProvider>
         </BrowserRouter>
       </TooltipProvider>

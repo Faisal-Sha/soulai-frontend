@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { SoulBrand, SoulNav, SoulTextLink } from '@/components/soul'
-import { getKnowSections, knowProgress, type KnowQuestion } from './knowData'
+import { type KnowQuestion } from './knowData'
+import { useKnowAnswers } from './useKnowAnswers'
 import './soul-account.css'
 import bgRipple from '../home/assets/bg-ripple.png'
 import iconArrowLight from '../readings/assets/icon-arrow-light.svg'
@@ -12,8 +13,7 @@ import iconBack from '../people/assets/icon-chevron.svg'
  */
 export function SoulAccountKnowScreen() {
   const navigate = useNavigate()
-  const sections = getKnowSections()
-  const progress = knowProgress(sections)
+  const { sections, progress } = useKnowAnswers()
 
   const onOpenQuestion = (q: KnowQuestion) => {
     navigate(`/account/know/${q.id}`)

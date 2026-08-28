@@ -5,6 +5,28 @@
 
 project_id = "soulplus-ai-v2"
 
+[auth]
+enabled = true
+site_url = "http://localhost:8080"
+additional_redirect_urls = [
+  "http://localhost:8080/login/callback",
+  "http://localhost:8080/**",
+]
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+enable_signup = true
+
+[auth.sessions]
+# Stay signed in for months. Access token still rotates every hour.
+timebox = "4320h"
+inactivity_timeout = "2160h"
+
+[auth.email]
+enable_signup = true
+enable_confirmations = false
+otp_expiry = 86400
+max_frequency = "60s"
+
 [functions.quiz-complete]
 enabled = true
 verify_jwt = false

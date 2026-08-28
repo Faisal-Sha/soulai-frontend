@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/integrations/supabase/client'
+import { useUser } from '@/hooks/useUser'
 import type { QuizAnswers, UTMParams } from '../types'
 
 const LS_PENDING = 'soul-pending-lead'
@@ -15,6 +16,7 @@ export function useLeadCapture() {
   const [leadId, setLeadId] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
+  const { user, refetch } = useUser()
 
   // On mount: retry any pending lead from a previous failed attempt
   useEffect(() => {
@@ -52,6 +54,9 @@ export function useLeadCapture() {
 
       setLeadId(id)
       try { localStorage.removeItem(LS_PENDING) } catch { /* ignore */ }
+      if (user) {
+        try { await refetch() } catch { /* profile will load on next session */ }
+      }
       return { leadId: id, error: null }
 
     } catch (err) {
@@ -66,7 +71,7 @@ export function useLeadCapture() {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [refetch, user])
 
   return { captureEmail, leadId, isLoading, error }
 }

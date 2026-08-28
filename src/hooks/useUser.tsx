@@ -21,6 +21,7 @@ export interface UserProfile {
   birth_place?: string | null
   birth_time?: string | null
   quiz_completed_at?: string | null
+  know_answers: Record<string, string>
 }
 
 export interface UserSubscription {
@@ -35,6 +36,13 @@ export interface UserSubscription {
   current_period_end: string | null
 }
 
+export type IdentityPatch = {
+  full_name: string
+  birth_date: string | null
+  birth_time: string | null
+  birth_place: string | null
+}
+
 type UserContextValue = {
   user: User | null
   session: Session | null
@@ -43,6 +51,8 @@ type UserContextValue = {
   isPremium: boolean
   loading: boolean
   refetch: () => Promise<void>
+  saveKnowAnswer: (questionId: string, answer: string) => Promise<void>
+  updateIdentity: (patch: IdentityPatch) => Promise<void>
 }
 
 const PREMIUM_PLANS = new Set([
@@ -75,33 +85,118 @@ function isPremiumSubscription(sub: UserSubscription | null) {
   )
 }
 
-function mapSoulProfile(row: Record<string, unknown> | null): UserProfile | null {
+function asKnowAnswers(raw: unknown): Record<string, string> {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return {}
+  const out: Record<string, string> = {}
+  for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
+    if (typeof value === 'string' && value.trim()) out[key] = value.trim()
+  }
+  return out
+}
+
+function oauthPicture(user: User) {
+  const meta = user.user_metadata ?? {}
+  const picture = meta.avatar_url || meta.picture
+  return typeof picture === 'string' && picture.trim() ? picture.trim() : null
+}
+
+function oauthName(user: User) {
+  const meta = user.user_metadata ?? {}
+  const name = meta.full_name || meta.name
+  return typeof name === 'string' && name.trim() ? name.trim() : null
+}
+
+function mapSoulProfile(row: Record<string, unknown> | null, user?: User | null): UserProfile | null {
   if (!row) return null
   const birthDate = typeof row.birth_date === 'string' ? row.birth_date : null
   return {
     id: String(row.id),
     auth_user_id: typeof row.auth_user_id === 'string' ? row.auth_user_id : null,
-    full_name: typeof row.full_name === 'string' ? row.full_name : null,
+    full_name: (typeof row.full_name === 'string' ? row.full_name : null) || (user ? oauthName(user) : null),
     email: typeof row.email === 'string' ? row.email : null,
-    avatar_url: typeof row.avatar_url === 'string' ? row.avatar_url : null,
+    avatar_url:
+      (typeof row.avatar_url === 'string' ? row.avatar_url : null) || (user ? oauthPicture(user) : null),
     dob: birthDate,
     birth_place: typeof row.birth_place === 'string' ? row.birth_place : null,
     birth_time: typeof row.birth_time === 'string' ? row.birth_time : null,
     quiz_completed_at: typeof row.quiz_completed_at === 'string' ? row.quiz_completed_at : null,
+    know_answers: asKnowAnswers(row.know_answers),
   }
 }
 
-async function loadUserRows(userId: string) {
+function mergeQuizAnswers(
+  raw: unknown,
+  patch: IdentityPatch,
+): Record<string, unknown> {
+  const qa =
+    raw && typeof raw === 'object' && !Array.isArray(raw)
+      ? { ...(raw as Record<string, unknown>) }
+      : {}
+
+  qa.name = patch.full_name
+
+  if (patch.birth_date) {
+    const [year, month, day] = patch.birth_date.split('-')
+    qa.birthdate = {
+      day: String(Number(day)),
+      month: String(Number(month)),
+      year,
+    }
+  }
+
+  if (patch.birth_time) {
+    qa['birth-time'] = patch.birth_time.slice(0, 5)
+    qa['birth-time-known'] = 'yes'
+  } else {
+    qa['birth-time-known'] = 'no'
+    delete qa['birth-time']
+  }
+
+  if (patch.birth_place) {
+    qa['birth-place'] = patch.birth_place
+  } else {
+    delete qa['birth-place']
+  }
+
+  return qa
+}
+
+function asTimeValue(raw: string | null): string | null {
+  if (!raw) return null
+  const trimmed = raw.trim()
+  if (!/^\d{1,2}:\d{2}(:\d{2})?$/.test(trimmed)) return null
+  const [h, m, s] = trimmed.split(':')
+  const hour = Number(h)
+  const minute = Number(m)
+  if (hour > 23 || minute > 59) return null
+  return `${String(hour).padStart(2, '0')}:${m}${s ? `:${s}` : ':00'}`
+}
+
+async function loadUserRows(user: User) {
   const profileRes = await supabase
     .from('soul_profiles')
     .select(
-      'id,auth_user_id,full_name,email,avatar_url,birth_date,birth_place,birth_time,quiz_completed_at',
+      'id,auth_user_id,full_name,email,avatar_url,birth_date,birth_place,birth_time,quiz_completed_at,know_answers',
     )
-    .eq('auth_user_id', userId)
+    .eq('auth_user_id', user.id)
     .maybeSingle()
 
+  const row = (profileRes.data as Record<string, unknown> | null) ?? null
+  const profile = mapSoulProfile(row, user)
+
+  const backfill: Record<string, string> = {}
+  const picture = oauthPicture(user)
+  const name = oauthName(user)
+  const rowAvatar = typeof row?.avatar_url === 'string' ? row.avatar_url.trim() : ''
+  const rowName = typeof row?.full_name === 'string' ? row.full_name.trim() : ''
+  if (profile && picture && !rowAvatar) backfill.avatar_url = picture
+  if (profile && name && !rowName) backfill.full_name = name
+  if (Object.keys(backfill).length) {
+    void supabase.from('soul_profiles').update(backfill).eq('auth_user_id', user.id)
+  }
+
   return {
-    profile: mapSoulProfile((profileRes.data as Record<string, unknown> | null) ?? null),
+    profile,
     subscription: null as UserSubscription | null,
   }
 }
@@ -127,7 +222,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      const rows = await loadUserRows(nextUser.id)
+      const rows = await loadUserRows(nextUser)
       if (userIdRef.current !== nextUser.id) return
       setProfile(rows.profile)
       setSubscription(rows.subscription)
@@ -168,6 +263,77 @@ export function UserProvider({ children }: { children: ReactNode }) {
     if (user) await applySession(session)
   }, [applySession, session, user])
 
+  const saveKnowAnswer = useCallback(
+    async (questionId: string, answer: string) => {
+      if (!user) throw new Error('Not signed in')
+      const trimmed = answer.trim()
+      const next = { ...(profile?.know_answers ?? {}) }
+      if (trimmed) next[questionId] = trimmed
+      else delete next[questionId]
+
+      const { error } = await supabase
+        .from('soul_profiles')
+        .update({ know_answers: next })
+        .eq('auth_user_id', user.id)
+      if (error) throw error
+
+      setProfile((prev) => (prev ? { ...prev, know_answers: next } : prev))
+    },
+    [profile?.know_answers, user],
+  )
+
+  const updateIdentity = useCallback(
+    async (patch: IdentityPatch) => {
+      if (!user) throw new Error('Not signed in')
+      if (!profile) throw new Error('Profile not found')
+
+      const birthTime = asTimeValue(patch.birth_time)
+      const birthDate = patch.birth_date?.trim() || null
+      const birthPlace = patch.birth_place?.trim() || null
+      const fullName = patch.full_name.trim()
+      if (!fullName) throw new Error('Name is required')
+
+      const { data: current, error: readErr } = await supabase
+        .from('soul_profiles')
+        .select('quiz_answers')
+        .eq('auth_user_id', user.id)
+        .maybeSingle()
+      if (readErr) throw readErr
+
+      const quiz_answers = mergeQuizAnswers(current?.quiz_answers, {
+        full_name: fullName,
+        birth_date: birthDate,
+        birth_time: birthTime,
+        birth_place: birthPlace,
+      })
+
+      const { error } = await supabase
+        .from('soul_profiles')
+        .update({
+          full_name: fullName,
+          birth_date: birthDate,
+          birth_time: birthTime,
+          birth_place: birthPlace,
+          quiz_answers,
+        })
+        .eq('auth_user_id', user.id)
+      if (error) throw error
+
+      setProfile((prev) =>
+        prev
+          ? {
+              ...prev,
+              full_name: fullName,
+              dob: birthDate,
+              birth_time: birthTime,
+              birth_place: birthPlace,
+            }
+          : prev,
+      )
+    },
+    [profile, user],
+  )
+
   const value = useMemo<UserContextValue>(
     () => ({
       user,
@@ -177,8 +343,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
       isPremium: isPremiumSubscription(subscription),
       loading,
       refetch,
+      saveKnowAnswer,
+      updateIdentity,
     }),
-    [user, session, profile, subscription, loading, refetch],
+    [user, session, profile, subscription, loading, refetch, saveKnowAnswer, updateIdentity],
   )
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>

@@ -1,16 +1,18 @@
 import { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useUser } from '@/hooks/useUser'
-import { getPostAuthPath } from './authActions'
+import { getPostAuthPath, isQuizComplete, pathAfterSignIn } from './authActions'
 
-/** Send returning sessions off the login screens. */
+/** Send returning sessions off the login screens. Incomplete quiz → quiz. */
 export function useLeaveIfSignedIn() {
-  const { user, loading } = useUser()
+  const { user, profile, loading } = useUser()
   const navigate = useNavigate()
   const location = useLocation()
 
   useEffect(() => {
     if (loading || !user) return
-    navigate(getPostAuthPath(location.search), { replace: true })
-  }, [loading, location.search, navigate, user])
+    navigate(pathAfterSignIn(isQuizComplete(profile), getPostAuthPath(location.search)), {
+      replace: true,
+    })
+  }, [loading, location.search, navigate, profile, user])
 }

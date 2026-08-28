@@ -1,4 +1,4 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsPreflight, jsonResponse } from '../_shared/cors.ts'
 import {
   normalizeEmail,
@@ -27,7 +27,75 @@ function siteUrlFrom(req: Request): string {
   if (env) return env
   const origin = req.headers.get('origin')?.replace(/\/$/, '')
   if (origin) return origin
-  return 'http://localhost:5173'
+  return 'http://localhost:8080'
+}
+
+function isUniqueViolation(err: { code?: string; message?: string } | null) {
+  return err?.code === '23505' || /duplicate key/i.test(err?.message ?? '')
+}
+
+async function callerAuthUser(
+  req: Request,
+  supabaseUrl: string,
+  anonKey: string,
+): Promise<{ id: string; email: string | null } | null> {
+  const header = req.headers.get('Authorization')
+  if (!header || header === `Bearer ${anonKey}`) return null
+
+  const userClient = createClient(supabaseUrl, anonKey, {
+    global: { headers: { Authorization: header } },
+    auth: { autoRefreshToken: false, persistSession: false },
+  })
+  const { data: { user } } = await userClient.auth.getUser()
+  if (!user?.id) return null
+  return { id: user.id, email: user.email ? user.email.toLowerCase() : null }
+}
+
+async function upsertProfile(
+  admin: SupabaseClient,
+  userId: string,
+  fields: Record<string, unknown>,
+  startedAtFallback: string,
+) {
+  const { data: byAuth, error: byAuthErr } = await admin
+    .from('soul_profiles')
+    .select('id, quiz_started_at, email')
+    .eq('auth_user_id', userId)
+    .maybeSingle()
+
+  if (byAuthErr) throw byAuthErr
+
+  if (byAuth?.id) {
+    const payload = {
+      ...fields,
+      quiz_started_at: byAuth.quiz_started_at ?? startedAtFallback,
+    }
+    const { error } = await admin.from('soul_profiles').update(payload).eq('id', byAuth.id)
+    if (error && isUniqueViolation(error)) {
+      const withoutEmail = { ...payload }
+      delete withoutEmail.email
+      const { error: retryErr } = await admin
+        .from('soul_profiles')
+        .update(withoutEmail)
+        .eq('id', byAuth.id)
+      if (retryErr) throw retryErr
+    } else if (error) {
+      throw error
+    }
+    return byAuth.id as string
+  }
+
+  const { data: inserted, error: insertErr } = await admin
+    .from('soul_profiles')
+    .upsert(
+      { ...fields, quiz_started_at: startedAtFallback },
+      { onConflict: 'email' },
+    )
+    .select('id')
+    .single()
+
+  if (insertErr || !inserted?.id) throw insertErr ?? new Error('profile upsert failed')
+  return inserted.id as string
 }
 
 Deno.serve(async (req) => {
@@ -73,15 +141,20 @@ Deno.serve(async (req) => {
       utm_campaign: asText(body.utm_campaign),
     }
 
-    let userId: string | null = null
-    const { data: existingId, error: lookupErr } = await admin.rpc('auth_user_id_by_email', {
-      p_email: email,
-    })
-    if (lookupErr) {
-      console.error('[quiz-complete] auth lookup failed:', lookupErr.message)
-      return jsonResponse({ error: 'auth_lookup_failed' }, 500)
+    const sessionUser = anonKey ? await callerAuthUser(req, supabaseUrl, anonKey) : null
+
+    let userId: string | null = sessionUser?.id ?? null
+
+    if (!userId) {
+      const { data: existingId, error: lookupErr } = await admin.rpc('auth_user_id_by_email', {
+        p_email: email,
+      })
+      if (lookupErr) {
+        console.error('[quiz-complete] auth lookup failed:', lookupErr.message)
+        return jsonResponse({ error: 'auth_lookup_failed' }, 500)
+      }
+      userId = (existingId as string | null) ?? null
     }
-    userId = (existingId as string | null) ?? null
 
     if (!userId) {
       const { data: created, error: createErr } = await admin.auth.admin.createUser({
@@ -120,58 +193,21 @@ Deno.serve(async (req) => {
       ...utm,
     }
 
-    const { data: byAuth, error: byAuthErr } = await admin
-      .from('soul_profiles')
-      .select('id, quiz_started_at')
-      .eq('auth_user_id', userId)
-      .maybeSingle()
-
-    if (byAuthErr) {
-      console.error('[quiz-complete] profile lookup failed:', byAuthErr.message)
+    let profileId: string
+    try {
+      profileId = await upsertProfile(admin, userId, profileFields, now)
+    } catch (err) {
+      console.error('[quiz-complete] profile write failed:', err)
       return jsonResponse({ error: 'db_error' }, 500)
     }
 
-    let profileId = byAuth?.id as string | undefined
-
-    if (profileId) {
-      const { error: updateErr } = await admin
-        .from('soul_profiles')
-        .update({
-          ...profileFields,
-          quiz_started_at: byAuth?.quiz_started_at ?? now,
-        })
-        .eq('id', profileId)
-
-      if (updateErr) {
-        console.error('[quiz-complete] profile update failed:', updateErr.message)
-        return jsonResponse({ error: 'db_error' }, 500)
-      }
-    } else {
-      const { data: inserted, error: insertErr } = await admin
-        .from('soul_profiles')
-        .upsert(
-          {
-            ...profileFields,
-            quiz_started_at: now,
-          },
-          { onConflict: 'email' },
-        )
-        .select('id')
-        .single()
-
-      if (insertErr || !inserted?.id) {
-        console.error('[quiz-complete] profile upsert failed:', insertErr?.message)
-        return jsonResponse({ error: 'db_error' }, 500)
-      }
-      profileId = inserted.id as string
-    }
-
+    const mailTo = sessionUser?.email || email
     if (anonKey) {
       const anon = createClient(supabaseUrl, anonKey, {
         auth: { autoRefreshToken: false, persistSession: false },
       })
       const { error: otpErr } = await anon.auth.signInWithOtp({
-        email,
+        email: mailTo,
         options: {
           emailRedirectTo: `${siteUrlFrom(req)}/login/callback`,
           shouldCreateUser: false,

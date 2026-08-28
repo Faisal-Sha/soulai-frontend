@@ -1,7 +1,8 @@
 export type KnowQuestion = {
   id: string
   prompt: string
-  /** Demo answer from Figma; omit = unanswered */
+  /** Figma preview copy only — not used for signed-in profiles */
+  demoAnswer?: string
   answer?: string
 }
 
@@ -26,18 +27,18 @@ export const KNOW_SECTIONS: KnowSection[] = [
       {
         id: 'core-evening',
         prompt: 'What do you do with an evening when nobody expects anything from you?',
-        answer: 'Nothing planned. I end up working, which is not the same as resting.',
+        demoAnswer: 'Nothing planned. I end up working, which is not the same as resting.',
       },
       {
         id: 'core-first-meet',
         prompt: 'What do people get wrong about you when they first meet you?',
-        answer: 'That I am easy-going. I am just slow to object.',
+        demoAnswer: 'That I am easy-going. I am just slow to object.',
       },
       {
         id: 'core-right',
         prompt:
           'When you know something is right but cannot explain why — what happens next?',
-        answer: 'I look for a reason good enough to say out loud.',
+        demoAnswer: 'I look for a reason good enough to say out loud.',
       },
     ],
   },
@@ -48,7 +49,7 @@ export const KNOW_SECTIONS: KnowSection[] = [
       {
         id: 'pattern-evening',
         prompt: 'What do you do with an evening when nobody expects anything from you?',
-        answer: 'Nothing planned. I end up working, which is not the same as resting.',
+        demoAnswer: 'Nothing planned. I end up working, which is not the same as resting.',
       },
       {
         id: 'pattern-sets-off',
@@ -223,23 +224,31 @@ export function writeKnowAnswer(questionId: string, answer: string) {
   }
 }
 
-/** Merge demo defaults with any session overrides. */
-export function getKnowSections(): KnowSection[] {
-  const overrides = readKnowAnswers()
+/** Merge stored answers. Signed-in: only DB/session values. Preview: Figma demo copy. */
+export function getKnowSections(
+  stored: Record<string, string> = {},
+  opts?: { preview?: boolean },
+): KnowSection[] {
+  const preview = opts?.preview ?? false
   return KNOW_SECTIONS.map((section) => ({
     ...section,
     questions: section.questions.map((q) => {
-      if (Object.prototype.hasOwnProperty.call(overrides, q.id)) {
-        const value = overrides[q.id]
+      if (Object.prototype.hasOwnProperty.call(stored, q.id)) {
+        const value = stored[q.id]
         return value ? { ...q, answer: value } : { ...q, answer: undefined }
       }
-      return { ...q }
+      if (preview) return { ...q, answer: q.demoAnswer }
+      return { ...q, answer: undefined }
     }),
   }))
 }
 
-export function findKnowQuestion(questionId: string) {
-  const sections = getKnowSections()
+export function findKnowQuestion(
+  questionId: string,
+  stored: Record<string, string> = {},
+  opts?: { preview?: boolean },
+) {
+  const sections = getKnowSections(stored, opts)
   for (const section of sections) {
     const index = section.questions.findIndex((q) => q.id === questionId)
     if (index >= 0) {

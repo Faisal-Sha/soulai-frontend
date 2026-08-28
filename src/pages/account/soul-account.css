@@ -234,12 +234,19 @@
   width: 52px;
   height: 52px;
   border-radius: 26px;
+  overflow: hidden;
   background: #c8c2b6;
   font-family: var(--soul-font-display);
   font-size: 23px;
   line-height: 29px;
   letter-spacing: -0.5px;
   color: #3a362e;
+}
+
+.soul-account__monogram img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .soul-account__identity-text {
@@ -903,6 +910,28 @@
   padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
 }
 
+.soul-account__birth {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 560px;
+  margin-inline: auto;
+  padding: 24px 24px calc(96px + env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
+}
+
+.soul-account__birth .soul-account__answer-card {
+  gap: 16px;
+}
+
+.soul-account__birth .soul-field,
+.soul-account__birth .soul-field .soul-input,
+.soul-account__birth .soul-account__answer-save.soul-btn {
+  max-width: none;
+  width: 100%;
+}
+
 .soul-account__know--answer .soul-account__know-list {
   width: 100%;
 }
@@ -1098,7 +1127,8 @@
   }
 
   .soul-account__intro,
-  .soul-account__know {
+  .soul-account__know,
+  .soul-account__birth {
     max-width: 560px;
     margin-inline: auto;
     width: 100%;

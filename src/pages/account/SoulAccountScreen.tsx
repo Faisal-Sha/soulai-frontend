@@ -10,7 +10,8 @@ import './soul-account.css'
 import bgRipple from '../home/assets/bg-ripple.png'
 import iconArrow from './assets/icon-arrow.svg'
 import iconChevron from './assets/icon-chevron.svg'
-import { getKnowSections, knowProgress } from './knowData'
+import { displayName, identityMetaLine } from './profileDisplay'
+import { useKnowAnswers } from './useKnowAnswers'
 
 const DEMO = {
   name: 'Pavel',
@@ -84,6 +85,7 @@ export function SoulAccountScreen() {
   const [searchParams] = useSearchParams()
   const { user, profile, isPremium, subscription } = useUser()
   const [signingOut, setSigningOut] = useState(false)
+  const { progress: know } = useKnowAnswers()
 
   const subscriptionEnded = useMemo(() => {
     if (searchParams.get('ended') === '1' || searchParams.get('ended') === 'true') {
@@ -99,30 +101,23 @@ export function SoulAccountScreen() {
   )
   const { resumeOpen, resumeMode, openResume, closeResume } = useSoulSheetParams(resumeExtra)
 
-  const name = profile?.full_name?.trim() || DEMO.name
-  const know = useMemo(() => knowProgress(getKnowSections()), [])
+  const signedIn = Boolean(user)
+  const name = signedIn
+    ? displayName(profile?.full_name, profile?.email ?? user?.email)
+    : DEMO.name
+  const avatarUrl = signedIn ? profile?.avatar_url : null
   const metaLine = useMemo(() => {
-    const parts: string[] = []
-    parts.push(profile?.birth_place?.trim() || DEMO.place)
-    if (profile?.dob) {
-      try {
-        parts.push(
-          new Date(profile.dob).toLocaleDateString(undefined, {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
-          }),
-        )
-      } catch {
-        parts.push(DEMO.birthDate)
-      }
-    } else {
-      parts.push(DEMO.birthDate)
+    if (!signedIn) {
+      return [DEMO.place, DEMO.birthDate, DEMO.birthTime].join(' · ')
     }
-    const time = profile?.birth_time?.slice(0, 5)
-    parts.push(time || DEMO.birthTime)
-    return parts.join(' · ')
-  }, [profile?.birth_place, profile?.birth_time, profile?.dob])
+    return (
+      identityMetaLine({
+        birthPlace: profile?.birth_place,
+        dob: profile?.dob,
+        birthTime: profile?.birth_time,
+      }) || 'Add your birth details'
+    )
+  }, [signedIn, profile?.birth_place, profile?.birth_time, profile?.dob])
 
   const notificationsLine = readNotificationsLine()
 
@@ -203,7 +198,7 @@ export function SoulAccountScreen() {
           <article className="soul-account__card soul-account__card--identity">
             <div className="soul-account__identity">
               <span className="soul-account__monogram" aria-hidden="true">
-                {initialFromName(name)}
+                {avatarUrl ? <img src={avatarUrl} alt="" /> : initialFromName(name)}
               </span>
               <div className="soul-account__identity-text">
                 <p className="soul-account__name">{name}</p>
@@ -286,7 +281,7 @@ export function SoulAccountScreen() {
             <button
               type="button"
               className="soul-account__row"
-              onClick={() => toast.message('Coming next — Birth details')}
+              onClick={() => navigate('/account/birth')}
             >
               <span className="soul-account__row-text">
                 <span className="soul-account__row-label">Birth details</span>
