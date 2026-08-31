@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { SoulBrand, SoulNav } from '@/components/soul'
+import { useUser } from '@/hooks/useUser'
 import {
   READING_CHAPTERS,
   type ReadingChapter,
@@ -24,12 +25,17 @@ type SoulReadingsScreenProps = {
  * NEXT: chapter detail “Your pattern” (625:1991+)
  */
 export function SoulReadingsScreen({
-  chaptersRead = 3,
+  chaptersRead: chaptersReadProp,
   chaptersTotal = 9,
-  wordsRead = 6400,
+  wordsRead: wordsReadProp,
   wordsTotal = 18000,
-  isPremium = true,
+  isPremium: isPremiumProp,
 }: SoulReadingsScreenProps) {
+  const { user, isPremium: premiumFromSession, loading } = useUser()
+  const isPremium = isPremiumProp ?? premiumFromSession
+  const live = Boolean(user) || loading
+  const chaptersRead = chaptersReadProp ?? (live ? 0 : 3)
+  const wordsRead = wordsReadProp ?? (live ? 0 : 6400)
   const navigate = useNavigate()
   const progressPct = Math.min(
     100,
@@ -104,7 +110,7 @@ export function SoulReadingsScreen({
           {READING_CHAPTERS.map((chapter) => (
             <ChapterRow
               key={chapter.id}
-              chapter={chapter}
+              chapter={live ? { ...chapter, read: false } : chapter}
               onOpen={() => openChapter(chapter)}
             />
           ))}

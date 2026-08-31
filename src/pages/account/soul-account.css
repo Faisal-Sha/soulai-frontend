@@ -14,6 +14,7 @@
   height: 100dvh;
   background: #746c5e;
   color: #fff;
+  color-scheme: dark;
   font-family: var(--soul-font-ui);
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
@@ -397,6 +398,22 @@
   display: flex;
   justify-content: center;
   padding: 24px 24px calc(24px + env(safe-area-inset-bottom, 0px));
+}
+
+.soul-account__cancel-confirm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 320px;
+  text-align: center;
+}
+
+.soul-account__cancel-copy {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .soul-account__signout {
@@ -917,19 +934,85 @@
   width: 100%;
   max-width: 560px;
   margin-inline: auto;
-  padding: 24px 24px calc(96px + env(safe-area-inset-bottom, 0px));
+  padding: 8px 24px calc(96px + env(safe-area-inset-bottom, 0px));
   box-sizing: border-box;
 }
 
-.soul-account__birth .soul-account__answer-card {
-  gap: 16px;
-}
-
 .soul-account__birth .soul-field,
-.soul-account__birth .soul-field .soul-input,
-.soul-account__birth .soul-account__answer-save.soul-btn {
+.soul-account__birth .soul-input,
+.soul-account__birth .soul-account__birth-save.soul-btn {
   max-width: none;
   width: 100%;
+}
+
+.soul-account__birth .soul-input:focus-within:not(.soul-input--disabled):not(.soul-input--readonly):not(.soul-input--error):not(.soul-input--success),
+.soul-account__birth .soul-account__picker:focus-within {
+  background: var(--soul-input-bg);
+  border-color: transparent;
+  box-shadow: none;
+  outline: none;
+}
+
+.soul-account__birth .soul-input__control:focus,
+.soul-account__birth .soul-input__control:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.soul-account__birth .soul-field__label {
+  color: var(--soul-input-label);
+}
+
+.soul-account__birth .soul-field--helper .soul-field__message {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.soul-account__picker {
+  position: relative;
+  width: 100%;
+}
+
+.soul-account__picker-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin-right: -8px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.soul-account__picker-btn:hover,
+.soul-account__picker-btn:focus-visible {
+  opacity: 1;
+}
+
+.soul-account__picker-btn img {
+  display: block;
+  width: 16px;
+  height: 20px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.soul-account__native {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.soul-account__birth-save {
+  margin-top: 8px;
 }
 
 .soul-account__know--answer .soul-account__know-list {

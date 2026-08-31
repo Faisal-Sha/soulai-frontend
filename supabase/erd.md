@@ -4,15 +4,14 @@
 
 Visual board (FigJam): [SoulPlus V2 planned ERD](https://www.figma.com/board/6LeVkl0m7qxS4KSj9djZGU)
 
-**Now in the database:** `soul_profiles` (migrations `001` + `002`).
+**Now in the database:** `soul_profiles`, `quiz_intents`, `subscriptions`, `stripe_events`.
 
-**Rule:** child tables use `owner_profile_id → soul_profiles.id`. Auth is only the login door.
+**Rule:** child tables use `owner_profile_id → soul_profiles.id`. Auth is only the login door. The auth user is created **after Stripe payment**, not at the quiz email gate.
 
 ## Add next, in this order
 
 | Next migration | Feature to wire first | Tables |
 |---|---|---|
-| `003` | Paywall / home paid-trial-unpaid | `subscriptions`, `stripe_events` |
 | `004` | Account · Notifications | `notification_preferences` |
 | `005` | People add / list / report | `people`, `people_reports` |
 | `006` | Readings + home daily note | `readings`, `reading_chapters`, `daily_notes` |

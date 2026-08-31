@@ -52,7 +52,8 @@ export default function QuizEmailScreen({
           <section className="soul-em__hero">
             <h1 className="soul-em__title">Where can I reach you?</h1>
             <p className="soul-em__subtitle">
-              So I can send your profile — and pick up right where we left off next time.
+              After you subscribe I’ll send a login link here. Until then you can stay with the
+              free preview.
             </p>
           </section>
 

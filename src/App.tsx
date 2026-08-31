@@ -8,6 +8,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { UserProvider } from "./hooks/useUser";
 import { SoulHomeRoute } from "./pages/home/SoulHomeRoute";
 import QuizShell from "./pages/quiz/QuizShell";
+import { SoulPaidScreen } from "./pages/quiz/SoulPaidScreen";
 import { SoulSavedInsightsScreen } from "./pages/insights/SoulSavedInsightsScreen";
 import { SoulReadingsScreen } from "./pages/readings/SoulReadingsScreen";
 import { SoulPatternChapterScreen } from "./pages/readings/SoulPatternChapterScreen";
@@ -49,6 +50,7 @@ function AppRoutes() {
 
       <Route path="/quiz" element={<Navigate to="/quiz/welcome" replace />} />
       <Route path="/quiz/*" element={<QuizShell />} />
+      <Route path="/paid" element={<SoulPaidScreen />} />
 
       <Route path="/agent" element={<AgentPage />} />
 

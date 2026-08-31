@@ -71,7 +71,7 @@ export async function resolveSignedInPath(userId: string, requested = APP_HOME) 
 export function authErrorMessage(err: unknown) {
   const raw = err instanceof Error ? err.message : String(err || 'Something went wrong')
   if (/signups not allowed/i.test(raw) || /user not found/i.test(raw)) {
-    return 'I don’t have an account with that email. Take the quiz to start.'
+    return 'I don’t have an account with that email. Take the quiz and subscribe to start.'
   }
   if (/invalid login/i.test(raw)) return 'That didn’t work. Try the link again.'
   if (/rate limit|too many/i.test(raw)) return 'Too many tries. Wait a minute, then send another link.'

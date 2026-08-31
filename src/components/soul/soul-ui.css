@@ -632,6 +632,7 @@
   line-height: 22px;
   color: var(--soul-input-fg);
   caret-color: #fffdfa;
+  color-scheme: dark;
 }
 
 .soul-input__control::placeholder {

@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import {
   addUserSavedInsight,
-  getSavedInsightsCount,
   isQuoteSaved,
 } from '@/pages/insights/insightsStore'
 import {
@@ -90,7 +89,7 @@ export function SoulHomeScreen({
   compatSummary = 'Anna, Mark and 2 more',
   isPremium = true,
   trialTitle = 'Your trial ends tomorrow.',
-  trialDetail = '$5.99/month starts soon. Cancel anytime.',
+  trialDetail = '$6.99/month starts soon. Cancel anytime.',
   resumePrice = '$6.99',
 }: SoulHomeScreenProps) {
   const navigate = useNavigate()
@@ -144,23 +143,24 @@ export function SoulHomeScreen({
     return `Today · ${formatHomeDate()} · Day ${day}`
   }, [day1, dayNumber])
 
-  const readingsMeta = day1
+  const readingsMeta = day1 || chaptersDone === 0
     ? 'Nine chapters, ready when you are'
     : `${chaptersDone} of ${chaptersTotal} chapters`
-  const readingsCta = day1 ? 'Start reading' : 'Continue reading'
+  const readingsCta = day1 || chaptersDone === 0 ? 'Start reading' : 'Continue reading'
   const insightsMeta = useMemo(() => {
-    const count = getSavedInsightsCount(!day1)
     if (day1) {
-      return count > 0
-        ? `${count} note${count === 1 ? '' : 's'} you kept`
+      return insightsCount > 0
+        ? `${insightsCount} note${insightsCount === 1 ? '' : 's'} you kept`
         : 'Anything you highlight will live here'
     }
-    return `${count || insightsCount} notes you kept`
+    return `${insightsCount} notes you kept`
   }, [day1, insightsCount, noteSaved])
   const insightsCta =
-    day1 && getSavedInsightsCount(false) === 0 ? 'Nothing saved yet' : 'See all'
-  const compatMeta = day1 ? 'Add someone close to you' : compatSummary
-  const compatCta = day1 ? 'Add someone' : 'See all'
+    day1 && insightsCount === 0 ? 'Nothing saved yet' : 'See all'
+  const compatMeta = day1 || compatSummary.startsWith('Add someone')
+    ? 'Add someone close to you'
+    : compatSummary
+  const compatCta = day1 || compatSummary.startsWith('Add someone') ? 'Add someone' : 'See all'
   const progressPct = unpaidPool
     ? 100
     : Math.min(100, Math.round((chaptersDone / chaptersTotal) * 100))
@@ -186,8 +186,7 @@ export function SoulHomeScreen({
   }
 
   const openInsights = () => {
-    const hasSaved = getSavedInsightsCount(!day1) > 0
-    navigate(day1 && !hasSaved ? '/insights/empty' : '/insights')
+    navigate(day1 && insightsCount === 0 ? '/insights/empty' : '/insights')
   }
 
   const onResume = () => openResume('confirm')

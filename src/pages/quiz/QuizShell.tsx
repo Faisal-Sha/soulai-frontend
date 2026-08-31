@@ -5,7 +5,6 @@ import './quiz.css'
 import { initQuizAnalytics } from './lib/analyticsInit'
 import { useQuizEngine } from './hooks/useQuizEngine'
 import { useUTMParams } from './hooks/useUTMParams'
-import { useLeadCapture } from './hooks/useLeadCapture'
 import OnboardingFlow from './screens/OnboardingFlow'
 import QuizTopicsScreen from './screens/QuizTopicsScreen'
 import QuizReinforceScreen from './screens/QuizReinforceScreen'
@@ -64,14 +63,16 @@ function injectFonts() {
 export default function QuizShell() {
   const engine = useQuizEngine()
   const utm = useUTMParams()
-  const leadCapture = useLeadCapture()
   const navigate = useNavigate()
   const location = useLocation()
 
   const urlSyncRef = useRef(false)
 
   const { startCheckout, isProcessing: checkoutProcessing } = useCheckout({
-    leadId: leadCapture.leadId,
+    getPayload: () => ({
+      answers: engine.answersRef.current,
+      utm,
+    }),
     trackMetaInitiateCheckout: true,
   })
 
@@ -177,11 +178,6 @@ export default function QuizShell() {
 
     await trackScreenPassed('email', answers)
     engine.goNext()
-
-    const { leadId, error: captureErr } = await leadCapture.captureEmail(email, answers, utm)
-    if (captureErr) {
-      console.error('[quiz] lead capture failed:', captureErr.message)
-    }
   }
 
   const goToScreenKey = (key: string) => {
@@ -301,7 +297,6 @@ export default function QuizShell() {
           value={answers.email}
           onChange={v => engine.setAnswer('email', v)}
           onContinue={handleEmailSubmit}
-          isLoading={leadCapture.isLoading}
         />
       )
     }
@@ -362,7 +357,6 @@ export default function QuizShell() {
             value={answers.email}
             onChange={v => engine.setAnswer('email', v)}
             onContinue={handleEmailSubmit}
-            isLoading={leadCapture.isLoading}
           />
         )
 
@@ -461,16 +455,8 @@ export default function QuizShell() {
               canProceed={engine.canProceed()}
               questionIndex={questionIndex}
               totalQuestions={totalQuestions}
-              isLoading={leadCapture.isLoading}
-              captureError={leadCapture.error}
               theme={theme}
               onToggleTheme={toggleTheme}
-              onRetry={() => {
-                const latest = engine.answersRef.current
-                if (latest.email) {
-                  leadCapture.captureEmail(latest.email, latest, utm)
-                }
-              }}
             />
           )
         }

@@ -42,8 +42,11 @@ const ENDED_STATUSES = new Set([
 export function SoulAccountPlanScreen() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const { isPremium, subscription } = useUser()
+  const { user, isPremium, subscription, refetch } = useUser()
   const [signingOut, setSigningOut] = useState(false)
+  const [confirmCancel, setConfirmCancel] = useState(false)
+  const [planBusy, setPlanBusy] = useState(false)
+  const live = Boolean(user && subscription)
 
   const subscriptionEnded = useMemo(() => {
     if (searchParams.get('ended') === '1' || searchParams.get('ended') === 'true') {
@@ -72,19 +75,67 @@ export function SoulAccountPlanScreen() {
     }
   }, [subscription?.expires_at, subscription?.current_period_end])
 
-  const priceTitle = subscriptionEnded ? 'Ended' : DEMO_PLAN.priceTitle
+  const trialing = live && subscription?.status?.toLowerCase() === 'trialing'
+  const cancelledAtPeriodEnd = Boolean(subscription?.cancel_at_period_end)
 
-  /** Active + ended Figma both use this renew line under the plan heading */
-  const planBody = `Renews on ${renewLabel}. Cancel anytime - it stays active until then.`
+  const priceTitle = subscriptionEnded
+    ? 'Ended'
+    : trialing
+      ? '7-day trial'
+      : DEMO_PLAN.priceTitle
 
-  const messagesMeta = `${DEMO_PLAN.messagesLeft} of ${DEMO_PLAN.messagesTotal} left today · ${DEMO_PLAN.topUpPrice} adds another ${DEMO_PLAN.topUpAmount}`
+  const planBody = subscriptionEnded
+    ? `Ended on ${renewLabel}. Resume anytime.`
+    : trialing && cancelledAtPeriodEnd
+      ? `Access until ${renewLabel}. You will not be charged $6.99.`
+      : trialing
+        ? `$6.99/month starts ${renewLabel} unless you cancel.`
+        : `Renews on ${renewLabel}. Cancel anytime - it stays active until then.`
+
+  const messagesMeta = live
+    ? 'Included with your plan · usage tracking comes with chat'
+    : `${DEMO_PLAN.messagesLeft} of ${DEMO_PLAN.messagesTotal} left today · ${DEMO_PLAN.topUpPrice} adds another ${DEMO_PLAN.topUpAmount}`
+
+  const paymentMethod = live ? 'Card on file' : DEMO_PLAN.paymentMethod
+
+  const billingHistory = useMemo(() => {
+    if (!live) return DEMO_PLAN.history
+    const date = subscription?.created_at
+      ? new Date(subscription.created_at).toLocaleDateString(undefined, {
+          day: 'numeric',
+          month: 'long',
+        })
+      : renewLabel
+    return [{ id: 'intro', date, detail: 'Seven-day trial', amount: '$0.99' }]
+  }, [live, subscription?.created_at, renewLabel])
 
   const onResume = () => openResume('confirm')
 
-  const onCancelPlan = () => {
-    toast.message('Cancel plan', {
-      description: 'Cancel flow comes next from Figma.',
-    })
+  const invokePlan = async (action: 'cancel' | 'resume') => {
+    if (planBusy) return
+    setPlanBusy(true)
+    try {
+      const { data, error } = await supabase.functions.invoke('cancel-subscription', {
+        body: { action },
+      })
+      if (error) {
+        const detail = (data as { error?: string } | null)?.error
+        throw new Error(detail || error.message)
+      }
+      if (data?.error) throw new Error(data.error)
+      await refetch()
+      setConfirmCancel(false)
+      toast.success(
+        action === 'cancel'
+          ? 'Plan cancelled. You keep access until the date above.'
+          : 'Plan kept. $6.99/month will start when the trial ends.',
+      )
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Could not update plan'
+      toast.error(message)
+    } finally {
+      setPlanBusy(false)
+    }
   }
 
   const onSignOut = async () => {
@@ -183,7 +234,7 @@ export function SoulAccountPlanScreen() {
           <article className="soul-account__card soul-account__card--frost">
             <div className="soul-account__card-heading">
               <h2 className="soul-account__card-title">Payment method</h2>
-              <p className="soul-account__card-meta">{DEMO_PLAN.paymentMethod}</p>
+              <p className="soul-account__card-meta">{paymentMethod}</p>
             </div>
             <button
               type="button"
@@ -196,7 +247,7 @@ export function SoulAccountPlanScreen() {
           </article>
 
           <div className="soul-account__card soul-account__card--frost soul-account__card--rows">
-            {DEMO_PLAN.history.map((row, i) => (
+            {billingHistory.map((row, i) => (
               <div key={row.id} className="soul-account__billing-block">
                 {i > 0 ? <hr className="soul-account__hairline" /> : null}
                 <div className="soul-account__row soul-account__row--billing">
@@ -221,8 +272,43 @@ export function SoulAccountPlanScreen() {
             >
               {signingOut ? 'Signing out…' : 'Sign out'}
             </button>
+          ) : cancelledAtPeriodEnd ? (
+            <button
+              type="button"
+              className="soul-account__signout"
+              onClick={() => void invokePlan('resume')}
+              disabled={planBusy}
+            >
+              {planBusy ? 'Saving…' : 'Keep plan'}
+            </button>
+          ) : confirmCancel ? (
+            <div className="soul-account__cancel-confirm">
+              <p className="soul-account__cancel-copy">
+                You keep access until {renewLabel}. You will not be charged $6.99.
+              </p>
+              <button
+                type="button"
+                className="soul-account__signout"
+                onClick={() => void invokePlan('cancel')}
+                disabled={planBusy}
+              >
+                {planBusy ? 'Cancelling…' : 'Confirm cancel'}
+              </button>
+              <button
+                type="button"
+                className="soul-account__signout"
+                onClick={() => setConfirmCancel(false)}
+                disabled={planBusy}
+              >
+                Never mind
+              </button>
+            </div>
           ) : (
-            <button type="button" className="soul-account__signout" onClick={onCancelPlan}>
+            <button
+              type="button"
+              className="soul-account__signout"
+              onClick={() => setConfirmCancel(true)}
+            >
               Cancel plan
             </button>
           )}

@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { SoulBrand, SoulButton } from '@/components/soul'
+import { useUser } from '@/hooks/useUser'
 import { SAVED_INSIGHTS, type SavedInsight } from './insightsData'
 import { loadAllSavedInsights, removeUserSavedInsight } from './insightsStore'
 import './soul-insights.css'
@@ -29,14 +30,27 @@ function variantFromPath(pathname: string): InsightsVariant {
 export function SoulSavedInsightsScreen({ variant: variantProp }: SoulSavedInsightsScreenProps) {
   const navigate = useNavigate()
   const { pathname } = useLocation()
+  const { user, loading } = useUser()
   const variant = variantProp ?? variantFromPath(pathname)
+  const includeDemo = !user
 
-  const [insights, setInsights] = useState(() =>
-    variant === 'empty' ? [] : loadAllSavedInsights(),
-  )
-  const [openId, setOpenId] = useState<string | null>(() =>
-    variant === 'open' ? SAVED_INSIGHTS[0]?.id ?? null : null,
-  )
+  const [insights, setInsights] = useState<SavedInsight[]>([])
+  const [openId, setOpenId] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (variant === 'empty') {
+      setInsights([])
+      return
+    }
+    if (loading) return
+    setInsights(loadAllSavedInsights({ includeDemo }))
+  }, [variant, includeDemo, loading])
+
+  useEffect(() => {
+    if (variant === 'open' && includeDemo) {
+      setOpenId(SAVED_INSIGHTS[0]?.id ?? null)
+    }
+  }, [variant, includeDemo])
 
   const empty = insights.length === 0
 

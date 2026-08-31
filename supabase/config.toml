@@ -14,7 +14,8 @@ additional_redirect_urls = [
 ]
 jwt_expiry = 3600
 enable_refresh_token_rotation = true
-enable_signup = true
+# Global: Google/Apple/email must not create users. Admin.createUser after payment still works.
+enable_signup = false
 
 [auth.sessions]
 # Stay signed in for months. Access token still rotates every hour.
@@ -22,6 +23,8 @@ timebox = "4320h"
 inactivity_timeout = "2160h"
 
 [auth.email]
+# Must stay true or magic-link login is disabled ("Email logins are disabled").
+# New email accounts are still blocked by [auth] enable_signup = false + shouldCreateUser: false.
 enable_signup = true
 enable_confirmations = false
 otp_expiry = 86400
@@ -30,3 +33,15 @@ max_frequency = "60s"
 [functions.quiz-complete]
 enabled = true
 verify_jwt = false
+
+[functions.create-checkout-session]
+enabled = true
+verify_jwt = false
+
+[functions.stripe-webhook]
+enabled = true
+verify_jwt = false
+
+[functions.cancel-subscription]
+enabled = true
+verify_jwt = true

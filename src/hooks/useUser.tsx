@@ -34,6 +34,7 @@ export interface UserSubscription {
   cancel_at: string | null
   current_period_start: string | null
   current_period_end: string | null
+  created_at: string | null
 }
 
 export type IdentityPatch = {
@@ -195,9 +196,37 @@ async function loadUserRows(user: User) {
     void supabase.from('soul_profiles').update(backfill).eq('auth_user_id', user.id)
   }
 
+  let subscription: UserSubscription | null = null
+  if (profile) {
+    const subRes = await supabase
+      .from('subscriptions')
+      .select(
+        'owner_profile_id,status,plan_type,expires_at,cancel_at_period_end,cancel_at,current_period_start,current_period_end,created_at',
+      )
+      .eq('owner_profile_id', profile.id)
+      .maybeSingle()
+    const sub = subRes.data as Record<string, unknown> | null
+    if (sub) {
+      subscription = {
+        id: String(sub.owner_profile_id),
+        user_id: user.id,
+        status: typeof sub.status === 'string' ? sub.status : '',
+        plan_type: typeof sub.plan_type === 'string' ? sub.plan_type : '',
+        expires_at: typeof sub.expires_at === 'string' ? sub.expires_at : null,
+        cancel_at_period_end: Boolean(sub.cancel_at_period_end),
+        cancel_at: typeof sub.cancel_at === 'string' ? sub.cancel_at : null,
+        current_period_start:
+          typeof sub.current_period_start === 'string' ? sub.current_period_start : null,
+        current_period_end:
+          typeof sub.current_period_end === 'string' ? sub.current_period_end : null,
+        created_at: typeof sub.created_at === 'string' ? sub.created_at : null,
+      }
+    }
+  }
+
   return {
     profile,
-    subscription: null as UserSubscription | null,
+    subscription,
   }
 }
 

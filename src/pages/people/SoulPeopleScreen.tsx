@@ -79,7 +79,7 @@ function AddSomeoneIcon() {
 export function SoulPeopleScreen({ people, subscriptionEnded: endedProp }: SoulPeopleScreenProps) {
   const navigate = useNavigate()
   const [params] = useSearchParams()
-  const { subscription, isPremium } = useUser()
+  const { user, subscription, isPremium, loading } = useUser()
 
   const subscriptionEnded = useMemo(() => {
     if (endedProp) return true
@@ -91,8 +91,10 @@ export function SoulPeopleScreen({ people, subscriptionEnded: endedProp }: SoulP
   const entries = useMemo(() => {
     if (people) return people
     if (params.get('people') === 'empty') return []
+    if (params.get('people') === 'demo') return DEMO_PEOPLE
+    if (user || loading) return []
     return DEMO_PEOPLE
-  }, [people, params])
+  }, [people, params, user, loading])
 
   const isEmpty = entries.length === 0
 

@@ -3,22 +3,36 @@ import { useUser } from '@/hooks/useUser'
 import { QUIZ_START, isQuizComplete } from './authActions'
 import type { ReactNode } from 'react'
 
-const OPEN_PREFIXES = ['/quiz', '/login', '/forgot-password', '/contact', '/faq', '/privacy', '/terms']
+const OPEN_PREFIXES = [
+  '/quiz',
+  '/login',
+  '/forgot-password',
+  '/paid',
+  '/contact',
+  '/faq',
+  '/privacy',
+  '/terms',
+]
 
 function isOpenPath(pathname: string) {
   return OPEN_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`))
 }
 
 /**
- * Logged-in users with no completed quiz must finish the quiz (OAuth-first).
- * Anonymous visitors can still see home and the rest of the shells.
+ * The app is for people who already paid.
+ * Quiz, login, paid-return, and legal stay public.
+ * Unsigned visitors hitting home/account/people are sent to login
+ * (login itself points new people at the quiz).
  */
 export function QuizGate({ children }: { children: ReactNode }) {
   const { user, profile, loading } = useUser()
   const location = useLocation()
 
   if (loading || isOpenPath(location.pathname)) return children
-  if (user && !isQuizComplete(profile)) {
+  if (!user) {
+    return <Navigate to="/login" replace />
+  }
+  if (!isQuizComplete(profile)) {
     return <Navigate to={QUIZ_START} replace />
   }
   return children

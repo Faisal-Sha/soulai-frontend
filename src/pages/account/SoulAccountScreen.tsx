@@ -34,12 +34,14 @@ const ENDED_STATUSES = new Set([
   'unpaid',
 ])
 
-function readNotificationsLine() {
+function readNotificationsLine(signedIn: boolean) {
   try {
-    return sessionStorage.getItem('soul-account-notifications-line') || DEMO.notificationsLine
+    const stored = sessionStorage.getItem('soul-account-notifications-line')
+    if (stored) return stored
   } catch {
-    return DEMO.notificationsLine
+    /* ignore */
   }
+  return signedIn ? 'Choose how we write to you' : DEMO.notificationsLine
 }
 
 function initialFromName(name: string) {
@@ -50,17 +52,27 @@ function initialFromName(name: string) {
 function formatPlanLine(opts: {
   isPremium: boolean
   expiresAt?: string | null
-  planType?: string | null
+  status?: string | null
+  cancelAtPeriodEnd?: boolean
 }) {
   if (!opts.isPremium) return 'Free · upgrade anytime'
-  const renew = opts.expiresAt
+  const date = opts.expiresAt
     ? new Date(opts.expiresAt).toLocaleDateString(undefined, {
         day: 'numeric',
         month: 'long',
       })
     : null
-  const price = '$6.99 a month'
-  return renew ? `${price} · renews ${renew}` : price
+  const trialing = opts.status?.toLowerCase() === 'trialing'
+  if (trialing && opts.cancelAtPeriodEnd) {
+    return date ? `Ends ${date} · no monthly charge` : 'Cancelled · ends at trial'
+  }
+  if (trialing) {
+    return date ? `$6.99 a month · starts ${date}` : '$6.99 a month after trial'
+  }
+  if (opts.cancelAtPeriodEnd) {
+    return date ? `$6.99 a month · ends ${date}` : '$6.99 a month'
+  }
+  return date ? `$6.99 a month · renews ${date}` : '$6.99 a month'
 }
 
 function formatEndedOn(raw?: string | null) {
@@ -119,14 +131,15 @@ export function SoulAccountScreen() {
     )
   }, [signedIn, profile?.birth_place, profile?.birth_time, profile?.dob])
 
-  const notificationsLine = readNotificationsLine()
+  const notificationsLine = readNotificationsLine(signedIn)
 
   const planLine = subscriptionEnded
     ? `Ended on ${formatEndedOn(subscription?.expires_at ?? subscription?.current_period_end)}`
     : formatPlanLine({
         isPremium,
         expiresAt: subscription?.expires_at ?? subscription?.current_period_end,
-        planType: subscription?.plan_type,
+        status: subscription?.status,
+        cancelAtPeriodEnd: subscription?.cancel_at_period_end,
       })
 
   const knowPct = Math.round((know.answered / Math.max(1, know.total)) * 100)

@@ -1,5 +1,8 @@
 import type { UserSubscription } from '@/hooks/useUser'
 import type { SoulHomeVariant } from './SoulHomeScreen'
+import { isTrialEndingSoon } from './trialNotice'
+
+export { isTrialEndingSoon, trialBannerCopy, trialDaysLeft, TRIAL_ENDING_WINDOW_DAYS } from './trialNotice'
 
 /** One canonical preview URL per home screen — `/?home=<key>` */
 export const HOME_PREVIEW_KEYS = {
@@ -52,43 +55,30 @@ export function resolveHomeVariant(
   const status = subscription.status?.toLowerCase() ?? ''
   if (UNPAID_STATUSES.has(status)) return 'unpaid'
 
-  if (status === 'trialing') {
-    if (subscription.current_period_start) {
-      const ageMs = Date.now() - new Date(subscription.current_period_start).getTime()
-      if (ageMs < 36 * 60 * 60 * 1000) return 'day1'
-    }
-    return 'trial'
-  }
+  if (status === 'trialing' && isTrialEndingSoon(subscription)) return 'trial'
+
+  const day = membershipDayNumber(
+    subscription.created_at ?? subscription.current_period_start,
+  )
+  if (day <= 1) return 'day1'
 
   void isPremium
   return 'default'
 }
 
-export function trialDayNumber(periodStart?: string | null): number {
-  if (!periodStart) return 1
-  const ageMs = Date.now() - new Date(periodStart).getTime()
-  if (Number.isNaN(ageMs) || ageMs < 0) return 1
-  return Math.max(1, Math.floor(ageMs / (24 * 60 * 60 * 1000)) + 1)
+/** Days since the member started (first paid row), 1-based. */
+export function membershipDayNumber(startedAt?: string | null): number {
+  if (!startedAt) return 1
+  const start = new Date(startedAt)
+  if (Number.isNaN(start.getTime())) return 1
+
+  const startDay = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate())
+  const now = new Date()
+  const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())
+  const days = Math.floor((today - startDay) / (24 * 60 * 60 * 1000))
+  return Math.max(1, days + 1)
 }
 
-export function trialBannerCopy(periodEnd?: string | null): { title: string; detail: string } {
-  const end = periodEnd ? new Date(periodEnd) : null
-  const valid = end && !Number.isNaN(end.getTime())
-  const daysLeft = valid
-    ? Math.ceil((end!.getTime() - Date.now()) / (24 * 60 * 60 * 1000))
-    : null
-
-  let title = 'Your trial ends soon.'
-  if (daysLeft !== null) {
-    if (daysLeft <= 0) title = 'Your trial ends today.'
-    else if (daysLeft === 1) title = 'Your trial ends tomorrow.'
-    else title = `Your trial ends in ${daysLeft} days.`
-  }
-
-  const startLabel = valid
-    ? end!.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
-    : 'soon'
-  const detail = `$5.99/month starts ${startLabel}. Cancel anytime.`
-
-  return { title, detail }
+export function trialDayNumber(periodStart?: string | null): number {
+  return membershipDayNumber(periodStart)
 }
