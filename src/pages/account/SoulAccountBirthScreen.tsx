@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
-import { SoulBrand, SoulButton, SoulField, SoulNav } from '@/components/soul'
+import { SoulBrand, SoulButton, SoulField, SoulNav, SoulRippleBg } from '@/components/soul'
 import iconCalendar from '@/components/soul/assets/icon-calendar.svg'
 import iconClock from '@/components/soul/assets/icon-clock.svg'
 import { useUser } from '@/hooks/useUser'
@@ -10,7 +10,6 @@ import {
   type BirthdateValue,
 } from '@/pages/quiz/lib/dateValidation'
 import './soul-account.css'
-import bgRipple from '../home/assets/bg-ripple.png'
 import iconBack from '../people/assets/icon-chevron.svg'
 import { formatBirthTime } from './profileDisplay'
 
@@ -135,16 +134,7 @@ export function SoulAccountBirthScreen() {
 
   return (
     <div className="soul-account" data-name="Account · Birth details">
-      <div className="soul-account__bg" aria-hidden="true">
-        <div className="soul-account__bg-tile soul-account__bg-tile--1">
-          <img src={bgRipple} alt="" />
-          <span className="soul-account__bg-dim" />
-        </div>
-        <div className="soul-account__bg-tile soul-account__bg-tile--2">
-          <img src={bgRipple} alt="" />
-          <span className="soul-account__bg-dim" />
-        </div>
-      </div>
+      <SoulRippleBg className="soul-account__bg" />
       <div className="soul-account__scrim" aria-hidden="true" />
       <div className="soul-account__dock-scrim" aria-hidden="true" />
 

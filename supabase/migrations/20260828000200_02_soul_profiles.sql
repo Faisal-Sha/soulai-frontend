@@ -1,15 +1,14 @@
 -- =============================================================================
 -- V2 / 02 soul_profiles
--- Step 1: identity only. Quiz + account + auth link.
--- Later tables are planned in supabase/erd.md — add them as their own
--- migrations when that feature is wired, not all at once.
+-- Identity hub. auth_user_id → auth.users ON DELETE CASCADE.
+-- Child tables FK owner_profile_id here, not auth.users.
 -- Depends on: 01 helpers
 -- =============================================================================
 
 CREATE TABLE public.soul_profiles (
   id                uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 
-  auth_user_id      uuid UNIQUE REFERENCES auth.users(id) ON DELETE SET NULL,
+  auth_user_id      uuid UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
 
   full_name         text,
   email             text UNIQUE,
@@ -46,9 +45,9 @@ CREATE INDEX soul_profiles_quiz_answers_gin
   ON public.soul_profiles USING gin (quiz_answers);
 
 COMMENT ON TABLE public.soul_profiles IS
-  'V2 identity. Created at quiz email gate or as an OAuth stub.';
+  'V2 identity hub. Created after Stripe payment. Auth delete CASCADE-removes this row; children CASCADE from here.';
 COMMENT ON COLUMN public.soul_profiles.auth_user_id IS
-  'Set once the auth user exists. NULL only if the auth user was deleted.';
+  'Login door. Deleting auth.users cascades this row; child tables cascade from here.';
 COMMENT ON COLUMN public.soul_profiles.quiz_answers IS
   'Full QuizAnswers object. Keys must match src/pages/quiz/types.ts.';
 COMMENT ON COLUMN public.soul_profiles.birth_place IS

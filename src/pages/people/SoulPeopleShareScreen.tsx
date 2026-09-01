@@ -1,10 +1,9 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { SoulBrand, SoulNav } from '@/components/soul'
+import { SoulBrand, SoulNav, SoulRippleBg } from '@/components/soul'
 import { DEMO_PEOPLE } from './peopleData'
 import { PEOPLE_REPORT_META } from './reportContent'
 import './soul-people.css'
-import bgRipple from '../home/assets/bg-ripple.png'
 import inviteMark from './assets/invite-mark.svg'
 import iconLink from './assets/icon-link.svg'
 
@@ -28,16 +27,7 @@ export function SoulPeopleShareScreen() {
 
   return (
     <div className="soul-people soul-people--share">
-      <div className="soul-people__bg" aria-hidden="true">
-        <div className="soul-people__bg-tile soul-people__bg-tile--1">
-          <img src={bgRipple} alt="" />
-          <span className="soul-people__bg-dim" />
-        </div>
-        <div className="soul-people__bg-tile soul-people__bg-tile--2">
-          <img src={bgRipple} alt="" />
-          <span className="soul-people__bg-dim" />
-        </div>
-      </div>
+      <SoulRippleBg className="soul-people__bg" />
       <div className="soul-people__scrim" aria-hidden="true" />
       <div className="soul-people__dock-scrim" aria-hidden="true" />
 

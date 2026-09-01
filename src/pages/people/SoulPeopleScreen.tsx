@@ -1,10 +1,9 @@
 import { useMemo } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { SoulBrand, SoulNav } from '@/components/soul'
+import { SoulBrand, SoulNav, SoulRippleBg } from '@/components/soul'
 import { useUser } from '@/hooks/useUser'
 import { DEMO_PEOPLE, initialFromName, type PeopleEntry } from './peopleData'
 import './soul-people.css'
-import bgRipple from '../home/assets/bg-ripple.png'
 import iconChevronRight from './assets/icon-chevron-right.svg'
 
 type SoulPeopleScreenProps = {
@@ -120,16 +119,7 @@ export function SoulPeopleScreen({ people, subscriptionEnded: endedProp }: SoulP
 
   return (
     <div className="soul-people">
-      <div className="soul-people__bg" aria-hidden="true">
-        <div className="soul-people__bg-tile soul-people__bg-tile--1">
-          <img src={bgRipple} alt="" />
-          <span className="soul-people__bg-dim" />
-        </div>
-        <div className="soul-people__bg-tile soul-people__bg-tile--2">
-          <img src={bgRipple} alt="" />
-          <span className="soul-people__bg-dim" />
-        </div>
-      </div>
+      <SoulRippleBg className="soul-people__bg" />
       <div className="soul-people__scrim" aria-hidden="true" />
       <div className="soul-people__dock-scrim" aria-hidden="true" />
 

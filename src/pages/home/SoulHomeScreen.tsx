@@ -8,6 +8,7 @@ import {
   SoulBrand,
   SoulButton,
   SoulNav,
+  SoulRippleBg,
   SoulSecondaryButton,
   SoulTextLink,
 } from '@/components/soul'
@@ -17,7 +18,6 @@ import { ResumeSheet } from './ResumeSheet'
 import { useSoulSheetParams } from './useSoulSheetParams'
 import { useHomeEnter } from './useHomeEnter'
 import './soul-home.css'
-import bgRipple from './assets/bg-ripple.png'
 import iconReadings from './assets/icon-readings.png'
 import iconInsights from './assets/icon-insights.png'
 import iconCompat from './assets/icon-compat.png'
@@ -214,24 +214,7 @@ export function SoulHomeScreen({
       ref={homeRootRef}
       className={`soul-home${paymentConfirmation && !welcomeDismissed ? ' soul-home--welcome-open' : ''}${resumeOpen || installOpen ? ' soul-home--sheet-open' : ''}`}
     >
-      <div className="soul-home__bg" aria-hidden="true">
-        <div className="soul-home__bg-tile soul-home__bg-tile--1">
-          <img src={bgRipple} alt="" />
-          <span className="soul-home__bg-dim" />
-        </div>
-        <div className="soul-home__bg-tile soul-home__bg-tile--2">
-          <img src={bgRipple} alt="" />
-          <span className="soul-home__bg-dim" />
-        </div>
-        <div className="soul-home__bg-tile soul-home__bg-tile--3">
-          <img src={bgRipple} alt="" />
-          <span className="soul-home__bg-dim" />
-        </div>
-        <div className="soul-home__bg-tile soul-home__bg-tile--4">
-          <img src={bgRipple} alt="" />
-          <span className="soul-home__bg-dim" />
-        </div>
-      </div>
+      <SoulRippleBg className="soul-home__bg" />
       <div className="soul-home__scrim" aria-hidden="true" />
       <div className="soul-home__dock-scrim" aria-hidden="true" />
 
@@ -458,6 +441,7 @@ export function SoulHomeScreen({
           </p>
           <div className="soul-home__footer-links">
             <Link to="/contact">Support</Link>
+            <Link to="/about">About</Link>
             <Link to="/account">Manage subscription</Link>
             <Link to="/terms">Terms of Service</Link>
             <Link to="/privacy">Privacy Policy</Link>

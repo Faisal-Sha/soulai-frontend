@@ -7,6 +7,15 @@ import {
   upsertSubscription,
 } from '../_shared/provision-account.ts'
 import { sendEmail, trialEndingEmailHtml } from '../_shared/email.ts'
+import {
+  clearCancelParams,
+  customerIdOf,
+  invoiceSubscriptionId,
+  isoFromUnix,
+  isScheduledCancel,
+  snapshotFromStripe,
+  willCollectAfterTrial,
+} from '../_shared/stripe-sub.ts'
 
 /** V2 Stripe webhook. V1 lives under src/legacy and is not called from here. */
 
@@ -74,11 +83,20 @@ async function createIntroSubscriptionFromPayment(
 
   const productId = await getOrCreateMonthlyProduct()
 
+  let created: Stripe.Subscription
   try {
-    return await stripe.subscriptions.create({
+    created = await stripe.subscriptions.create({
       customer: customerId,
       default_payment_method: paymentMethodId,
+      collection_method: 'charge_automatically',
+      off_session: true,
       trial_period_days: 7,
+      payment_settings: {
+        save_default_payment_method: 'on_subscription',
+      },
+      trial_settings: {
+        end_behavior: { missing_payment_method: 'create_invoice' },
+      },
       items: [{
         price_data: {
           currency: 'usd',
@@ -95,18 +113,30 @@ async function createIntroSubscriptionFromPayment(
     })
   } catch (err) {
     const raced = await findSubForCheckout(customerId, session.id)
-    if (raced) return raced
+    if (raced) return ensureWillCollect(raced)
     throw err
   }
+
+  return ensureWillCollect(created)
 }
 
-function isoFromUnix(seconds: number | null | undefined): string | null {
-  if (!seconds) return null
-  return new Date(seconds * 1000).toISOString()
-}
-
-function customerIdOf(sub: Stripe.Subscription): string {
-  return typeof sub.customer === 'string' ? sub.customer : sub.customer.id
+/** Never leave a new trial with cancel_at set — that is how V1 skipped the $6.99 invoice. */
+async function ensureWillCollect(sub: Stripe.Subscription): Promise<Stripe.Subscription> {
+  let live = sub
+  if (live.cancel_at || live.cancel_at_period_end) {
+    console.warn(`[stripe-webhook] clearing scheduled cancel on new sub ${live.id}`)
+    live = await stripe.subscriptions.update(live.id, clearCancelParams(live))
+  }
+  if (live.status !== 'trialing' && live.status !== 'active') {
+    throw new Error(`Intro sub ${live.id} unexpected status ${live.status}`)
+  }
+  if (live.status === 'trialing' && !willCollectAfterTrial(live)) {
+    throw new Error(`Intro sub ${live.id} would not charge after trial`)
+  }
+  console.log(
+    `[stripe-webhook] monthly sub ${live.id} status=${live.status} trial_end=${isoFromUnix(live.trial_end)} will_charge=${willCollectAfterTrial(live) || live.status === 'active'}`,
+  )
+  return live
 }
 
 function invoiceAlreadyCollected(invoice: Stripe.Invoice | string | null | undefined): boolean {
@@ -150,8 +180,8 @@ async function shouldSendTrialReminder(
   if (live.status !== 'trialing') {
     return { send: false, live, reason: `status=${live.status}` }
   }
-  if (live.cancel_at_period_end) {
-    return { send: false, live, reason: 'cancel_at_period_end' }
+  if (isScheduledCancel(live)) {
+    return { send: false, live, reason: 'scheduled cancel' }
   }
   if (live.trial_end && live.trial_end * 1000 <= Date.now()) {
     return { send: false, live, reason: 'trial already ended' }
@@ -162,6 +192,103 @@ async function shouldSendTrialReminder(
   }
 
   return { send: true, live }
+}
+
+type AdminClient = ReturnType<typeof createClient>
+
+async function resolveOwner(
+  admin: AdminClient,
+  customerId: string,
+): Promise<{
+  ownerProfileId: string
+  planType: string
+  storedSubId?: string
+  storedStatus: string
+} | null> {
+  const { data: existing } = await admin
+    .from('subscriptions')
+    .select('owner_profile_id, plan_type, stripe_subscription_id, status')
+    .eq('stripe_customer_id', customerId)
+    .maybeSingle()
+
+  let ownerProfileId = existing?.owner_profile_id as string | undefined
+  let planType = existing?.plan_type || INTRO_PLAN_SKU
+  let storedSubId = existing?.stripe_subscription_id as string | undefined
+  let storedStatus = (existing?.status as string | undefined)?.toLowerCase() ?? ''
+
+  if (!ownerProfileId) {
+    const customer = await stripe.customers.retrieve(customerId)
+    const fromMeta =
+      !customer.deleted ? (customer as Stripe.Customer).metadata?.soul_profile_id : null
+    if (fromMeta) ownerProfileId = fromMeta
+  }
+  if (!ownerProfileId) return null
+
+  if (!existing) {
+    const { data: byOwner } = await admin
+      .from('subscriptions')
+      .select('plan_type, stripe_subscription_id, status')
+      .eq('owner_profile_id', ownerProfileId)
+      .maybeSingle()
+    if (byOwner) {
+      planType = byOwner.plan_type || planType
+      storedSubId = byOwner.stripe_subscription_id as string | undefined
+      storedStatus = (byOwner.status as string | undefined)?.toLowerCase() ?? ''
+    }
+  }
+
+  return { ownerProfileId, planType, storedSubId, storedStatus }
+}
+
+/** Always retrieve the live Stripe subscription, then copy its fields into our row. */
+async function syncLiveSubscription(
+  admin: AdminClient,
+  subscriptionId: string,
+  opts: { deleted?: boolean } = {},
+) {
+  const live = await stripe.subscriptions.retrieve(subscriptionId)
+  const owner = await resolveOwner(admin, customerIdOf(live))
+  if (!owner) {
+    console.warn(`[stripe-webhook] skip sync ${live.id} — no V2 profile`)
+    return null
+  }
+
+  const livePaid = new Set(['active', 'trialing', 'past_due'])
+  if (
+    !opts.deleted &&
+    owner.storedSubId &&
+    owner.storedSubId !== live.id &&
+    livePaid.has(owner.storedStatus)
+  ) {
+    console.log(
+      `[stripe-webhook] skip ${live.id} — profile already on live sub ${owner.storedSubId}`,
+    )
+    return live
+  }
+
+  await upsertSubscription(
+    admin,
+    snapshotFromStripe(
+      owner.ownerProfileId,
+      live,
+      owner.planType,
+      opts.deleted ? 'canceled' : undefined,
+    ),
+  )
+  console.log(
+    `[stripe-webhook] synced ${live.id} status=${opts.deleted ? 'canceled' : live.status}`,
+  )
+  return live
+}
+
+function subscriptionIdFromEvent(event: Stripe.Event): string | null {
+  if (event.type.startsWith('customer.subscription.')) {
+    return (event.data.object as Stripe.Subscription).id ?? null
+  }
+  if (event.type.startsWith('invoice.')) {
+    return invoiceSubscriptionId(event.data.object as Stripe.Invoice)
+  }
+  return null
 }
 
 Deno.serve(async (req) => {
@@ -246,30 +373,19 @@ Deno.serve(async (req) => {
 
         let stripeSub: Stripe.Subscription | null = null
         if (isIntro) {
-          try {
-            stripeSub = await createIntroSubscriptionFromPayment(
-              session,
-              customerId,
-              planType,
-              intentId,
-            )
-          } catch (err) {
-            const message = err instanceof Error ? err.message : String(err)
-            console.error('[stripe-webhook] intro sub failed, continuing to provision:', message)
-            const listed = await stripe.subscriptions.list({
-              customer: customerId,
-              status: 'all',
-              limit: 20,
-            })
-            stripeSub =
-              listed.data.find(
-                (s) =>
-                  s.metadata?.checkout_session_id === session.id ||
-                  s.metadata?.intent_id === intentId,
-              ) ?? null
-          }
+          stripeSub = await createIntroSubscriptionFromPayment(
+            session,
+            customerId,
+            planType,
+            intentId,
+          )
         } else if (typeof session.subscription === 'string') {
           stripeSub = await stripe.subscriptions.retrieve(session.subscription)
+        }
+
+        // V1 charged $0.99 then often never created a monthly sub — access without a bill.
+        if (isIntro && !stripeSub) {
+          throw new Error(`intro checkout ${session.id} has no monthly subscription`)
         }
 
         const { data: intent, error: intentErr } = await admin
@@ -298,21 +414,10 @@ Deno.serve(async (req) => {
 
         if (stripeSub) {
           const liveSub = await stripe.subscriptions.retrieve(stripeSub.id)
-          await upsertSubscription(admin, {
-            ownerProfileId: profileId,
-            status: liveSub.status,
-            planType,
-            stripeCustomerId: customerId,
-            stripeSubscriptionId: liveSub.id,
-            periodStart: isoFromUnix(liveSub.current_period_start),
-            periodEnd: isoFromUnix(liveSub.current_period_end),
-            cancelAtPeriodEnd: liveSub.cancel_at_period_end ?? false,
-            cancelAt: isoFromUnix(
-              liveSub.cancel_at_period_end
-                ? (liveSub.cancel_at ?? liveSub.trial_end)
-                : liveSub.cancel_at,
-            ),
-          })
+          await upsertSubscription(
+            admin,
+            snapshotFromStripe(profileId, liveSub, planType),
+          )
         }
 
         try {
@@ -341,6 +446,7 @@ Deno.serve(async (req) => {
 
       case 'customer.subscription.trial_will_end': {
         const eventSub = event.data.object as Stripe.Subscription
+        await syncLiveSubscription(admin, eventSub.id)
         const check = await shouldSendTrialReminder(eventSub.id)
         if (!check.send || !check.live) {
           console.log(`[stripe-webhook] skip trial email — ${check.reason ?? 'unknown'} ${eventSub.id}`)
@@ -349,23 +455,8 @@ Deno.serve(async (req) => {
 
         const live = check.live
         const customerId = customerIdOf(live)
-
-        const { data: existing } = await admin
-          .from('subscriptions')
-          .select('owner_profile_id')
-          .eq('stripe_customer_id', customerId)
-          .maybeSingle()
-
-        let ownerProfileId = existing?.owner_profile_id as string | undefined
-        if (!ownerProfileId) {
-          const customer = await stripe.customers.retrieve(customerId)
-          const fromMeta =
-            !customer.deleted ? (customer as Stripe.Customer).metadata?.soul_profile_id : null
-          if (fromMeta) ownerProfileId = fromMeta
-        }
-
-        // No V2 profile = not our user (shared Stripe sandbox still receives V1 events).
-        if (!ownerProfileId) {
+        const owner = await resolveOwner(admin, customerId)
+        if (!owner) {
           console.warn(`[stripe-webhook] trial_will_end: skip, no V2 profile for ${customerId}`)
           break
         }
@@ -373,7 +464,7 @@ Deno.serve(async (req) => {
         const { data: profile } = await admin
           .from('soul_profiles')
           .select('email, full_name')
-          .eq('id', ownerProfileId)
+          .eq('id', owner.ownerProfileId)
           .maybeSingle()
 
         let to = typeof profile?.email === 'string' ? profile.email : null
@@ -414,76 +505,21 @@ Deno.serve(async (req) => {
 
       case 'customer.subscription.created':
       case 'customer.subscription.updated':
-      case 'customer.subscription.deleted': {
-        const subscription = event.data.object as Stripe.Subscription
-        const customerId = customerIdOf(subscription)
-
-        const { data: existing } = await admin
-          .from('subscriptions')
-          .select('owner_profile_id, plan_type, stripe_subscription_id, status')
-          .eq('stripe_customer_id', customerId)
-          .maybeSingle()
-
-        let ownerProfileId = existing?.owner_profile_id as string | undefined
-        let planType = existing?.plan_type || INTRO_PLAN_SKU
-        let storedSubId = existing?.stripe_subscription_id as string | undefined
-        let storedStatus = (existing?.status as string | undefined)?.toLowerCase() ?? ''
-
-        if (!ownerProfileId) {
-          const customer = await stripe.customers.retrieve(customerId)
-          const profileFromMeta =
-            !customer.deleted ? (customer as Stripe.Customer).metadata?.soul_profile_id : null
-          if (profileFromMeta) ownerProfileId = profileFromMeta
-        }
-
-        if (!ownerProfileId) {
-          console.warn(`[stripe-webhook] no V2 profile for customer ${customerId}`)
+      case 'customer.subscription.deleted':
+      case 'customer.subscription.paused':
+      case 'customer.subscription.resumed':
+      case 'invoice.created':
+      case 'invoice.finalized':
+      case 'invoice.paid':
+      case 'invoice.payment_failed':
+      case 'invoice.payment_action_required': {
+        const subId = subscriptionIdFromEvent(event)
+        if (!subId) {
+          console.log(`[stripe-webhook] ${event.type} has no subscription id`)
           break
         }
-
-        if (!existing && ownerProfileId) {
-          const { data: byOwner } = await admin
-            .from('subscriptions')
-            .select('plan_type, stripe_subscription_id, status')
-            .eq('owner_profile_id', ownerProfileId)
-            .maybeSingle()
-          if (byOwner) {
-            planType = byOwner.plan_type || planType
-            storedSubId = byOwner.stripe_subscription_id as string | undefined
-            storedStatus = (byOwner.status as string | undefined)?.toLowerCase() ?? ''
-          }
-        }
-        const livePaid = new Set(['active', 'trialing', 'past_due'])
-        if (
-          event.type !== 'customer.subscription.deleted' &&
-          storedSubId &&
-          storedSubId !== subscription.id &&
-          livePaid.has(storedStatus)
-        ) {
-          console.log(
-            `[stripe-webhook] skip ${subscription.id} — profile already on live sub ${storedSubId}`,
-          )
-          break
-        }
-
-        const status = event.type === 'customer.subscription.deleted'
-          ? 'canceled'
-          : subscription.status
-
-        await upsertSubscription(admin, {
-          ownerProfileId,
-          status,
-          planType: subscription.metadata?.plan_type || planType,
-          stripeCustomerId: customerId,
-          stripeSubscriptionId: subscription.id,
-          periodStart: isoFromUnix(subscription.current_period_start),
-          periodEnd: isoFromUnix(subscription.current_period_end),
-          cancelAtPeriodEnd: subscription.cancel_at_period_end ?? false,
-          cancelAt: isoFromUnix(
-            subscription.cancel_at_period_end
-              ? (subscription.cancel_at ?? subscription.trial_end)
-              : subscription.cancel_at,
-          ),
+        await syncLiveSubscription(admin, subId, {
+          deleted: event.type === 'customer.subscription.deleted',
         })
         break
       }

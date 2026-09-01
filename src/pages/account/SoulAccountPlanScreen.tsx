@@ -1,13 +1,13 @@
 import { useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { SoulBrand, SoulNav } from '@/components/soul'
+import { SoulBrand, SoulNav, SoulRippleBg } from '@/components/soul'
 import { useUser } from '@/hooks/useUser'
 import { supabase } from '@/integrations/supabase/client'
 import { ResumeSheet } from '@/pages/home/ResumeSheet'
 import { useSoulSheetParams } from '@/pages/home/useSoulSheetParams'
+import { CancelPlanSheet, type CancelPlanSheetView } from './CancelPlanSheet'
 import './soul-account.css'
-import bgRipple from '../home/assets/bg-ripple.png'
 import iconArrow from './assets/icon-arrow.svg'
 import iconArrowLight from './assets/icon-arrow-light.svg'
 import iconBack from '../people/assets/icon-chevron.svg'
@@ -44,8 +44,11 @@ export function SoulAccountPlanScreen() {
   const [searchParams] = useSearchParams()
   const { user, isPremium, subscription, refetch } = useUser()
   const [signingOut, setSigningOut] = useState(false)
-  const [confirmCancel, setConfirmCancel] = useState(false)
   const [planBusy, setPlanBusy] = useState(false)
+  const [planError, setPlanError] = useState(false)
+  const [sheetView, setSheetView] = useState<CancelPlanSheetView | null>(
+    () => (searchParams.get('cancel') === '1' ? 'cancel' : null),
+  )
   const live = Boolean(user && subscription)
 
   const subscriptionEnded = useMemo(() => {
@@ -76,7 +79,9 @@ export function SoulAccountPlanScreen() {
   }, [subscription?.expires_at, subscription?.current_period_end])
 
   const trialing = live && subscription?.status?.toLowerCase() === 'trialing'
-  const cancelledAtPeriodEnd = Boolean(subscription?.cancel_at_period_end)
+  const cancelledAtPeriodEnd = Boolean(
+    subscription?.cancel_at_period_end || subscription?.cancel_at,
+  )
 
   const priceTitle = subscriptionEnded
     ? 'Ended'
@@ -114,6 +119,7 @@ export function SoulAccountPlanScreen() {
   const invokePlan = async (action: 'cancel' | 'resume') => {
     if (planBusy) return
     setPlanBusy(true)
+    setPlanError(false)
     try {
       const { data, error } = await supabase.functions.invoke('cancel-subscription', {
         body: { action },
@@ -124,15 +130,12 @@ export function SoulAccountPlanScreen() {
       }
       if (data?.error) throw new Error(data.error)
       await refetch()
-      setConfirmCancel(false)
-      toast.success(
-        action === 'cancel'
-          ? 'Plan cancelled. You keep access until the date above.'
-          : 'Plan kept. $6.99/month will start when the trial ends.',
-      )
+      if (action === 'cancel') setSheetView('done')
+      else setSheetView(null)
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Could not update plan'
       toast.error(message)
+      setPlanError(true)
     } finally {
       setPlanBusy(false)
     }
@@ -155,21 +158,12 @@ export function SoulAccountPlanScreen() {
 
   return (
     <div
-      className="soul-account"
+      className={`soul-account${sheetView ? ' soul-account--sheet-open' : ''}`}
       data-name={
         subscriptionEnded ? 'Account · Plan · Subscription ended' : 'Account · Plan'
       }
     >
-      <div className="soul-account__bg" aria-hidden="true">
-        <div className="soul-account__bg-tile soul-account__bg-tile--1">
-          <img src={bgRipple} alt="" />
-          <span className="soul-account__bg-dim" />
-        </div>
-        <div className="soul-account__bg-tile soul-account__bg-tile--2">
-          <img src={bgRipple} alt="" />
-          <span className="soul-account__bg-dim" />
-        </div>
-      </div>
+      <SoulRippleBg className="soul-account__bg" />
       <div className="soul-account__scrim" aria-hidden="true" />
       <div className="soul-account__dock-scrim" aria-hidden="true" />
 
@@ -276,38 +270,21 @@ export function SoulAccountPlanScreen() {
             <button
               type="button"
               className="soul-account__signout"
-              onClick={() => void invokePlan('resume')}
-              disabled={planBusy}
+              onClick={() => {
+                setPlanError(false)
+                setSheetView('keep')
+              }}
             >
-              {planBusy ? 'Saving…' : 'Keep plan'}
+              Keep plan
             </button>
-          ) : confirmCancel ? (
-            <div className="soul-account__cancel-confirm">
-              <p className="soul-account__cancel-copy">
-                You keep access until {renewLabel}. You will not be charged $6.99.
-              </p>
-              <button
-                type="button"
-                className="soul-account__signout"
-                onClick={() => void invokePlan('cancel')}
-                disabled={planBusy}
-              >
-                {planBusy ? 'Cancelling…' : 'Confirm cancel'}
-              </button>
-              <button
-                type="button"
-                className="soul-account__signout"
-                onClick={() => setConfirmCancel(false)}
-                disabled={planBusy}
-              >
-                Never mind
-              </button>
-            </div>
           ) : (
             <button
               type="button"
               className="soul-account__signout"
-              onClick={() => setConfirmCancel(true)}
+              onClick={() => {
+                setPlanError(false)
+                setSheetView('cancel')
+              }}
             >
               Cancel plan
             </button>
@@ -325,6 +302,20 @@ export function SoulAccountPlanScreen() {
         price={DEMO_PLAN.resumePrice}
         onClose={closeResume}
         onModeChange={openResume}
+      />
+      <CancelPlanSheet
+        open={sheetView != null}
+        view={sheetView ?? 'cancel'}
+        accessUntil={renewLabel}
+        busy={planBusy}
+        error={planError}
+        onClose={() => {
+          if (planBusy) return
+          setSheetView(null)
+          setPlanError(false)
+        }}
+        onConfirmCancel={() => void invokePlan('cancel')}
+        onConfirmKeep={() => void invokePlan('resume')}
       />
     </div>
   )

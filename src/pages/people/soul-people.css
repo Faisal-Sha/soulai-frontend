@@ -28,58 +28,6 @@
   background: #746c5e;
 }
 
-.soul-people__bg-tile {
-  position: absolute;
-  left: 0;
-  right: 0;
-  overflow: hidden;
-}
-
-.soul-people__bg-tile img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center top;
-  display: block;
-}
-
-.soul-people__bg-dim {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.1);
-}
-
-.soul-people__bg-tile--1 {
-  top: 0;
-  height: 100%;
-}
-
-/* Soft-blend the flipped ripple so the mid-screen seam disappears */
-.soul-people__bg-tile--2 {
-  top: 42%;
-  height: 70%;
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(0, 0, 0, 0.55) 22%,
-    #000 42%,
-    #000 100%
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(0, 0, 0, 0.55) 22%,
-    #000 42%,
-    #000 100%
-  );
-}
-
-.soul-people__bg-tile--2 img {
-  transform: rotate(180deg) scaleX(-1);
-}
-
 .soul-people__scrim {
   position: fixed;
   left: 0;

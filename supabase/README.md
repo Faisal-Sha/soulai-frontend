@@ -24,7 +24,20 @@ npx supabase secrets set RESEND_API_KEY=re_...
 npx supabase secrets set RESEND_FROM_EMAIL=noreply@soulplus-ai.com
 ```
 
-Stripe webhook events (V2 endpoint only): `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `customer.subscription.trial_will_end`.
+Stripe webhook events (V2 endpoint only — enable these on the sandbox endpoint). Each of these **re-fetches the live Stripe subscription** and copies status/dates; we do not invent trial/cancel dates.
+
+- `checkout.session.completed`
+- `customer.subscription.created`
+- `customer.subscription.updated`
+- `customer.subscription.deleted`
+- `customer.subscription.paused`
+- `customer.subscription.resumed`
+- `customer.subscription.trial_will_end`
+- `invoice.created`
+- `invoice.finalized`
+- `invoice.paid`
+- `invoice.payment_failed`
+- `invoice.payment_action_required`
 
 Cancel (JWT): `cancel-subscription` with `{ "action": "cancel" }` or `{ "action": "resume" }`. Sets Stripe `cancel_at_period_end` — access stays until trial/period end, no $6.99 if they cancel during trial. Idempotent. Emails on cancel only.
 
@@ -41,6 +54,10 @@ Use the `whsec_...` that `stripe listen` prints as `STRIPE_WEBHOOK_SECRET`.
 ## Auth (required — dashboard must match)
 
 No passwords. Account is created **only after payment** (service role). Login is returning subscribers.
+
+Deleting a row in **Authentication → Users** follows the FK policy in [`erd.md`](./erd.md): `auth.users` CASCADE `soul_profiles` CASCADE `subscriptions`. A trigger also deletes `quiz_intents` for that email. `stripe_events` and Stripe itself are not FKs and stay.
+
+New user-owned tables must use `owner_profile_id → soul_profiles(id) ON DELETE CASCADE`. Never `SET NULL`. Never FK to `auth.users`.
 
 | Setting | Value |
 |---------|--------|
@@ -67,13 +84,20 @@ Same values live in `config.toml` (`npx supabase config push`). Re-check them in
 4. `stripe-webhook` on `checkout.session.completed` creates `auth.users` + `soul_profiles` + `subscriptions`, then sends the magic login link.
 5. `/paid` tells them to check email. The app (home, account, …) is for signed-in paying users.
 
-## Applied
+## Applied (run in this order)
 
-| File | What it creates |
-|------|-----------------|
-| `20260828000100_helpers.sql` | `set_updated_at()` |
-| `20260828000200_soul_profiles.sql` | Identity, auth trigger, RLS helpers |
-| `20260831000100_subscriptions.sql` | `quiz_intents`, `subscriptions`, `stripe_events` |
+`npx supabase db push` applies them by timestamp. Do not skip or reorder.
+
+| File | What it does |
+|------|----------------|
+| `20260828000100_01_helpers.sql` | `set_updated_at()` + delete-policy note |
+| `20260828000200_02_soul_profiles.sql` | Identity hub. `auth_user_id → auth.users ON DELETE CASCADE` |
+| `20260831000100_03_subscriptions.sql` | `quiz_intents`, `subscriptions` (CASCADE from profile), `stripe_events` (no user FK) |
+| `20260901000100_04_soul_profiles_auth_cascade.sql` | Live follow-up: SET NULL → CASCADE (no-op if 02 already CASCADE) |
+| `20260901000200_05_quiz_intents_purge_on_delete.sql` | Email trigger: delete `quiz_intents` with Auth / profile |
+| `20260901000300_06_fk_delete_policy_comments.sql` | Catalog comments for the locked delete policy |
+
+Blank project: `npx supabase db push` from repo `supabase/`. All six are idempotent enough to run in order.
 
 ## Next (do not add until that screen is wired)
 

@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { SoulBrand, SoulNav } from '@/components/soul'
+import { SoulBrand, SoulNav, SoulRippleBg } from '@/components/soul'
 import { useUser } from '@/hooks/useUser'
 import { ResumeSheet } from '@/pages/home/ResumeSheet'
 import { useSoulSheetParams } from '@/pages/home/useSoulSheetParams'
 import { PATTERN_META, PATTERN_SECTIONS } from './patternContent'
 import { addUserSavedInsight } from '@/pages/insights/insightsStore'
 import './soul-pattern.css'
-import bgRipple from '../home/assets/bg-ripple.png'
 import patternHero from './assets/pattern-hero.png'
 import iconArrowLight from './assets/icon-arrow-light.svg'
 import iconArrowDark from './assets/icon-arrow-dark.svg'
@@ -207,16 +206,7 @@ export function SoulPatternChapterScreen() {
 
   return (
     <div className="soul-pattern">
-      <div className="soul-pattern__bg" aria-hidden="true">
-        <div className="soul-pattern__bg-tile soul-pattern__bg-tile--1">
-          <img src={bgRipple} alt="" />
-          <span className="soul-pattern__bg-dim" />
-        </div>
-        <div className="soul-pattern__bg-tile soul-pattern__bg-tile--2">
-          <img src={bgRipple} alt="" />
-          <span className="soul-pattern__bg-dim" />
-        </div>
-      </div>
+      <SoulRippleBg className="soul-pattern__bg" />
 
       <div className="soul-pattern__chrome-wrap">
         <header className="soul-pattern__chrome">

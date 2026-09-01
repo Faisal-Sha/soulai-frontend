@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { SoulBrand, SoulButton, SoulField } from '@/components/soul'
+import { SoulBrand, SoulButton, SoulField, SoulRippleBg } from '@/components/soul'
 import iconCalendar from '@/components/soul/assets/icon-calendar.svg'
 import iconClock from '@/components/soul/assets/icon-clock.svg'
 import iconChevronDown from '@/components/soul/assets/icon-chevron-down.svg'
@@ -11,7 +11,6 @@ import {
   type BirthdateValue,
 } from '@/pages/quiz/lib/dateValidation'
 import './soul-people.css'
-import bgRipple from '../home/assets/bg-ripple.png'
 import iconChevron from './assets/icon-chevron.svg'
 
 function digitsFromBirthdate(v?: BirthdateValue): string {
@@ -146,16 +145,7 @@ export function SoulPeopleAddScreen() {
 
   return (
     <div className="soul-people">
-      <div className="soul-people__bg" aria-hidden="true">
-        <div className="soul-people__bg-tile soul-people__bg-tile--1">
-          <img src={bgRipple} alt="" />
-          <span className="soul-people__bg-dim" />
-        </div>
-        <div className="soul-people__bg-tile soul-people__bg-tile--2">
-          <img src={bgRipple} alt="" />
-          <span className="soul-people__bg-dim" />
-        </div>
-      </div>
+      <SoulRippleBg className="soul-people__bg" />
       <div className="soul-people__scrim" aria-hidden="true" />
 
       <div className="soul-people__scroll soul-people__scroll--form">

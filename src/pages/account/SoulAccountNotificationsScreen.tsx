@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { SoulBrand, SoulNav } from '@/components/soul'
+import { SoulBrand, SoulNav, SoulRippleBg } from '@/components/soul'
 import { AddToHomeSheet } from '@/pages/home/AddToHomeSheet'
 import { useSoulSheetParams } from '@/pages/home/useSoulSheetParams'
 import './soul-account.css'
-import bgRipple from '../home/assets/bg-ripple.png'
 import iconArrowLight from '../readings/assets/icon-arrow-light.svg'
 import iconChevron from './assets/icon-chevron.svg'
 import iconBack from '../people/assets/icon-chevron.svg'
@@ -64,16 +63,7 @@ export function SoulAccountNotificationsScreen() {
       className="soul-account"
       data-name={blocked ? 'Account · Notifications · Blocked' : 'Account · Notifications'}
     >
-      <div className="soul-account__bg" aria-hidden="true">
-        <div className="soul-account__bg-tile soul-account__bg-tile--1">
-          <img src={bgRipple} alt="" />
-          <span className="soul-account__bg-dim" />
-        </div>
-        <div className="soul-account__bg-tile soul-account__bg-tile--2">
-          <img src={bgRipple} alt="" />
-          <span className="soul-account__bg-dim" />
-        </div>
-      </div>
+      <SoulRippleBg className="soul-account__bg" />
       <div className="soul-account__scrim" aria-hidden="true" />
       <div className="soul-account__dock-scrim" aria-hidden="true" />
 

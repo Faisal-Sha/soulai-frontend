@@ -1,9 +1,8 @@
 import { useNavigate } from 'react-router-dom'
-import { SoulBrand, SoulNav, SoulTextLink } from '@/components/soul'
+import { SoulBrand, SoulNav, SoulRippleBg, SoulTextLink } from '@/components/soul'
 import { type KnowQuestion } from './knowData'
 import { useKnowAnswers } from './useKnowAnswers'
 import './soul-account.css'
-import bgRipple from '../home/assets/bg-ripple.png'
 import iconArrowLight from '../readings/assets/icon-arrow-light.svg'
 import iconBack from '../people/assets/icon-chevron.svg'
 
@@ -21,16 +20,7 @@ export function SoulAccountKnowScreen() {
 
   return (
     <div className="soul-account" data-name="Account · What I know about you · Full">
-      <div className="soul-account__bg" aria-hidden="true">
-        <div className="soul-account__bg-tile soul-account__bg-tile--1">
-          <img src={bgRipple} alt="" />
-          <span className="soul-account__bg-dim" />
-        </div>
-        <div className="soul-account__bg-tile soul-account__bg-tile--2">
-          <img src={bgRipple} alt="" />
-          <span className="soul-account__bg-dim" />
-        </div>
-      </div>
+      <SoulRippleBg className="soul-account__bg" />
       <div className="soul-account__scrim" aria-hidden="true" />
       <div className="soul-account__dock-scrim" aria-hidden="true" />
 

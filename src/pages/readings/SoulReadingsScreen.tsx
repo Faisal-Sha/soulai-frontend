@@ -1,6 +1,6 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
-import { SoulBrand, SoulNav } from '@/components/soul'
+import { SoulBrand, SoulFooter, SoulNav, SoulRippleBg } from '@/components/soul'
 import { useUser } from '@/hooks/useUser'
 import {
   READING_CHAPTERS,
@@ -8,7 +8,6 @@ import {
   type ReadingChapterId,
 } from './chapters'
 import './soul-readings.css'
-import bgRipple from '../home/assets/bg-ripple.png'
 import iconRead from './assets/icon-read.svg'
 import iconChevron from './assets/icon-chevron.svg'
 
@@ -54,16 +53,7 @@ export function SoulReadingsScreen({
 
   return (
     <div className="soul-readings">
-      <div className="soul-readings__bg" aria-hidden="true">
-        <div className="soul-readings__bg-tile soul-readings__bg-tile--1">
-          <img src={bgRipple} alt="" />
-          <span className="soul-readings__bg-dim" />
-        </div>
-        <div className="soul-readings__bg-tile soul-readings__bg-tile--2">
-          <img src={bgRipple} alt="" />
-          <span className="soul-readings__bg-dim" />
-        </div>
-      </div>
+      <SoulRippleBg className="soul-readings__bg" />
       <div className="soul-readings__scrim" aria-hidden="true" />
       <div className="soul-readings__dock-scrim" aria-hidden="true" />
 
@@ -116,37 +106,7 @@ export function SoulReadingsScreen({
           ))}
         </section>
 
-        <footer className="soul-readings__footer">
-          <hr className="soul-readings__divider" />
-          <p className="soul-readings__footer-tag">
-            Helping you unlock your potential through ancient wisdom and modern technology.
-          </p>
-          <div className="soul-readings__footer-links">
-            <Link to="/contact">Support</Link>
-            <Link to="/account">Manage subscription</Link>
-            <Link to="/terms">Terms of Service</Link>
-            <Link to="/privacy">Privacy Policy</Link>
-            <a href="mailto:support@soulplusai.com">Refund Policy</a>
-          </div>
-          <a className="soul-readings__footer-email" href="mailto:support@soulplusai.com">
-            support@soulplusai.com
-          </a>
-          <div className="soul-readings__footer-links">
-            <a href="https://instagram.com" target="_blank" rel="noreferrer">
-              Instagram
-            </a>
-            <a href="https://facebook.com" target="_blank" rel="noreferrer">
-              Facebook
-            </a>
-            <a href="https://twitter.com" target="_blank" rel="noreferrer">
-              Twitter
-            </a>
-            <a href="https://youtube.com" target="_blank" rel="noreferrer">
-              Youtube
-            </a>
-          </div>
-          <p className="soul-readings__footer-copy">© 2026 Soul+AI. All rights reserved.</p>
-        </footer>
+        <SoulFooter className="soul-readings__footer" />
       </div>
 
       <div className="soul-readings__nav soul-readings__nav--mobile">

@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { SoulBrand, SoulButton } from '@/components/soul'
+import { SoulBrand, SoulButton, SoulRippleBg } from '@/components/soul'
 import { useUser } from '@/hooks/useUser'
 import { SAVED_INSIGHTS, type SavedInsight } from './insightsData'
 import { loadAllSavedInsights, removeUserSavedInsight } from './insightsStore'
 import './soul-insights.css'
-import bgRipple from '../home/assets/bg-ripple.png'
 import iconBack from './assets/icon-back.svg'
 import iconBookmark from './assets/icon-bookmark.svg'
 
@@ -71,16 +70,7 @@ export function SoulSavedInsightsScreen({ variant: variantProp }: SoulSavedInsig
 
   return (
     <div className="soul-insights">
-      <div className="soul-insights__bg" aria-hidden="true">
-        <div className="soul-insights__bg-tile soul-insights__bg-tile--1">
-          <img src={bgRipple} alt="" />
-          <span className="soul-insights__bg-dim" />
-        </div>
-        <div className="soul-insights__bg-tile soul-insights__bg-tile--2">
-          <img src={bgRipple} alt="" />
-          <span className="soul-insights__bg-dim" />
-        </div>
-      </div>
+      <SoulRippleBg className="soul-insights__bg" />
       <div className="soul-insights__scrim" aria-hidden="true" />
 
       <div className="soul-insights__scroll">

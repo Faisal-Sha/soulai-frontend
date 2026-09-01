@@ -5,7 +5,7 @@ import './soul-glass-orb.css'
 
 const PAGE_TAUPE = '#746c5e'
 const BG_IMG_SEL =
-  'img.soul-rf__bg-img, img.soul-wt__bg-img, .soul-people__bg-tile--1 img'
+  'img.soul-rf__bg-img, img.soul-wt__bg-img, .soul-people__bg img, .soul-ripple-bg img'
 const HOST_SEL = '.soul-rf, .soul-wt, .soul-people'
 /** Crop the video’s outer glow so only the glass sphere remains. */
 const VIDEO_ZOOM = 1.5

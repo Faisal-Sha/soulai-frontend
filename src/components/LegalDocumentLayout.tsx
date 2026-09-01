@@ -1,6 +1,6 @@
 import { useEffect, type ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { SoulBrand } from "@/components/soul";
+import { SoulBrand, SoulFooter } from "@/components/soul";
 import bgRipple from "@/pages/home/assets/bg-ripple.png";
 import "@/pages/legal/soul-legal.css";
 
@@ -115,37 +115,7 @@ export function LegalDocumentLayout({
               ))}
             </div>
 
-            <footer className="soul-legal__footer">
-              <hr className="soul-legal__divider" />
-              <p className="soul-legal__footer-tag">
-                Helping you unlock your potential through ancient wisdom and modern technology.
-              </p>
-              <div className="soul-legal__footer-links">
-                <Link to="/contact">Support</Link>
-                <Link to="/account">Manage subscription</Link>
-                <Link to="/terms">Terms of Service</Link>
-                <Link to="/privacy">Privacy Policy</Link>
-                <Link to="/faq">Refund Policy</Link>
-              </div>
-              <a className="soul-legal__footer-email" href="mailto:support@soulplusai.com">
-                support@soulplusai.com
-              </a>
-              <div className="soul-legal__footer-links">
-                <a href="https://instagram.com" target="_blank" rel="noreferrer">
-                  Instagram
-                </a>
-                <a href="https://facebook.com" target="_blank" rel="noreferrer">
-                  Facebook
-                </a>
-                <a href="https://twitter.com" target="_blank" rel="noreferrer">
-                  Twitter
-                </a>
-                <a href="https://youtube.com" target="_blank" rel="noreferrer">
-                  Youtube
-                </a>
-              </div>
-              <p className="soul-legal__footer-copy">© 2026 Soul+AI. All rights reserved.</p>
-            </footer>
+            <SoulFooter className="soul-legal__footer" />
         </div>
       </div>
     </div>

@@ -29,43 +29,6 @@
   background: #746c5e;
 }
 
-.soul-pattern__bg-tile {
-  position: absolute;
-  left: 0;
-  right: 0;
-  overflow: hidden;
-}
-
-.soul-pattern__bg-tile img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center top;
-  display: block;
-}
-
-.soul-pattern__bg-dim {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.1);
-}
-
-.soul-pattern__bg-tile--1 {
-  top: 0;
-  height: 100%;
-}
-
-.soul-pattern__bg-tile--2 {
-  top: 52%;
-  height: 60%;
-}
-
-.soul-pattern__bg-tile--2 img {
-  transform: rotate(180deg) scaleX(-1);
-}
-
 .soul-pattern__chrome-wrap {
   position: relative;
   z-index: 2;

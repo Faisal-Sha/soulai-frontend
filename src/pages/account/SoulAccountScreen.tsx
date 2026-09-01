@@ -1,13 +1,12 @@
 import { useMemo, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { SoulBrand, SoulNav } from '@/components/soul'
+import { SoulBrand, SoulNav, SoulRippleBg } from '@/components/soul'
 import { useUser } from '@/hooks/useUser'
 import { supabase } from '@/integrations/supabase/client'
 import { ResumeSheet } from '@/pages/home/ResumeSheet'
 import { useSoulSheetParams } from '@/pages/home/useSoulSheetParams'
 import './soul-account.css'
-import bgRipple from '../home/assets/bg-ripple.png'
 import iconArrow from './assets/icon-arrow.svg'
 import iconChevron from './assets/icon-chevron.svg'
 import { displayName, identityMetaLine } from './profileDisplay'
@@ -166,16 +165,7 @@ export function SoulAccountScreen() {
       className="soul-account"
       data-name={subscriptionEnded ? 'Account · Subscription ended' : 'Account · Full'}
     >
-      <div className="soul-account__bg" aria-hidden="true">
-        <div className="soul-account__bg-tile soul-account__bg-tile--1">
-          <img src={bgRipple} alt="" />
-          <span className="soul-account__bg-dim" />
-        </div>
-        <div className="soul-account__bg-tile soul-account__bg-tile--2">
-          <img src={bgRipple} alt="" />
-          <span className="soul-account__bg-dim" />
-        </div>
-      </div>
+      <SoulRippleBg className="soul-account__bg" />
       <div className="soul-account__scrim" aria-hidden="true" />
       <div className="soul-account__dock-scrim" aria-hidden="true" />
 

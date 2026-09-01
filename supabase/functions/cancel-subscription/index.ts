@@ -2,6 +2,13 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'npm:stripe@14.21.0'
 import { corsPreflight, jsonResponse } from '../_shared/cors.ts'
 import { sendEmail, cancellationEmailHtml } from '../_shared/email.ts'
+import { upsertSubscription } from '../_shared/provision-account.ts'
+import {
+  clearCancelParams,
+  dbPeriodFields,
+  isScheduledCancel,
+  snapshotFromStripe,
+} from '../_shared/stripe-sub.ts'
 
 /** V2 cancel / keep-plan. JWT required. Stripe is source of truth; webhook will re-sync. */
 
@@ -61,7 +68,7 @@ Deno.serve(async (req) => {
 
   const { data: sub, error: subErr } = await admin
     .from('subscriptions')
-    .select('stripe_subscription_id, status, cancel_at_period_end, current_period_end, expires_at')
+    .select('stripe_subscription_id, status, plan_type, cancel_at_period_end, current_period_end, expires_at')
     .eq('owner_profile_id', profile.id)
     .maybeSingle()
 
@@ -76,22 +83,16 @@ Deno.serve(async (req) => {
       if (live.status === 'canceled' || live.status === 'unpaid' || live.status === 'incomplete_expired') {
         return jsonResponse({ error: 'Subscription already ended. Start a new plan to continue.' }, 400)
       }
-      if (!live.cancel_at_period_end) {
+      if (!isScheduledCancel(live)) {
         return jsonResponse({ success: true, already: true, cancel_at: null })
       }
 
-      const updated = await stripe.subscriptions.update(live.id, {
-        cancel_at_period_end: false,
-      })
-
-      await admin.from('subscriptions').update({
-        status: updated.status,
-        cancel_at_period_end: false,
-        cancel_at: null,
-        expires_at: isoFromUnix(updated.current_period_end),
-        current_period_end: isoFromUnix(updated.current_period_end),
-      }).eq('owner_profile_id', profile.id)
-
+      const updated = await stripe.subscriptions.update(live.id, clearCancelParams(live))
+      const fresh = await stripe.subscriptions.retrieve(updated.id)
+      await upsertSubscription(
+        admin,
+        snapshotFromStripe(profile.id, fresh, sub.plan_type || 'full_access_7day'),
+      )
       return jsonResponse({ success: true, cancel_at: null })
     }
 
@@ -99,32 +100,26 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: 'Subscription is not active or in trial' }, 400)
     }
 
-    const cancelAtUnix = live.cancel_at ?? live.trial_end ?? live.current_period_end
-    const cancelAt = isoFromUnix(cancelAtUnix)
-
-    if (live.cancel_at_period_end) {
-      await admin.from('subscriptions').update({
-        cancel_at_period_end: true,
-        cancel_at: cancelAt,
-      }).eq('owner_profile_id', profile.id)
-      return jsonResponse({ success: true, already: true, cancel_at: cancelAt })
+    if (isScheduledCancel(live)) {
+      const fields = dbPeriodFields(live)
+      await upsertSubscription(
+        admin,
+        snapshotFromStripe(profile.id, live, sub.plan_type || 'full_access_7day'),
+      )
+      return jsonResponse({ success: true, already: true, cancel_at: fields.cancelAt })
     }
 
     const updated = await stripe.subscriptions.update(live.id, {
       cancel_at_period_end: true,
     })
-
-    const accessUntil = isoFromUnix(
-      updated.cancel_at ?? updated.trial_end ?? updated.current_period_end,
+    const fresh = await stripe.subscriptions.retrieve(updated.id)
+    const fields = dbPeriodFields(fresh)
+    await upsertSubscription(
+      admin,
+      snapshotFromStripe(profile.id, fresh, sub.plan_type || 'full_access_7day'),
     )
 
-    await admin.from('subscriptions').update({
-      status: updated.status,
-      cancel_at_period_end: true,
-      cancel_at: accessUntil,
-      expires_at: isoFromUnix(updated.current_period_end),
-      current_period_end: isoFromUnix(updated.current_period_end),
-    }).eq('owner_profile_id', profile.id)
+    const accessUntil = fields.cancelAt ?? fields.periodEnd
 
     const to = (typeof profile.email === 'string' && profile.email) || user.email
     if (to) {
@@ -163,8 +158,3 @@ Deno.serve(async (req) => {
     return jsonResponse({ error: message }, 500)
   }
 })
-
-function isoFromUnix(seconds: number | null | undefined): string | null {
-  if (!seconds) return null
-  return new Date(seconds * 1000).toISOString()
-}

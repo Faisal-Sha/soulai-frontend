@@ -12,6 +12,7 @@ const OPEN_PREFIXES = [
   '/faq',
   '/privacy',
   '/terms',
+  '/about',
 ]
 
 function isOpenPath(pathname: string) {
@@ -20,7 +21,7 @@ function isOpenPath(pathname: string) {
 
 /**
  * The app is for people who already paid.
- * Quiz, login, paid-return, and legal stay public.
+ * Quiz, login, paid-return, About, and legal stay public.
  * Unsigned visitors hitting home/account/people are sent to login
  * (login itself points new people at the quiz).
  */

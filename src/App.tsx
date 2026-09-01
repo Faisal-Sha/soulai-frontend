@@ -23,6 +23,7 @@ import { SoulAccountNotificationsScreen } from "./pages/account/SoulAccountNotif
 import { SoulAccountKnowScreen } from "./pages/account/SoulAccountKnowScreen";
 import { SoulAccountKnowAnswerScreen } from "./pages/account/SoulAccountKnowAnswerScreen";
 import { SoulAccountBirthScreen } from "./pages/account/SoulAccountBirthScreen";
+import { SoulAboutScreen } from "./pages/about/SoulAboutScreen";
 import { SoulLoginScreen } from "./pages/auth/SoulLoginScreen";
 import { SoulLoginEmailScreen } from "./pages/auth/SoulLoginEmailScreen";
 import { SoulLoginCheckScreen } from "./pages/auth/SoulLoginCheckScreen";
@@ -81,6 +82,7 @@ function AppRoutes() {
       <Route path="/account/know" element={<SoulAccountKnowScreen />} />
       <Route path="/account/know/:questionId" element={<SoulAccountKnowAnswerScreen />} />
       <Route path="/account/birth" element={<SoulAccountBirthScreen />} />
+      <Route path="/about" element={<SoulAboutScreen />} />
 
       <Route path="/contact" element={<Contact />} />
       <Route path="/faq" element={<FAQ />} />

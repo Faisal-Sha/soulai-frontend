@@ -1,9 +1,8 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { SoulBrand, SoulButton, SoulNav } from '@/components/soul'
+import { SoulBrand, SoulButton, SoulNav, SoulRippleBg } from '@/components/soul'
 import { DEMO_PEOPLE } from './peopleData'
 import { PEOPLE_REPORT_META, PEOPLE_REPORT_SECTIONS } from './reportContent'
 import './soul-people.css'
-import bgRipple from '../home/assets/bg-ripple.png'
 import iconChevron from './assets/icon-chevron.svg'
 import iconArrow from '../readings/assets/icon-arrow-light.svg'
 
@@ -40,16 +39,7 @@ export function SoulPeopleReportScreen() {
 
   return (
     <div className="soul-people">
-      <div className="soul-people__bg" aria-hidden="true">
-        <div className="soul-people__bg-tile soul-people__bg-tile--1">
-          <img src={bgRipple} alt="" />
-          <span className="soul-people__bg-dim" />
-        </div>
-        <div className="soul-people__bg-tile soul-people__bg-tile--2">
-          <img src={bgRipple} alt="" />
-          <span className="soul-people__bg-dim" />
-        </div>
-      </div>
+      <SoulRippleBg className="soul-people__bg" />
       <div className="soul-people__scrim" aria-hidden="true" />
       <div className="soul-people__dock-scrim" aria-hidden="true" />
 

@@ -1,7 +1,8 @@
 -- =============================================================================
--- V2 / 03 subscriptions + checkout intents
+-- V2 / 03 quiz_intents + subscriptions + stripe_events
 -- Account is created only after Stripe payment — not at the quiz email gate.
--- quiz_intents holds email + answers between paywall and webhook.
+-- subscriptions.owner_profile_id → soul_profiles ON DELETE CASCADE.
+-- quiz_intents has no Auth FK (purged in 05). stripe_events has no user FK.
 -- Depends on: 02 soul_profiles
 -- =============================================================================
 
@@ -25,7 +26,7 @@ CREATE INDEX quiz_intents_open_idx ON public.quiz_intents (created_at)
   WHERE consumed_at IS NULL;
 
 COMMENT ON TABLE public.quiz_intents IS
-  'Pre-payment quiz stash. No auth user until stripe-webhook consumes this row.';
+  'Pre-payment quiz stash. No Auth FK (row exists before login). Purged by trigger when auth.users or soul_profiles for that email is deleted.';
 
 ALTER TABLE public.quiz_intents ENABLE ROW LEVEL SECURITY;
 
@@ -56,7 +57,7 @@ CREATE INDEX subscriptions_stripe_customer_id_idx
   ON public.subscriptions (stripe_customer_id);
 
 COMMENT ON TABLE public.subscriptions IS
-  '1:1 with soul_profiles. Written by stripe-webhook only.';
+  'App cache of Stripe state. 1:1 with soul_profiles. owner_profile_id ON DELETE CASCADE. Stripe itself is not a Postgres FK.';
 
 CREATE TRIGGER subscriptions_set_updated_at
   BEFORE UPDATE ON public.subscriptions
@@ -82,10 +83,10 @@ CREATE TABLE public.stripe_events (
 );
 
 COMMENT ON TABLE public.stripe_events IS
-  'Stripe webhook idempotency. Insert event id before handling.';
+  'Webhook idempotency (event id + type only). No user FK — do not CASCADE from Auth.';
 
 COMMENT ON TABLE public.soul_profiles IS
-  'V2 identity. Created after Stripe payment (stripe-webhook), not at the quiz email gate.';
+  'V2 identity hub. Created after Stripe payment. Auth delete CASCADE-removes this row; children CASCADE from here.';
 
 ALTER TABLE public.stripe_events ENABLE ROW LEVEL SECURITY;
 
