@@ -1,7 +1,10 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { SoulBrand, SoulNav, SoulRippleBg } from '@/components/soul'
+import { useUser } from '@/hooks/useUser'
+import { displayName } from '@/pages/account/profileDisplay'
 import { DEMO_PEOPLE, initialFromName } from './peopleData'
+import { demoPerson, getPerson, markPersonReportReady } from './peopleApi'
 import './soul-people.css'
 import iconChevron from './assets/icon-chevron.svg'
 import markHero from './assets/pair-mark-hero.svg'
@@ -19,6 +22,22 @@ const STEPS = [
 const SEQUENCE_MS = 10500
 const DONE_MS = 900
 
+function draftName(personId: string) {
+  try {
+    const raw = sessionStorage.getItem('soul-people-draft')
+    if (raw) {
+      const draft = JSON.parse(raw) as { id?: string; name?: string }
+      if (draft.name && (!draft.id || draft.id === personId)) return draft.name
+    }
+  } catch {
+    /* ignore */
+  }
+  return personId
+    .split('-')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ')
+}
+
 /**
  * Figma DEV · People · Generate · Pair (1017:3884)
  * Mark/hero steps 180° per checklist item; P / A stay on the ring; orb stays centered.
@@ -26,27 +45,50 @@ const DONE_MS = 900
 export function SoulPeopleGenerateScreen() {
   const navigate = useNavigate()
   const { personId = 'anna' } = useParams()
+  const { profile } = useUser()
+  const profileRef = useRef(profile)
+  profileRef.current = profile
+  const [liveName, setLiveName] = useState<string | null>(null)
 
   const name = useMemo(() => {
+    if (liveName) return liveName
     const demo = DEMO_PEOPLE.find((p) => p.id === personId)
     if (demo) return demo.name
-    try {
-      const raw = sessionStorage.getItem('soul-people-draft')
-      if (raw) {
-        const draft = JSON.parse(raw) as { name?: string }
-        if (draft.name) return draft.name
-      }
-    } catch {
-      /* ignore */
-    }
-    return personId
-      .split('-')
-      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(' ')
-  }, [personId])
+    return draftName(personId)
+  }, [liveName, personId])
 
-  const selfInitial = 'P'
+  const selfInitial = initialFromName(displayName(profile?.full_name, profile?.email))
   const otherInitial = initialFromName(name)
+
+  useEffect(() => {
+    let cancelled = false
+    void (async () => {
+      try {
+        const person = await getPerson(personId)
+        if (cancelled) return
+        if (!person) return
+        setLiveName(person.full_name)
+        const current = profileRef.current
+        if (person.status === 'ready') {
+          navigate(`/people/${encodeURIComponent(personId)}`, { replace: true })
+          return
+        }
+        if (current?.id && !demoPerson(personId)) {
+          await markPersonReportReady({
+            ownerProfileId: current.id,
+            personId,
+            selfName: displayName(current.full_name, current.email),
+            partnerName: person.full_name,
+          })
+        }
+      } catch {
+        /* demo / missing id — animation still runs */
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [navigate, personId])
 
   useEffect(() => {
     const t = window.setTimeout(() => {

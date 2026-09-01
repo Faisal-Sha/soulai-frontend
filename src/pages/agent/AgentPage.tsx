@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, type MouseEvent } from 'react
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { saveInsight } from '@/pages/insights/insightsApi'
 import { useUser } from '@/hooks/useUser'
 import {
   AlertDialog,
@@ -207,6 +208,7 @@ function isNetworkError(err: unknown): boolean {
 
 function MessageActions({ content }: { content: string }) {
   const navigate = useNavigate()
+  const { profile } = useUser()
   const [saved, setSaved] = useState(false)
 
   const onCopy = async () => {
@@ -220,8 +222,22 @@ function MessageActions({ content }: { content: string }) {
 
   const onSave = () => {
     if (saved) return
-    // UI shell — persist to insights backend later
-    setSaved(true)
+    if (!profile?.id) {
+      setSaved(true)
+      return
+    }
+    void saveInsight({
+      ownerProfileId: profile.id,
+      quote: content,
+      source: 'Mentor',
+      sourceKind: 'chat',
+    })
+      .then((row) => {
+        if (row) setSaved(true)
+      })
+      .catch(() => {
+        toast.error('Could not save')
+      })
   }
 
   return (

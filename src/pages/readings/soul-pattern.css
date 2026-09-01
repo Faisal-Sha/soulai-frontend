@@ -76,6 +76,16 @@
   background: rgba(255, 253, 250, 0.18);
 }
 
+.soul-pattern__hydrate {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #746c5e;
+}
+
 .soul-pattern__sheet {
   position: relative;
   z-index: 2;

@@ -1,12 +1,18 @@
-import { useNavigate } from 'react-router-dom'
-import { toast } from 'sonner'
-import { SoulBrand, SoulFooter, SoulNav, SoulRippleBg } from '@/components/soul'
+import { useEffect, useMemo, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { SoulBrand, SoulFooter, SoulNav, SoulPending, SoulRippleBg } from '@/components/soul'
 import { useUser } from '@/hooks/useUser'
 import {
   READING_CHAPTERS,
   type ReadingChapter,
   type ReadingChapterId,
 } from './chapters'
+import {
+  ensureReading,
+  summarizeProgress,
+  toListChapter,
+  type ReadingProgress,
+} from './readingsApi'
 import './soul-readings.css'
 import iconRead from './assets/icon-read.svg'
 import iconChevron from './assets/icon-chevron.svg'
@@ -19,37 +25,83 @@ type SoulReadingsScreenProps = {
   isPremium?: boolean
 }
 
+const ENDED_STATUSES = new Set([
+  'canceled',
+  'cancelled',
+  'expired',
+  'inactive',
+  'unpaid',
+])
+
 /**
  * Figma DEV · Readings · Viewport (625:1793) / Full scroll (625:1663)
- * NEXT: chapter detail “Your pattern” (625:1991+)
  */
 export function SoulReadingsScreen({
   chaptersRead: chaptersReadProp,
-  chaptersTotal = 9,
+  chaptersTotal: chaptersTotalProp,
   wordsRead: wordsReadProp,
-  wordsTotal = 18000,
+  wordsTotal: wordsTotalProp,
   isPremium: isPremiumProp,
 }: SoulReadingsScreenProps) {
-  const { user, isPremium: premiumFromSession, loading } = useUser()
+  const { user, profile, isPremium: premiumFromSession, subscription, loading } = useUser()
   const isPremium = isPremiumProp ?? premiumFromSession
-  const live = Boolean(user) || loading
-  const chaptersRead = chaptersReadProp ?? (live ? 0 : 3)
-  const wordsRead = wordsReadProp ?? (live ? 0 : 6400)
+  const live = Boolean(user)
+  const [searchParams] = useSearchParams()
+  const [list, setList] = useState<ReadingChapter[]>([])
+  const [progress, setProgress] = useState<ReadingProgress | null>(null)
+  const [ready, setReady] = useState(false)
   const navigate = useNavigate()
+
+  const subscriptionEnded = useMemo(() => {
+    if (searchParams.get('ended') === '1' || searchParams.get('ended') === 'true') return true
+    const status = subscription?.status?.toLowerCase() ?? ''
+    return !isPremium && ENDED_STATUSES.has(status)
+  }, [searchParams, subscription?.status, isPremium])
+
+  useEffect(() => {
+    if (loading) return
+    if (!profile?.id) {
+      setList(READING_CHAPTERS)
+      setProgress(null)
+      setReady(true)
+      return
+    }
+    setReady(false)
+    let cancelled = false
+    void ensureReading(profile.id)
+      .then((rows) => {
+        if (cancelled) return
+        setList(rows.map(toListChapter))
+        setProgress(summarizeProgress(rows))
+      })
+      .catch(() => {
+        if (!cancelled) setList([])
+      })
+      .finally(() => {
+        if (!cancelled) setReady(true)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [profile?.id, loading])
+
+  const waiting = loading || (live && !ready)
+  const chaptersRead = chaptersReadProp ?? (waiting ? 0 : live ? progress?.chaptersRead ?? 0 : 3)
+  const chaptersTotal = chaptersTotalProp ?? progress?.chaptersTotal ?? 9
+  const wordsRead = wordsReadProp ?? (waiting ? 0 : live ? progress?.wordsRead ?? 0 : 6400)
+  const wordsTotal = wordsTotalProp ?? progress?.wordsTotal ?? 18000
   const progressPct = Math.min(
     100,
-    Math.round((chaptersRead / Math.max(1, chaptersTotal)) * 100),
+    progress?.overallPct ??
+      Math.round((chaptersRead / Math.max(1, chaptersTotal)) * 100),
   )
 
   const openChapter = (chapter: ReadingChapter) => {
-    if (chapter.id === 'your-pattern') {
-      navigate(isPremium ? '/readings/your-pattern' : '/readings/your-pattern?ended=1')
-      return
-    }
-    toast.message(chapter.title, {
-      description: 'Chapter detail comes after Your pattern.',
-    })
+    const q = !isPremium || subscriptionEnded ? '?ended=1' : ''
+    navigate(`/readings/${chapter.id}${q}`)
   }
+
+  const displayList = live ? list : READING_CHAPTERS
 
   return (
     <div className="soul-readings">
@@ -82,28 +134,38 @@ export function SoulReadingsScreen({
           </p>
 
           <div className="soul-readings__progress" aria-label="Reading progress">
-            <div className="soul-readings__progress-meta">
-              <span>
-                {chaptersRead} of {chaptersTotal} chapters read
-              </span>
-              <span>
-                {wordsRead.toLocaleString()} / {wordsTotal.toLocaleString()} words
-              </span>
-            </div>
-            <div className="soul-readings__progress-track" aria-hidden="true">
-              <span style={{ width: `${progressPct}%` }} />
-            </div>
+            {waiting ? (
+              <SoulPending rows={1} label="Checking your chapters" />
+            ) : (
+              <>
+                <div className="soul-readings__progress-meta">
+                  <span>
+                    {chaptersRead} of {chaptersTotal} chapters read
+                  </span>
+                  <span>
+                    {wordsRead.toLocaleString()} / {wordsTotal.toLocaleString()} words
+                  </span>
+                </div>
+                <div className="soul-readings__progress-track" aria-hidden="true">
+                  <span style={{ width: `${progressPct}%` }} />
+                </div>
+              </>
+            )}
           </div>
         </section>
 
         <section className="soul-readings__chapters" aria-label="Chapters">
-          {READING_CHAPTERS.map((chapter) => (
-            <ChapterRow
-              key={chapter.id}
-              chapter={live ? { ...chapter, read: false } : chapter}
-              onOpen={() => openChapter(chapter)}
-            />
-          ))}
+          {waiting ? (
+            <SoulPending rows={9} label="Loading chapters" />
+          ) : (
+            displayList.map((chapter) => (
+              <ChapterRow
+                key={chapter.id}
+                chapter={chapter}
+                onOpen={() => openChapter(chapter)}
+              />
+            ))
+          )}
         </section>
 
         <SoulFooter className="soul-readings__footer" />

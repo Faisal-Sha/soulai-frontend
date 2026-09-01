@@ -1,12 +1,20 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { SoulBrand, SoulNav, SoulRippleBg } from '@/components/soul'
+import { SoulBrand, SoulNav, SoulPending, SoulRippleBg } from '@/components/soul'
 import { useUser } from '@/hooks/useUser'
 import { ResumeSheet } from '@/pages/home/ResumeSheet'
 import { useSoulSheetParams } from '@/pages/home/useSoulSheetParams'
-import { PATTERN_META, PATTERN_SECTIONS } from './patternContent'
-import { addUserSavedInsight } from '@/pages/insights/insightsStore'
+import { saveInsight } from '@/pages/insights/insightsApi'
+import { READING_CHAPTERS, type ReadingChapterId } from './chapters'
+import { countWords, nextPack, packById } from './readingCatalog'
+import {
+  ensureReading,
+  getChapterRow,
+  markChapterOpened,
+  saveChapterProgress,
+  type ChapterProgressRow,
+} from './readingsApi'
 import './soul-pattern.css'
 import patternHero from './assets/pattern-hero.png'
 import iconArrowLight from './assets/icon-arrow-light.svg'
@@ -29,21 +37,34 @@ const ENDED_STATUSES = new Set([
   'unpaid',
 ])
 
+function isChapterId(raw: string | undefined): raw is ReadingChapterId {
+  return Boolean(raw && packById(raw))
+}
+
 /**
- * Figma DEV · Reading · Your pattern
- * Viewport 625:1991 · Action bar 625:2054 · Saved toast 625:2238
- * Ended selection (Save + Copy only) 956:14807 → /readings/your-pattern?ended=1
+ * Figma DEV · Reading chapter (Your pattern 625:1991). Same chrome for all nine.
  */
 export function SoulPatternChapterScreen() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const { subscription, isPremium } = useUser()
+  const { chapterId: chapterParam } = useParams()
+  const chapterId: ReadingChapterId = isChapterId(chapterParam) ? chapterParam : 'your-pattern'
+  const { profile, subscription, isPremium } = useUser()
   const sheetRef = useRef<HTMLDivElement>(null)
   const articleRef = useRef<HTMLElement>(null)
+  const persistTimer = useRef<number | null>(null)
+  const rowRef = useRef<ChapterProgressRow | null>(null)
+  const latestRef = useRef({ pct: 0.12, section: 1, complete: false })
+  const restoredScrollRef = useRef(false)
+  const [row, setRow] = useState<ChapterProgressRow | null>(null)
   const [progress, setProgress] = useState(0.12)
   const [menu, setMenu] = useState<MenuState>(null)
   const [savedToast, setSavedToast] = useState(false)
   const toastTimer = useRef<number | null>(null)
+
+  const catalog = packById(chapterId)
+  const pack = row?.content ?? catalog
+  const demo = READING_CHAPTERS.find((c) => c.id === chapterId)
 
   const subscriptionEnded = useMemo(() => {
     if (searchParams.get('ended') === '1' || searchParams.get('ended') === 'true') {
@@ -58,29 +79,132 @@ export function SoulPatternChapterScreen() {
     [subscriptionEnded],
   )
   const { resumeOpen, resumeMode, openResume, closeResume } = useSoulSheetParams(resumeExtra)
-
-  /** Figma 956:14807 — ended users keep Save/Copy, lose Ask about this */
   const canAskAboutSelection = !subscriptionEnded
+
+  const next = pack ? nextPack(pack.id) : null
+  const words = pack ? countWords(pack) : 0
+  const mins = row?.read_time_min ?? pack?.readTimeMin ?? 6
+  const title = pack?.title ?? demo?.title ?? 'Chapter'
+  const endedQuery = subscriptionEnded ? '?ended=1' : ''
+
+  useEffect(() => {
+    restoredScrollRef.current = false
+    let cancelled = false
+    void (async () => {
+      if (!profile?.id || !isChapterId(chapterId)) return
+      try {
+        await ensureReading(profile.id)
+        const loaded = await getChapterRow(profile.id, chapterId)
+        if (cancelled || !loaded) return
+        rowRef.current = loaded
+        setRow(loaded)
+        if (loaded.scroll_pct > 0) setProgress(Math.max(0.08, loaded.scroll_pct / 100))
+        await markChapterOpened(loaded.id)
+      } catch {
+        /* catalog fallback */
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [chapterId, profile?.id])
+
+  const persistProgress = useCallback(
+    (pct: number, lastSection: number, complete: boolean, immediate = false) => {
+      const current = rowRef.current
+      if (!current) return
+      latestRef.current = { pct, section: lastSection, complete }
+      const write = () => {
+        const row = rowRef.current
+        if (!row) return
+        const alreadyDone = Boolean(row.completed_at)
+        if (complete && !alreadyDone) {
+          rowRef.current = {
+            ...row,
+            completed_at: new Date().toISOString(),
+            scroll_pct: 100,
+            last_section_n: lastSection,
+          }
+        }
+        void saveChapterProgress({
+          rowId: row.id,
+          scrollPct: Math.round(pct * 100),
+          lastSectionN: lastSection,
+          complete: complete && !alreadyDone,
+        }).catch(() => {
+          /* ignore */
+        })
+      }
+      if (immediate || complete) {
+        if (persistTimer.current) window.clearTimeout(persistTimer.current)
+        write()
+        return
+      }
+      if (persistTimer.current) window.clearTimeout(persistTimer.current)
+      persistTimer.current = window.setTimeout(write, 400)
+    },
+    [],
+  )
 
   const onScroll = useCallback(() => {
     const el = sheetRef.current
     if (!el) return
     const max = el.scrollHeight - el.clientHeight
-    if (max <= 0) {
-      setProgress(0.12)
+    const article = articleRef.current
+    let lastSection = 1
+    if (article) {
+      const sheetTop = el.getBoundingClientRect().top
+      article.querySelectorAll<HTMLElement>('[data-section-n]').forEach((node) => {
+        const top = node.getBoundingClientRect().top - sheetTop
+        if (top <= el.clientHeight * 0.5) {
+          lastSection = Number(node.dataset.sectionN) || lastSection
+        }
+      })
+    }
+
+    if (max <= 8) {
+      const imagesPending = Array.from(el.querySelectorAll('img')).some((img) => !img.complete)
+      if (imagesPending || el.scrollHeight < 240) return
+      setProgress(1)
+      persistProgress(1, pack?.sections.length ?? lastSection, true, true)
       return
     }
-    const pct = el.scrollTop / max
-    setProgress(Math.min(1, Math.max(0.08, pct)))
-  }, [])
+    const pct = Math.min(1, Math.max(0.08, el.scrollTop / max))
+    setProgress(pct)
+    persistProgress(pct, lastSection, pct >= 0.88)
+  }, [pack?.sections.length, persistProgress])
+
+  const hydrating = Boolean(profile?.id) && !row
 
   useEffect(() => {
     const el = sheetRef.current
-    if (!el) return
+    if (!el || hydrating) return
+
+    const restore = () => {
+      const saved = rowRef.current
+      if (restoredScrollRef.current || !saved || saved.scroll_pct <= 0) return
+      const max = el.scrollHeight - el.clientHeight
+      if (max <= 8) return
+      el.scrollTop = (saved.scroll_pct / 100) * max
+      restoredScrollRef.current = true
+    }
+
+    restore()
     onScroll()
     el.addEventListener('scroll', onScroll, { passive: true })
-    return () => el.removeEventListener('scroll', onScroll)
-  }, [onScroll])
+    const ro = new ResizeObserver(() => {
+      restore()
+      onScroll()
+    })
+    ro.observe(el)
+    el.querySelectorAll('img').forEach((img) => {
+      if (!img.complete) img.addEventListener('load', onScroll, { once: true })
+    })
+    return () => {
+      el.removeEventListener('scroll', onScroll)
+      ro.disconnect()
+    }
+  }, [hydrating, onScroll, pack?.id, row?.id])
 
   useEffect(() => {
     const clearMenuIfOutside = () => {
@@ -96,6 +220,19 @@ export function SoulPatternChapterScreen() {
   useEffect(() => {
     return () => {
       if (toastTimer.current) window.clearTimeout(toastTimer.current)
+      if (persistTimer.current) window.clearTimeout(persistTimer.current)
+      const row = rowRef.current
+      const latest = latestRef.current
+      if (row) {
+        void saveChapterProgress({
+          rowId: row.id,
+          scrollPct: Math.round(latest.pct * 100),
+          lastSectionN: latest.section,
+          complete: latest.complete && !row.completed_at,
+        }).catch(() => {
+          /* ignore */
+        })
+      }
     }
   }, [])
 
@@ -152,7 +289,7 @@ export function SoulPatternChapterScreen() {
       range.surroundContents(mark)
       sel.removeAllRanges()
     } catch {
-      // Multi-node ranges can't surround — keep highlight via CSS selection only
+      /* keep CSS selection */
     }
   }
 
@@ -160,10 +297,23 @@ export function SoulPatternChapterScreen() {
     wrapSelectionMark()
     const text = menu?.text ?? ''
     setMenu(null)
-    if (text.trim()) {
-      addUserSavedInsight({ quote: text, source: 'Your pattern' })
+    if (!text.trim()) return
+    if (!profile?.id) {
+      showSavedToast()
+      return
     }
-    showSavedToast()
+    void saveInsight({
+      ownerProfileId: profile.id,
+      quote: text,
+      source: title,
+      sourceKind: 'reading',
+    })
+      .then((row) => {
+        if (row) showSavedToast()
+      })
+      .catch(() => {
+        /* keep the toast off so they can retry */
+      })
   }
 
   const onAsk = () => {
@@ -197,12 +347,34 @@ export function SoulPatternChapterScreen() {
     }
     navigate('/agent', {
       state: {
-        starter: 'Talk through my Pattern chapter with me.',
-        quotedNote: PATTERN_META.title,
+        starter: `Talk through my ${title} chapter with me.`,
+        quotedNote: title,
         newChat: true,
       },
     })
   }
+
+  const goNext = () => {
+    const current = rowRef.current
+    if (current) {
+      void saveChapterProgress({
+        rowId: current.id,
+        scrollPct: 100,
+        lastSectionN: pack?.sections.length ?? 0,
+        complete: true,
+      })
+    }
+    if (next) {
+      navigate(`/readings/${next.id}${endedQuery}`)
+      return
+    }
+    navigate('/readings')
+  }
+
+  if (!pack) return null
+
+  const sectionCount = pack.sections.length
+  const progressPct = Math.round(progress * 100)
 
   return (
     <div className="soul-pattern">
@@ -228,11 +400,16 @@ export function SoulPatternChapterScreen() {
         </div>
       </div>
 
+      {hydrating ? (
+        <div className="soul-pattern__hydrate">
+          <SoulPending variant="center" label="Opening chapter" />
+        </div>
+      ) : null}
       <div
         className="soul-pattern__sheet"
         ref={sheetRef}
         role="document"
-        aria-label="Your pattern chapter"
+        aria-label={`${title} chapter`}
       >
         <div className="soul-pattern__layout">
           <div className="soul-pattern__main">
@@ -247,15 +424,15 @@ export function SoulPatternChapterScreen() {
               </button>
               <div className="soul-pattern__head-row">
                 <div className="soul-pattern__head-copy">
-                  <h1 className="soul-pattern__title">{PATTERN_META.title}</h1>
-                  <p className="soul-pattern__read-time">{PATTERN_META.readTime}</p>
+                  <h1 className="soul-pattern__title">{title}</h1>
+                  <p className="soul-pattern__read-time">{mins} min read</p>
                 </div>
                 <p className="soul-pattern__progress-label" aria-hidden="true">
-                  {Math.round(progress * 100)}%
+                  {progressPct}%
                 </p>
               </div>
               <div className="soul-pattern__progress" aria-hidden="true">
-                <span style={{ width: `${Math.round(progress * 100)}%` }} />
+                <span style={{ width: `${progressPct}%` }} />
               </div>
             </div>
 
@@ -269,10 +446,11 @@ export function SoulPatternChapterScreen() {
               onMouseUp={onArticleMouseUp}
               onTouchEnd={onArticleMouseUp}
             >
-              {PATTERN_SECTIONS.map((section) => (
+              {pack.sections.map((section) => (
                 <section
                   key={section.n}
-                  id={`pattern-section-${section.n}`}
+                  id={`${pack.id}-section-${section.n}`}
+                  data-section-n={section.n}
                   className="soul-pattern__section"
                 >
                   <h2 className="soul-pattern__section-title">
@@ -288,8 +466,10 @@ export function SoulPatternChapterScreen() {
             <div className="soul-pattern__end">
               <hr className="soul-pattern__end-rule" />
               <div className="soul-pattern__end-copy">
-                <p className="soul-pattern__end-title">{PATTERN_META.finishedTitle}</p>
-                <p className="soul-pattern__end-meta">{PATTERN_META.finishedMeta}</p>
+                <p className="soul-pattern__end-title">You’ve finished {title}.</p>
+                <p className="soul-pattern__end-meta">
+                  {sectionCount} sections · {words.toLocaleString()} words
+                </p>
               </div>
               {!subscriptionEnded ? (
                 <button type="button" className="soul-pattern__cta" onClick={talkThrough}>
@@ -298,21 +478,15 @@ export function SoulPatternChapterScreen() {
                 </button>
               ) : null}
 
-              <button
-                type="button"
-                className="soul-pattern__next soul-pattern__next--mobile"
-                onClick={() =>
-                  toast.message('Purpose', {
-                    description: 'Next chapter detail comes after this screen.',
-                  })
-                }
-              >
-                <span className="soul-pattern__next-body">
-                  <span className="soul-pattern__next-label">{PATTERN_META.nextChapter.label}</span>
-                  <span className="soul-pattern__next-blurb">{PATTERN_META.nextChapter.blurb}</span>
-                </span>
-                <img src={iconArrowDark} alt="" width={18} height={18} />
-              </button>
+              {next ? (
+                <button type="button" className="soul-pattern__next soul-pattern__next--mobile" onClick={goNext}>
+                  <span className="soul-pattern__next-body">
+                    <span className="soul-pattern__next-label">Next · {next.title}</span>
+                    <span className="soul-pattern__next-blurb">{next.blurb}</span>
+                  </span>
+                  <img src={iconArrowDark} alt="" width={18} height={18} />
+                </button>
+              ) : null}
 
               <button
                 type="button"
@@ -327,19 +501,21 @@ export function SoulPatternChapterScreen() {
           <aside className="soul-pattern__rail" aria-label="Chapter guide">
             <div className="soul-pattern__rail-card">
               <p className="soul-pattern__rail-kicker">Chapter</p>
-              <p className="soul-pattern__rail-title">{PATTERN_META.title}</p>
-              <p className="soul-pattern__rail-meta">{PATTERN_META.readTime} · 6 sections</p>
+              <p className="soul-pattern__rail-title">{title}</p>
+              <p className="soul-pattern__rail-meta">
+                {mins} min read · {sectionCount} sections
+              </p>
               <div className="soul-pattern__rail-progress" aria-hidden="true">
-                <span style={{ width: `${Math.round(progress * 100)}%` }} />
+                <span style={{ width: `${progressPct}%` }} />
               </div>
               <ol className="soul-pattern__rail-toc">
-                {PATTERN_SECTIONS.map((section) => (
+                {pack.sections.map((section) => (
                   <li key={section.n}>
                     <button
                       type="button"
                       onClick={() => {
                         document
-                          .getElementById(`pattern-section-${section.n}`)
+                          .getElementById(`${pack.id}-section-${section.n}`)
                           ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
                       }}
                     >
@@ -359,21 +535,15 @@ export function SoulPatternChapterScreen() {
                   <img src={iconArrowLight} alt="" width={15} height={15} />
                 </button>
               ) : null}
-              <button
-                type="button"
-                className="soul-pattern__next"
-                onClick={() =>
-                  toast.message('Purpose', {
-                    description: 'Next chapter detail comes after this screen.',
-                  })
-                }
-              >
-                <span className="soul-pattern__next-body">
-                  <span className="soul-pattern__next-label">{PATTERN_META.nextChapter.label}</span>
-                  <span className="soul-pattern__next-blurb">{PATTERN_META.nextChapter.blurb}</span>
-                </span>
-                <img src={iconArrowDark} alt="" width={18} height={18} />
-              </button>
+              {next ? (
+                <button type="button" className="soul-pattern__next" onClick={goNext}>
+                  <span className="soul-pattern__next-body">
+                    <span className="soul-pattern__next-label">Next · {next.title}</span>
+                    <span className="soul-pattern__next-blurb">{next.blurb}</span>
+                  </span>
+                  <img src={iconArrowDark} alt="" width={18} height={18} />
+                </button>
+              ) : null}
             </div>
           </aside>
         </div>

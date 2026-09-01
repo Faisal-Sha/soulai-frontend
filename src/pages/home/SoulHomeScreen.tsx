@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import {
-  addUserSavedInsight,
-  isQuoteSaved,
-} from '@/pages/insights/insightsStore'
+import { useUser } from '@/hooks/useUser'
+import { quoteIsSaved, saveInsight } from '@/pages/insights/insightsApi'
 import {
   SoulBrand,
   SoulButton,
@@ -39,7 +37,12 @@ type SoulHomeScreenProps = {
   dayNumber?: number
   chaptersDone?: number
   chaptersTotal?: number
+  continueChapterId?: string
+  readingsProgressPct?: number
+  dailyHeadline?: string
+  dailySub?: string
   insightsCount?: number
+  shelfReady?: boolean
   compatSummary?: string
   isPremium?: boolean
   /** Trial banner — Figma 616:1545 */
@@ -85,7 +88,12 @@ export function SoulHomeScreen({
   dayNumber = 12,
   chaptersDone = 3,
   chaptersTotal = 9,
+  continueChapterId = 'your-pattern',
+  readingsProgressPct,
+  dailyHeadline,
+  dailySub,
   insightsCount = 12,
+  shelfReady = true,
   compatSummary = 'Anna, Mark and 2 more',
   isPremium = true,
   trialTitle = 'Your trial ends tomorrow.',
@@ -93,13 +101,19 @@ export function SoulHomeScreen({
   resumePrice = '$6.99',
 }: SoulHomeScreenProps) {
   const navigate = useNavigate()
+  const { profile } = useUser()
   const [searchParams] = useSearchParams()
   const variant =
     variantProp ?? variantFromUrlParam(searchParams.get('home')) ?? 'default'
   const [savedToast, setSavedToast] = useState(false)
   const [welcomeDismissed, setWelcomeDismissed] = useState(false)
+  const [notesKept, setNotesKept] = useState(insightsCount)
   const toastTimer = useRef<number | null>(null)
   const homeRootRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    setNotesKept(insightsCount)
+  }, [insightsCount])
 
   useEffect(
     () => () => {
@@ -115,12 +129,28 @@ export function SoulHomeScreen({
   const trial = variant === 'trial'
   const unpaid = variant === 'unpaid'
   const unpaidPool = variant === 'unpaid-pool'
-  const noteQuote = unpaidPool ? POOL_NOTE.headline : NOTE.headline
-  const [noteSaved, setNoteSaved] = useState(() => isQuoteSaved(noteQuote))
+  const noteHeadline = dailyHeadline?.trim() || NOTE.headline
+  const noteSub = dailySub?.trim() || NOTE.sub
+  const noteQuote = unpaidPool ? POOL_NOTE.headline : noteHeadline
+  const [noteSaved, setNoteSaved] = useState(false)
 
   useEffect(() => {
-    setNoteSaved(isQuoteSaved(noteQuote))
-  }, [noteQuote])
+    if (!profile?.id || unpaidPool) {
+      setNoteSaved(false)
+      return
+    }
+    let cancelled = false
+    void quoteIsSaved(profile.id, noteQuote)
+      .then((saved) => {
+        if (!cancelled) setNoteSaved(saved)
+      })
+      .catch(() => {
+        if (!cancelled) setNoteSaved(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [noteQuote, profile?.id, unpaidPool])
   const unpaidLike = unpaid || unpaidPool
   const showAgentFab = unpaidPool || (paymentConfirmation && !welcomeDismissed)
   const resumeExtra = useMemo(
@@ -143,31 +173,46 @@ export function SoulHomeScreen({
     return `Today · ${formatHomeDate()} · Day ${day}`
   }, [day1, dayNumber])
 
-  const readingsMeta = day1 || chaptersDone === 0
-    ? 'Nine chapters, ready when you are'
-    : `${chaptersDone} of ${chaptersTotal} chapters`
-  const readingsCta = day1 || chaptersDone === 0 ? 'Start reading' : 'Continue reading'
+  const readingsMeta = shelfReady
+    ? `${chaptersDone} of ${chaptersTotal} chapters`
+    : 'Checking your chapters…'
+  const readingsCta = !shelfReady
+    ? 'Open readings'
+    : chaptersDone === 0 && (readingsProgressPct ?? 0) === 0
+      ? 'Start reading'
+      : 'Continue reading'
   const insightsMeta = useMemo(() => {
+    if (!shelfReady) return 'Checking notes…'
     if (day1) {
-      return insightsCount > 0
-        ? `${insightsCount} note${insightsCount === 1 ? '' : 's'} you kept`
+      return notesKept > 0
+        ? `${notesKept} note${notesKept === 1 ? '' : 's'} you kept`
         : 'Anything you highlight will live here'
     }
-    return `${insightsCount} notes you kept`
-  }, [day1, insightsCount, noteSaved])
+    return `${notesKept} notes you kept`
+  }, [day1, notesKept, noteSaved, shelfReady])
   const insightsCta =
-    day1 && insightsCount === 0 ? 'Nothing saved yet' : 'See all'
-  const compatMeta = day1 || compatSummary.startsWith('Add someone')
-    ? 'Add someone close to you'
-    : compatSummary
+    day1 && notesKept === 0 ? 'Nothing saved yet' : 'See all'
+  const compatMeta = !shelfReady
+    ? 'Checking…'
+    : day1 || compatSummary.startsWith('Add someone')
+      ? 'Add someone close to you'
+      : compatSummary
   const compatCta = day1 || compatSummary.startsWith('Add someone') ? 'Add someone' : 'See all'
   const progressPct = unpaidPool
     ? 100
-    : Math.min(100, Math.round((chaptersDone / chaptersTotal) * 100))
-  const showShelfProgress = !day1
+    : !shelfReady
+      ? 0
+      : Math.min(
+          100,
+          Math.round(
+            readingsProgressPct ??
+              (chaptersDone / Math.max(1, chaptersTotal)) * 100,
+          ),
+        )
+  const showShelfProgress = true
 
   const openAgent = () => {
-    const starter = unpaidPool ? POOL_NOTE.headline : NOTE.headline
+    const starter = unpaidPool ? POOL_NOTE.headline : noteHeadline
     navigate('/agent', {
       state: {
         starter,
@@ -182,11 +227,15 @@ export function SoulHomeScreen({
   }
 
   const openPattern = () => {
-    navigate(unpaidLike ? '/readings/your-pattern?ended=1' : '/readings/your-pattern')
+    navigate(
+      unpaidLike
+        ? `/readings/${continueChapterId}?ended=1`
+        : `/readings/${continueChapterId}`,
+    )
   }
 
   const openInsights = () => {
-    navigate(day1 && insightsCount === 0 ? '/insights/empty' : '/insights')
+    navigate(day1 && notesKept === 0 ? '/insights/empty' : '/insights')
   }
 
   const onResume = () => openResume('confirm')
@@ -198,13 +247,24 @@ export function SoulHomeScreen({
   }
 
   const saveNote = () => {
-    if (noteSaved || noteLoading) return
-    addUserSavedInsight({
+    if (noteSaved || noteLoading || unpaidPool) return
+    if (!profile?.id) return
+    void saveInsight({
+      ownerProfileId: profile.id,
       quote: noteQuote,
       source: "Today's note",
+      sourceKind: 'daily_note',
     })
-    setNoteSaved(true)
-    showSavedToast()
+      .then((row) => {
+        if (row) {
+          setNoteSaved(true)
+          setNotesKept((n) => n + 1)
+          showSavedToast()
+        }
+      })
+      .catch(() => {
+        /* keep unsaved so they can retry */
+      })
   }
 
   useHomeEnter(homeRootRef, [variant, noteLoading])
@@ -285,14 +345,14 @@ export function SoulHomeScreen({
                 data-home-enter
                 data-home-enter-delay="400"
               >
-                {unpaidPool ? POOL_NOTE.headline : NOTE.headline}
+                {unpaidPool ? POOL_NOTE.headline : noteHeadline}
               </h1>
               <p
                 className="soul-home__sub soul-home__enter soul-home__enter--sub"
                 data-home-enter
                 data-home-enter-delay="600"
               >
-                {unpaidPool ? POOL_NOTE.sub : unpaid ? NOTE.unpaidSub : NOTE.sub}
+                {unpaidPool ? POOL_NOTE.sub : unpaid ? NOTE.unpaidSub : noteSub}
               </p>
             </div>
           )}

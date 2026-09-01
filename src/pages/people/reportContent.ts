@@ -15,6 +15,68 @@ export const PEOPLE_REPORT_META = {
   shareLink: 'soulplus.ai/p/8f2k9d',
 } as const
 
+export type StoredPeopleReport = {
+  subtitle: string
+  closingTitle: string
+  closingBody: string
+  shareQuote: string
+  sections: PeopleReportSection[]
+}
+
+function swapNames(text: string, selfName: string, partnerName: string) {
+  return text.replaceAll('Pavel', selfName).replaceAll('Anna', partnerName)
+}
+
+/** Placeholder copy until the generate-report function exists. */
+export function buildReportContent(selfName: string, partnerName: string): StoredPeopleReport {
+  const self = selfName.trim() || PEOPLE_REPORT_META.selfName
+  const partner = partnerName.trim() || PEOPLE_REPORT_META.partnerName
+  return {
+    subtitle: PEOPLE_REPORT_META.subtitle,
+    closingTitle: PEOPLE_REPORT_META.closingTitle,
+    closingBody: PEOPLE_REPORT_META.closingBody,
+    shareQuote: swapNames(PEOPLE_REPORT_META.shareQuote, self, partner),
+    sections: PEOPLE_REPORT_SECTIONS.map((section) => ({
+      n: section.n,
+      title: section.title,
+      paragraphs: section.paragraphs.map((p) => swapNames(p, self, partner)),
+    })),
+  }
+}
+
+export function parseReportContent(raw: unknown): StoredPeopleReport | null {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null
+  const row = raw as Record<string, unknown>
+  const sections = Array.isArray(row.sections) ? row.sections : null
+  if (!sections?.length) return null
+  const parsed: PeopleReportSection[] = []
+  for (const item of sections) {
+    if (!item || typeof item !== 'object') continue
+    const s = item as Record<string, unknown>
+    const title = typeof s.title === 'string' ? s.title : ''
+    const paragraphs = Array.isArray(s.paragraphs)
+      ? s.paragraphs.filter((p): p is string => typeof p === 'string' && p.trim().length > 0)
+      : []
+    if (!title || !paragraphs.length) continue
+    parsed.push({
+      n: typeof s.n === 'number' ? s.n : parsed.length + 1,
+      title,
+      paragraphs,
+    })
+  }
+  if (!parsed.length) return null
+  return {
+    subtitle: typeof row.subtitle === 'string' ? row.subtitle : PEOPLE_REPORT_META.subtitle,
+    closingTitle:
+      typeof row.closingTitle === 'string' ? row.closingTitle : PEOPLE_REPORT_META.closingTitle,
+    closingBody:
+      typeof row.closingBody === 'string' ? row.closingBody : PEOPLE_REPORT_META.closingBody,
+    shareQuote:
+      typeof row.shareQuote === 'string' ? row.shareQuote : PEOPLE_REPORT_META.shareQuote,
+    sections: parsed,
+  }
+}
+
 export const PEOPLE_REPORT_SECTIONS: PeopleReportSection[] = [
   {
     n: 1,

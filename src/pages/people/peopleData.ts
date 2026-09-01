@@ -8,7 +8,21 @@ export type PeopleEntry = {
   status: PeopleEntryStatus
 }
 
-/** Demo list — replace with listCompatibilityReports when wiring backend */
+export function peopleListSubtitle(count: number) {
+  if (count === 1) return 'One person read against your profile.'
+  if (count === 3) return 'Three people read against your profile.'
+  return `${count} people read against your profile.`
+}
+
+export function compatHomeSummary(names: string[]) {
+  if (!names.length) return 'Add someone close to you'
+  if (names.length === 1) return names[0]
+  if (names.length === 2) return `${names[0]} and ${names[1]}`
+  const extra = names.length - 2
+  return `${names[0]}, ${names[1]} and ${extra} more`
+}
+
+/** Figma preview list — `/people?people=demo` */
 export const DEMO_PEOPLE: PeopleEntry[] = [
   {
     id: 'kate',

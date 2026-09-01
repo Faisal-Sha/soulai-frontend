@@ -4,7 +4,7 @@
 
 Visual board (FigJam): [SoulPlus V2 planned ERD](https://www.figma.com/board/6LeVkl0m7qxS4KSj9djZGU)
 
-**Now in the database:** `soul_profiles`, `quiz_intents`, `subscriptions`, `stripe_events`.
+**Now in the database:** `soul_profiles`, `quiz_intents`, `subscriptions`, `stripe_events`, `people`, `people_reports`, `readings`, `reading_chapters`, `daily_notes`, `saved_insights`.
 
 ## Delete / FK policy (locked)
 
@@ -33,11 +33,8 @@ Every new table below must use the CASCADE rule above. Seed 1:1 side tables (`no
 
 | Next | Feature to wire first | Tables |
 |---|---|---|
-| notifications | Account · Notifications | `notification_preferences` |
-| people | People add / list / report | `people`, `people_reports` |
-| readings | Readings + home daily note | `readings`, `reading_chapters`, `daily_notes` |
-| insights | Saved insights | `saved_insights` |
 | chat | Chat history + top-up credits | `chat_threads`, `chat_messages`, `chat_wallets`, `chat_credit_ledger` |
+| notifications | Account · Notifications (PWA / launch) | `notification_preferences` |
 
 ## Target diagram
 

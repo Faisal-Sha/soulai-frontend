@@ -1,8 +1,9 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { SoulBrand, SoulNav, SoulRippleBg } from '@/components/soul'
+import { SoulBrand, SoulNav, SoulPending, SoulRippleBg } from '@/components/soul'
 import { useUser } from '@/hooks/useUser'
-import { DEMO_PEOPLE, initialFromName, type PeopleEntry } from './peopleData'
+import { DEMO_PEOPLE, initialFromName, peopleListSubtitle, type PeopleEntry } from './peopleData'
+import { listPeople } from './peopleApi'
 import './soul-people.css'
 import iconChevronRight from './assets/icon-chevron-right.svg'
 
@@ -78,7 +79,8 @@ function AddSomeoneIcon() {
 export function SoulPeopleScreen({ people, subscriptionEnded: endedProp }: SoulPeopleScreenProps) {
   const navigate = useNavigate()
   const [params] = useSearchParams()
-  const { user, subscription, isPremium, loading } = useUser()
+  const { user, profile, subscription, isPremium, loading } = useUser()
+  const [livePeople, setLivePeople] = useState<PeopleEntry[] | null>(null)
 
   const subscriptionEnded = useMemo(() => {
     if (endedProp) return true
@@ -87,15 +89,43 @@ export function SoulPeopleScreen({ people, subscriptionEnded: endedProp }: SoulP
     return !isPremium && ENDED_STATUSES.has(status)
   }, [endedProp, params, subscription?.status, isPremium])
 
+  useEffect(() => {
+    if (people) return
+    if (params.get('people') === 'empty' || params.get('people') === 'demo') return
+    if (loading) return
+    if (!profile?.id) {
+      setLivePeople([])
+      return
+    }
+    let cancelled = false
+    void listPeople(profile.id)
+      .then((rows) => {
+        if (!cancelled) setLivePeople(rows)
+      })
+      .catch(() => {
+        if (!cancelled) setLivePeople([])
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [people, profile?.id, params, loading])
+
+  const waitingLive =
+    Boolean(user) &&
+    livePeople === null &&
+    !people &&
+    params.get('people') !== 'empty' &&
+    params.get('people') !== 'demo'
+
   const entries = useMemo(() => {
     if (people) return people
     if (params.get('people') === 'empty') return []
     if (params.get('people') === 'demo') return DEMO_PEOPLE
-    if (user || loading) return []
+    if (user || loading) return livePeople ?? []
     return DEMO_PEOPLE
-  }, [people, params, user, loading])
+  }, [people, params, user, loading, livePeople])
 
-  const isEmpty = entries.length === 0
+  const isEmpty = !waitingLive && entries.length === 0
 
   const onAdd = () => {
     if (subscriptionEnded) return
@@ -110,12 +140,7 @@ export function SoulPeopleScreen({ people, subscriptionEnded: endedProp }: SoulP
     navigate(`/people/${entry.id}`)
   }
 
-  const listSubtitle =
-    entries.length === 3
-      ? 'Three people read against your profile.'
-      : entries.length === 1
-        ? 'One person read against your profile.'
-        : `${entries.length} people read against your profile.`
+  const listSubtitle = peopleListSubtitle(entries.length)
 
   return (
     <div className="soul-people">
@@ -157,7 +182,9 @@ export function SoulPeopleScreen({ people, subscriptionEnded: endedProp }: SoulP
           <h1 id="soul-people-title" className="soul-people__title">
             People
           </h1>
-          {isEmpty ? (
+          {waitingLive ? (
+            <p className="soul-people__subtitle">Loading…</p>
+          ) : isEmpty ? (
             <div className="soul-people__empty-copy">
               <p className="soul-people__lead">No one here yet.</p>
               <p className="soul-people__subtitle">
@@ -183,7 +210,9 @@ export function SoulPeopleScreen({ people, subscriptionEnded: endedProp }: SoulP
             </button>
           ) : null}
 
-          {!isEmpty ? (
+          {waitingLive ? (
+            <SoulPending rows={3} label="Loading people" />
+          ) : !isEmpty ? (
             <>
               {!subscriptionEnded ? (
                 <div className="soul-people__spacer" aria-hidden="true" />

@@ -1,8 +1,11 @@
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { SoulBrand, SoulNav, SoulRippleBg } from '@/components/soul'
-import { DEMO_PEOPLE } from './peopleData'
+import { displayName } from '@/pages/account/profileDisplay'
+import { useUser } from '@/hooks/useUser'
 import { PEOPLE_REPORT_META } from './reportContent'
+import { demoPerson, getPerson, getPersonReport } from './peopleApi'
 import './soul-people.css'
 import inviteMark from './assets/invite-mark.svg'
 import iconLink from './assets/icon-link.svg'
@@ -13,12 +16,45 @@ import iconLink from './assets/icon-link.svg'
 export function SoulPeopleShareScreen() {
   const navigate = useNavigate()
   const { personId = 'anna' } = useParams()
-  const partnerName =
-    DEMO_PEOPLE.find((p) => p.id === personId)?.name || PEOPLE_REPORT_META.partnerName
+  const { profile } = useUser()
+  const [partnerName, setPartnerName] = useState(
+    demoPerson(personId)?.name || PEOPLE_REPORT_META.partnerName,
+  )
+  const [quote, setQuote] = useState(PEOPLE_REPORT_META.shareQuote)
+  const [shareUrl, setShareUrl] = useState('')
+
+  const selfName = displayName(profile?.full_name, profile?.email)
+
+  useEffect(() => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : ''
+    setShareUrl(`${origin}/people/${personId}/share`)
+
+    let cancelled = false
+    void (async () => {
+      try {
+        const person = await getPerson(personId)
+        if (cancelled) return
+        if (person) setPartnerName(person.full_name)
+        const stored = await getPersonReport(personId)
+        if (cancelled) return
+        if (stored?.content?.shareQuote) setQuote(stored.content.shareQuote)
+        if (stored?.share_token && origin) {
+          setShareUrl(`${origin}/people/${personId}/share`)
+        }
+      } catch {
+        /* demo link */
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [personId])
+
+  const displayLink = shareUrl.replace(/^https?:\/\//, '')
 
   const onCopy = async () => {
     try {
-      await navigator.clipboard.writeText(`https://${PEOPLE_REPORT_META.shareLink}`)
+      await navigator.clipboard.writeText(shareUrl || `https://${PEOPLE_REPORT_META.shareLink}`)
       toast.message('Link copied')
     } catch {
       toast.message('Could not copy')
@@ -73,10 +109,10 @@ export function SoulPeopleShareScreen() {
             <hr className="soul-people__invite-rule" />
             <div className="soul-people__invite-body">
               <p className="soul-people__invite-quote">
-                “{PEOPLE_REPORT_META.shareQuote}”
+                “{quote}”
               </p>
               <p className="soul-people__invite-pair">
-                {PEOPLE_REPORT_META.selfName} and {partnerName}
+                {selfName} and {partnerName}
               </p>
             </div>
           </article>
@@ -94,7 +130,7 @@ export function SoulPeopleShareScreen() {
               width={18}
               height={18}
             />
-            <span className="soul-people__link-url">{PEOPLE_REPORT_META.shareLink}</span>
+            <span className="soul-people__link-url">{displayLink || PEOPLE_REPORT_META.shareLink}</span>
             <button type="button" className="soul-people__copy" onClick={() => void onCopy()}>
               Copy link
             </button>

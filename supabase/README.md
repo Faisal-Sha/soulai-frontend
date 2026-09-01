@@ -96,9 +96,10 @@ Same values live in `config.toml` (`npx supabase config push`). Re-check them in
 | `20260901000100_04_soul_profiles_auth_cascade.sql` | Live follow-up: SET NULL → CASCADE (no-op if 02 already CASCADE) |
 | `20260901000200_05_quiz_intents_purge_on_delete.sql` | Email trigger: delete `quiz_intents` with Auth / profile |
 | `20260901000300_06_fk_delete_policy_comments.sql` | Catalog comments for the locked delete policy |
-
-Blank project: `npx supabase db push` from repo `supabase/`. All six are idempotent enough to run in order.
+| `20260901000400_07_people.sql` | `people` + `people_reports` |
+| `20260901000500_08_readings.sql` | `readings`, `reading_chapters`, `daily_notes` |
+| `20260901000600_09_saved_insights.sql` | `saved_insights` |
 
 ## Next (do not add until that screen is wired)
 
-See [`erd.md`](./erd.md) — 004 notification prefs, then people, readings, insights, chat.
+Chat, then notifications / PWA. Readings **content** is a static pack until generate-reading.

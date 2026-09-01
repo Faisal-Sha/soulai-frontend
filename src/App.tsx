@@ -56,7 +56,7 @@ function AppRoutes() {
       <Route path="/agent" element={<AgentPage />} />
 
       <Route path="/readings" element={<SoulReadingsScreen />} />
-      <Route path="/readings/your-pattern" element={<SoulPatternChapterScreen />} />
+      <Route path="/readings/:chapterId" element={<SoulPatternChapterScreen />} />
       <Route path="/insights" element={<SoulSavedInsightsScreen />} />
       <Route path="/insights/open" element={<SoulSavedInsightsScreen variant="open" />} />
       <Route path="/insights/empty" element={<SoulSavedInsightsScreen variant="empty" />} />

@@ -185,6 +185,82 @@
   animation: soul-spin 0.75s linear infinite;
 }
 
+.soul-pending {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+}
+
+.soul-pending--center {
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 180px;
+  padding: 24px 0;
+}
+
+.soul-pending__label {
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.soul-pending__block {
+  width: 100%;
+  padding: 16px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.soul-pending__block:last-child {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.soul-pending__bar {
+  display: block;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.18);
+  animation: soul-pending-pulse 1.35s ease-in-out infinite;
+}
+
+.soul-pending__bar--title {
+  width: 42%;
+  height: 22px;
+  margin-bottom: 10px;
+}
+
+.soul-pending__bar--line {
+  width: 78%;
+  height: 14px;
+}
+
+.soul-pending__bar--meta {
+  width: 28%;
+  height: 12px;
+  margin-top: 10px;
+}
+
+.soul-pending__card {
+  width: 100%;
+  padding: 20px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.soul-pending__card:last-child {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+@keyframes soul-pending-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 /* ── Outline button (Skip / Try again) ── */
 .soul-btn-outline {
   display: inline-flex;

@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { SoulBrand, SoulButton, SoulRippleBg } from '@/components/soul'
+import { SoulBrand, SoulButton, SoulPending, SoulRippleBg } from '@/components/soul'
 import { useUser } from '@/hooks/useUser'
+import {
+  deleteInsight,
+  listSavedInsights,
+} from './insightsApi'
 import { SAVED_INSIGHTS, type SavedInsight } from './insightsData'
-import { loadAllSavedInsights, removeUserSavedInsight } from './insightsStore'
 import './soul-insights.css'
 import iconBack from './assets/icon-back.svg'
 import iconBookmark from './assets/icon-bookmark.svg'
@@ -29,21 +32,45 @@ function variantFromPath(pathname: string): InsightsVariant {
 export function SoulSavedInsightsScreen({ variant: variantProp }: SoulSavedInsightsScreenProps) {
   const navigate = useNavigate()
   const { pathname } = useLocation()
-  const { user, loading } = useUser()
+  const { user, profile, loading } = useUser()
   const variant = variantProp ?? variantFromPath(pathname)
   const includeDemo = !user
 
   const [insights, setInsights] = useState<SavedInsight[]>([])
   const [openId, setOpenId] = useState<string | null>(null)
+  const [ready, setReady] = useState(variant === 'empty')
 
   useEffect(() => {
     if (variant === 'empty') {
       setInsights([])
+      setReady(true)
       return
     }
-    if (loading) return
-    setInsights(loadAllSavedInsights({ includeDemo }))
-  }, [variant, includeDemo, loading])
+    if (loading) {
+      setReady(false)
+      return
+    }
+    if (!profile?.id) {
+      setInsights(includeDemo ? SAVED_INSIGHTS : [])
+      setReady(true)
+      return
+    }
+    setReady(false)
+    let cancelled = false
+    void listSavedInsights(profile.id)
+      .then((rows) => {
+        if (!cancelled) setInsights(rows)
+      })
+      .catch(() => {
+        if (!cancelled) setInsights([])
+      })
+      .finally(() => {
+        if (!cancelled) setReady(true)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [variant, includeDemo, loading, profile?.id])
 
   useEffect(() => {
     if (variant === 'open' && includeDemo) {
@@ -51,12 +78,17 @@ export function SoulSavedInsightsScreen({ variant: variantProp }: SoulSavedInsig
     }
   }, [variant, includeDemo])
 
-  const empty = insights.length === 0
+  const waiting = !ready
+  const empty = ready && insights.length === 0
 
   const removeInsight = (id: string) => {
-    removeUserSavedInsight(id)
     setInsights((items) => items.filter((item) => item.id !== id))
     setOpenId((current) => (current === id ? null : current))
+    if (profile?.id) {
+      void deleteInsight(profile.id, id).catch(() => {
+        /* list already updated; next load will reconcile */
+      })
+    }
   }
 
   const toggleOpen = (id: string) => {
@@ -92,7 +124,14 @@ export function SoulSavedInsightsScreen({ variant: variantProp }: SoulSavedInsig
           className={`soul-insights__main${empty ? ' soul-insights__main--empty' : ''}`}
           aria-labelledby="soul-insights-title"
         >
-          {empty ? (
+          {waiting ? (
+            <>
+              <h1 id="soul-insights-title" className="soul-insights__title">
+                Saved insights
+              </h1>
+              <SoulPending rows={3} variant="cards" label="Loading insights" />
+            </>
+          ) : empty ? (
             <>
               <div className="soul-insights__empty-head">
                 <h1 id="soul-insights-title" className="soul-insights__title">

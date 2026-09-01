@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 import { SoulBrand, SoulButton, SoulField, SoulRippleBg } from '@/components/soul'
+import { useUser } from '@/hooks/useUser'
+import { createPerson } from './peopleApi'
 import iconCalendar from '@/components/soul/assets/icon-calendar.svg'
 import iconClock from '@/components/soul/assets/icon-clock.svg'
 import iconChevronDown from '@/components/soul/assets/icon-chevron-down.svg'
@@ -69,6 +72,8 @@ function isValidTimeDigits(digits: string): boolean {
  */
 export function SoulPeopleAddScreen() {
   const navigate = useNavigate()
+  const { profile, isPremium } = useUser()
+  const [saving, setSaving] = useState(false)
   const [name, setName] = useState('')
   const [dobDigits, setDobDigits] = useState('')
   const [timeDigits, setTimeDigits] = useState('')
@@ -123,24 +128,46 @@ export function SoulPeopleAddScreen() {
     setPlaceOpen(false)
   }
 
-  const onSubmit = () => {
-    if (!canSubmit) return
-    const id = name.trim().toLowerCase().replace(/\s+/g, '-') || 'someone'
-    try {
-      sessionStorage.setItem(
-        'soul-people-draft',
-        JSON.stringify({
-          id,
-          name: name.trim(),
-          dob: formatDobDisplay(dobDigits),
-          time: timeValue,
-          place: place.trim(),
-        }),
-      )
-    } catch {
-      /* ignore */
+  const onSubmit = async () => {
+    if (!canSubmit || saving) return
+    if (!isPremium) {
+      toast.message('Adding people is paused until you resume.')
+      navigate('/account/plan')
+      return
     }
-    navigate(`/people/generate/${encodeURIComponent(id)}`)
+    if (!profile?.id) {
+      toast.message('Sign in to add someone')
+      navigate('/login')
+      return
+    }
+
+    const fullName = name.trim()
+    const birthTime = timeValue ? `${timeValue}:00` : null
+    const birthPlace = place.trim() || null
+
+    setSaving(true)
+    try {
+      const person = await createPerson({
+        ownerProfileId: profile.id,
+        fullName,
+        birthDate: toIso(dobParsed),
+        birthTime,
+        birthPlace,
+      })
+      try {
+        sessionStorage.setItem(
+          'soul-people-draft',
+          JSON.stringify({ id: person.id, name: fullName }),
+        )
+      } catch {
+        /* ignore */
+      }
+      navigate(`/people/generate/${encodeURIComponent(person.id)}`)
+    } catch (err) {
+      toast.message(err instanceof Error ? err.message : 'Could not save this person')
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -179,7 +206,7 @@ export function SoulPeopleAddScreen() {
           className="soul-people__form"
           onSubmit={(e) => {
             e.preventDefault()
-            onSubmit()
+            void onSubmit()
           }}
         >
           <SoulField
@@ -415,8 +442,8 @@ export function SoulPeopleAddScreen() {
           </SoulField>
 
           <div className="soul-people__form-cta">
-            <SoulButton type="submit" block disabled={!canSubmit}>
-              Read us together
+            <SoulButton type="submit" block disabled={!canSubmit || saving}>
+              {saving ? 'Saving…' : 'Read us together'}
             </SoulButton>
             <p className="soul-people__privacy">
               Their details stay private and are never shared.

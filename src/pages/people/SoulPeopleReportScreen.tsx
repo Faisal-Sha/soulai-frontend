@@ -1,10 +1,24 @@
+import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { SoulBrand, SoulButton, SoulNav, SoulRippleBg } from '@/components/soul'
-import { DEMO_PEOPLE } from './peopleData'
-import { PEOPLE_REPORT_META, PEOPLE_REPORT_SECTIONS } from './reportContent'
+import {
+  PEOPLE_REPORT_META,
+  PEOPLE_REPORT_SECTIONS,
+  type PeopleReportSection,
+  type StoredPeopleReport,
+} from './reportContent'
+import { demoPerson, getPerson, getPersonReport } from './peopleApi'
 import './soul-people.css'
 import iconChevron from './assets/icon-chevron.svg'
 import iconArrow from '../readings/assets/icon-arrow-light.svg'
+
+const FALLBACK: StoredPeopleReport = {
+  subtitle: PEOPLE_REPORT_META.subtitle,
+  closingTitle: PEOPLE_REPORT_META.closingTitle,
+  closingBody: PEOPLE_REPORT_META.closingBody,
+  shareQuote: PEOPLE_REPORT_META.shareQuote,
+  sections: PEOPLE_REPORT_SECTIONS,
+}
 
 /**
  * Figma WIP · People · Report (805:1970 / 803:1643)
@@ -12,10 +26,33 @@ import iconArrow from '../readings/assets/icon-arrow-light.svg'
 export function SoulPeopleReportScreen() {
   const navigate = useNavigate()
   const { personId = 'anna' } = useParams()
+  const [partnerName, setPartnerName] = useState(
+    demoPerson(personId)?.name || PEOPLE_REPORT_META.partnerName,
+  )
+  const [report, setReport] = useState<StoredPeopleReport>(FALLBACK)
 
-  const partnerName =
-    DEMO_PEOPLE.find((p) => p.id === personId)?.name ||
-    PEOPLE_REPORT_META.partnerName
+  useEffect(() => {
+    let cancelled = false
+    void (async () => {
+      try {
+        const person = await getPerson(personId)
+        if (cancelled) return
+        if (person?.status === 'generating') {
+          navigate(`/people/generate/${encodeURIComponent(personId)}`, { replace: true })
+          return
+        }
+        if (person) setPartnerName(person.full_name)
+        const stored = await getPersonReport(personId)
+        if (cancelled) return
+        if (stored?.content) setReport(stored.content)
+      } catch {
+        /* keep demo copy */
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [navigate, personId])
 
   const talkSection = (title: string, body: string) => {
     navigate('/agent', {
@@ -70,12 +107,12 @@ export function SoulPeopleReportScreen() {
               You and {partnerName}
             </h1>
             <p className="soul-people__subtitle soul-people__subtitle--report">
-              {PEOPLE_REPORT_META.subtitle}
+              {report.subtitle}
             </p>
           </section>
 
           <div className="soul-people__cards">
-            {PEOPLE_REPORT_SECTIONS.map((section) => {
+            {report.sections.map((section: PeopleReportSection) => {
               const body = section.paragraphs.join('\n\n')
               return (
                 <article key={section.n} className="soul-people__card">
@@ -112,8 +149,8 @@ export function SoulPeopleReportScreen() {
           </div>
 
           <section className="soul-people__closing">
-            <h2 className="soul-people__closing-title">{PEOPLE_REPORT_META.closingTitle}</h2>
-            <p className="soul-people__closing-body">{PEOPLE_REPORT_META.closingBody}</p>
+            <h2 className="soul-people__closing-title">{report.closingTitle}</h2>
+            <p className="soul-people__closing-body">{report.closingBody}</p>
             <SoulButton block onClick={askAboutPair}>
               Ask about you two
             </SoulButton>
