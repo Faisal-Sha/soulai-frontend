@@ -99,6 +99,10 @@ Same values live in `config.toml` (`npx supabase config push`). Re-check them in
 | `20260901000400_07_people.sql` | `people` + `people_reports` |
 | `20260901000500_08_readings.sql` | `readings`, `reading_chapters`, `daily_notes` |
 | `20260901000600_09_saved_insights.sql` | `saved_insights` |
+| `20260902000100_10_agent_helpers.sql` | `soul_profile_id_for_auth` + vector extension |
+| `20260902000200_11_rag_search.sql` | RAG tables (IF NOT EXISTS) + `match_document_chunks` + `get_energy_summaries` |
+| `20260902000300_12_agent_memory_and_chat.sql` | `memories`, `chat_history`, `conversation_context` + agent RPCs |
+| `20260902000400_13_destiny_metrics.sql` | `destiny_metrics` + `save_matrix` + `get_user_context` (reads `soul_profiles`) |
 
 ## Next (do not add until that screen is wired)
 

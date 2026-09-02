@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { upsertDestinyMetrics } from './destiny-metrics.ts'
 import {
   parseBirthDate,
   parseBirthPlace,
@@ -155,6 +156,11 @@ export async function provisionPaidAccount(
   }
 
   const profileId = await upsertProfile(admin, userId, profileFields, now)
+  try {
+    await upsertDestinyMetrics(admin, profileId, profileFields.birth_date)
+  } catch (err) {
+    console.error('[provision] destiny metrics failed:', err)
+  }
   return { userId, profileId }
 }
 

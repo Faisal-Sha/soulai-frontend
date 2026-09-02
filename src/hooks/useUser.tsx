@@ -10,6 +10,7 @@ import {
 } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
 import { supabase } from '@/integrations/supabase/client'
+import { upsertDestinyMetrics } from '@/services/destinyMetrics'
 
 export interface UserProfile {
   id: string
@@ -347,6 +348,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
         })
         .eq('auth_user_id', user.id)
       if (error) throw error
+
+      if (birthDate) {
+        try {
+          await upsertDestinyMetrics(supabase, profile.id, birthDate)
+        } catch (metricsErr) {
+          console.error('[destiny-metrics]', metricsErr)
+        }
+      }
 
       setProfile((prev) =>
         prev
