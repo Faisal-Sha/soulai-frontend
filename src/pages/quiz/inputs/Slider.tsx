@@ -111,7 +111,7 @@ export default function Slider({
           }}
         />
 
-        {/* Native range input — transparent overlay */}
+        {/* Native range input. Transparent overlay */}
         <input
           type="range"
           min={min}

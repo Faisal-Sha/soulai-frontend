@@ -68,7 +68,7 @@ function isValidTimeDigits(digits: string): boolean {
 }
 
 /**
- * Account · Birth details — same identity columns the quiz wrote.
+ * Account · Birth details. Same identity columns the quiz wrote.
  * Fields match People · Add (dark glass, not the cream Know card).
  */
 export function SoulAccountBirthScreen() {

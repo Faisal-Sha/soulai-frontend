@@ -37,7 +37,7 @@ const ENDED_STATUSES = new Set([
 
 /**
  * Figma · Account · Plan (860:3515)
- * Subscription ended (955:10560) — `/account/plan?ended=1`
+ * Subscription ended (955:10560). `/account/plan?ended=1`
  */
 export function SoulAccountPlanScreen() {
   const navigate = useNavigate()

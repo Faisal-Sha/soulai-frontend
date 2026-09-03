@@ -18,7 +18,7 @@ const STEPS = [
   'The one thing worth changing',
 ] as const
 
-/** Figma 1017:3884 cohort — 10.5s play-once, then a short settle before the report */
+/** Figma 1017:3884 cohort. 10.5s play-once, then a short settle before the report */
 const SEQUENCE_MS = 10500
 const DONE_MS = 900
 
@@ -82,7 +82,7 @@ export function SoulPeopleGenerateScreen() {
           })
         }
       } catch {
-        /* demo / missing id — animation still runs */
+        /* demo / missing id. Animation still runs */
       }
     })()
     return () => {
@@ -171,7 +171,7 @@ export function SoulPeopleGenerateScreen() {
         </ul>
 
         <p className="soul-people__gen-note soul-people-gen__enter soul-people-gen__enter--note">
-          This one takes a minute. You can leave — it will be here when you come back.
+          This one takes a minute. You can leave. It will be here when you come back.
         </p>
       </div>
 

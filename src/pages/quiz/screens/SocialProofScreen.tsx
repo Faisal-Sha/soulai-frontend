@@ -1,4 +1,4 @@
-// SocialProofScreen — interstitial after status question
+// SocialProofScreen. Interstitial after status question
 // Ported from soul-v6.html renderQuestion() social-proof type
 
 import PrimaryButton from '../atoms/PrimaryButton'
@@ -78,7 +78,7 @@ export default function SocialProofScreen({ onNext }: SocialProofScreenProps) {
             "It described him before I met him."
           </div>
           <div style={{ fontSize: 13, lineHeight: 1.55, color: 'var(--text-secondary)' }}>
-            Did this on a slow Sunday, half-skeptical. The reading laid out his energy, how we'd meet, even the way I'd recognize him. Specific stuff — not horoscope-vague. Three months later I went on a date with someone who matched almost every part of it. Not a sketch, not a guess. More like it was reading me, then telling me what fit.
+            Did this on a slow Sunday, half-skeptical. The reading laid out his energy, how we'd meet, even the way I'd recognize him. Specific stuff. Not horoscope-vague. Three months later I went on a date with someone who matched almost every part of it. Not a sketch, not a guess. More like it was reading me, then telling me what fit.
           </div>
         </div>
 

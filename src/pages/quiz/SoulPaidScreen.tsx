@@ -18,7 +18,7 @@ function readQuizEmail(): string {
 
 /**
  * Stripe success return. Account + magic link are created by the webhook.
- * Guest stays here — they are not signed in yet.
+ * Guest stays here. They are not signed in yet.
  */
 export function SoulPaidScreen() {
   const navigate = useNavigate()
@@ -35,7 +35,7 @@ export function SoulPaidScreen() {
           <h1 className="soul-auth__title">You’re in</h1>
           <p className="soul-auth__subtitle">
             {email
-              ? `I sent a login link to ${email}. It works once and expires in ${MAGIC_LINK_HOURS} hours. The app opens when you tap it — not before.`
+              ? `I sent a login link to ${email}. It works once and expires in ${MAGIC_LINK_HOURS} hours. The app opens when you tap it. Not before.`
               : `I sent a login link to the email you used at checkout. It works once and expires in ${MAGIC_LINK_HOURS} hours.`}
           </p>
         </section>

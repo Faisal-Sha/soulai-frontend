@@ -11,7 +11,7 @@ type SoulSecondaryButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 }
 
 /**
- * Figma WIP · Button / Secondary (559:569) — 50×50 circular icon button.
+ * Figma WIP · Button / Secondary (559:569). 50×50 circular icon button.
  * States: Default · Pressed · Disabled (+ loading)
  */
 export function SoulSecondaryButton({

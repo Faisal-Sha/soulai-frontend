@@ -1,4 +1,4 @@
-// Meta Pixel — ID from VITE_META_PIXEL_ID (.env). Not loaded from index.html.
+// Meta Pixel. ID from VITE_META_PIXEL_ID (.env). Not loaded from index.html.
 // Only the 7 sheet-mapped STANDARD events (never Soul* names).
 
 const META_PIXEL_ID = (import.meta.env.VITE_META_PIXEL_ID as string | undefined)?.trim() ?? ''
@@ -22,13 +22,13 @@ function isStandardEvent(name: string): name is MetaStandardEvent {
 }
 
 /**
- * Init from .env. Does NOT auto-fire PageView —
+ * Init from .env. Does NOT auto-fire PageView . 
  * sheet maps PageView to SoulWelcomeScreenViewed only.
  * autoConfig=false stops SubscribedButtonClick / SPA noise.
  */
 export function initMetaPixel(): void {
   if (!META_PIXEL_ID || typeof window === 'undefined') {
-    console.warn('[Meta Pixel] VITE_META_PIXEL_ID missing — pixel not loaded')
+    console.warn('[Meta Pixel] VITE_META_PIXEL_ID missing. Pixel not loaded')
     return
   }
   if (initStarted) return
@@ -140,7 +140,7 @@ export function trackMetaPixel(
   props: Record<string, unknown> = {},
 ): void {
   if (!META_PIXEL_ID) {
-    console.warn('[Meta Pixel] missing VITE_META_PIXEL_ID — skipped:', metaEvent)
+    console.warn('[Meta Pixel] missing VITE_META_PIXEL_ID. Skipped:', metaEvent)
     return
   }
   if (!isStandardEvent(metaEvent)) {
@@ -152,7 +152,7 @@ export function trackMetaPixel(
 
   const fbq = window.fbq
   if (typeof fbq !== 'function') {
-    console.warn('[Meta Pixel] fbq unavailable — skipped:', metaEvent)
+    console.warn('[Meta Pixel] fbq unavailable. Skipped:', metaEvent)
     return
   }
 

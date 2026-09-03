@@ -4,7 +4,7 @@ import { isTrialEndingSoon } from './trialNotice'
 
 export { isTrialEndingSoon, trialBannerCopy, trialDaysLeft, TRIAL_ENDING_WINDOW_DAYS } from './trialNotice'
 
-/** One canonical preview URL per home screen — `/?home=<key>` */
+/** One canonical preview URL per home screen. `/?home=<key>` */
 export const HOME_PREVIEW_KEYS = {
   default: null,
   day1: 'day1',

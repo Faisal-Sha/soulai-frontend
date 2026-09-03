@@ -93,7 +93,7 @@ export default function QuizBirthdateScreen({
           <section className="soul-bd__hero">
             <h1 className="soul-bd__title">When were you born?</h1>
             <p className="soul-bd__subtitle">
-              This is where your profile begins — it&apos;s what makes it about you, not
+              This is where your profile begins. It&apos;s what makes it about you, not
               everyone.
             </p>
           </section>

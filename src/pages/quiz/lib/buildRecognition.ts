@@ -1,4 +1,4 @@
-// buildRecognition — ported verbatim from soul-v6.html buildRecognition()
+// buildRecognition. Ported verbatim from soul-v6.html buildRecognition()
 // Generates 2–3 personalized paragraphs from the user's prior answers.
 
 import type { QuizAnswers } from '../types'
@@ -16,10 +16,10 @@ export function buildRecognition(answers: QuizAnswers): string[] {
     'overgiving':   "You give a lot. You give first. You give more than gets returned. You already know.",
   }
   const attachmentLines: Record<string, string> = {
-    'anxious':  "Closeness makes you reach. You watch for the small shifts — tone, text speed, whether they said goodnight the way they used to.",
+    'anxious':  "Closeness makes you reach. You watch for the small shifts. Tone, text speed, whether they said goodnight the way they used to.",
     'avoidant': "When it gets real, you get quiet. You want the connection, but your body pulls back before your mind catches up.",
-    'mixed':    "You do both. Reach when you should rest, pull back when you should lean in. The inconsistency isn't the problem — it's the signal.",
-    'shutdown': "When it gets too close, something in you goes quiet. Not cold — protected.",
+    'mixed':    "You do both. Reach when you should rest, pull back when you should lean in. The inconsistency isn't the problem. It's the signal.",
+    'shutdown': "When it gets too close, something in you goes quiet. Not cold. Protected.",
     'secure':   "You don't panic when love goes quiet. That's rarer than you think.",
   }
   const statusLines: Record<string, string> = {
@@ -46,13 +46,13 @@ export function buildRecognition(answers: QuizAnswers): string[] {
     'where':     "You want the logistics. The door. The room.",
     'recognize': "You want to not miss them when they walk past. You're worried you already have.",
     'current':   "You're asking whether the person in front of you is the one. That's not a small question.",
-    'why':       "You want to know why it's been so hard. Not to be fixed — to be understood.",
+    'why':       "You want to know why it's been so hard. Not to be fixed. To be understood.",
   }
   const vibeLines: Record<string, string> = {
-    'calm':      "You want safe, not boring. Steady, not flat. There's a version of calm that's electric — that's the one.",
+    'calm':      "You want safe, not boring. Steady, not flat. There's a version of calm that's electric. That's the one.",
     'spark':     "You want alive. You're done being comfortable with people who don't light anything up.",
     'familiar':  "You want someone who feels like coming home before you've even left.",
-    'mystery':   "You want depth. Not games — depth. There's a difference.",
+    'mystery':   "You want depth. Not games. Depth. There's a difference.",
     'mirror':    "You want to be seen. All of it. Not the version you perform.",
   }
 
@@ -62,7 +62,7 @@ export function buildRecognition(answers: QuizAnswers): string[] {
     paragraphs.push(vibeLines[answers['soulmate-vibe']])
   }
 
-  // ── Para 3: the closer — what you need / how you love ──
+  // ── Para 3: the closer. What you need / how you love ──
   const loveLines: Record<string, string> = {
     'words': "You need to hear it. Silent love doesn't land.",
     'touch': "You need the body in the room. Texts don't hold you.",

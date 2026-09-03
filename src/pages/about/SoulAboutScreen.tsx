@@ -56,7 +56,7 @@ export function SoulAboutScreen() {
             <section className="soul-about__title">
               <p className="soul-about__eyebrow">About SOUL+AI</p>
               <h1 className="soul-about__heading">
-                Where ancient wisdom meets artificial intelligence.
+                Where ancient wisdom meets artificial intelligence
               </h1>
             </section>
 

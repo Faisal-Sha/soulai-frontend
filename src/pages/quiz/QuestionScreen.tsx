@@ -50,7 +50,7 @@ export default function QuestionScreen({
       <div style={{ padding: '18px 0 0' }}>
 
         {/* Row 1: back button | logo | theme toggle
-            Both buttons are 40px wide — their outer edges define the horizontal
+            Both buttons are 40px wide. Their outer edges define the horizontal
             bounds. The progress bar below spans the same full width, so its
             ends sit exactly under the outer edges of the buttons. */}
         <div
@@ -61,7 +61,7 @@ export default function QuestionScreen({
             marginBottom: 14,
           }}
         >
-          {/* Back — outer left edge = left bound */}
+          {/* Back. Outer left edge = left bound */}
           <button
             onClick={onBack}
             aria-label="Go back"
@@ -72,7 +72,7 @@ export default function QuestionScreen({
             </svg>
           </button>
 
-          {/* Logo — centered between the two buttons */}
+          {/* Logo. Centered between the two buttons */}
           <div
             style={{
               fontFamily: 'var(--display)',
@@ -85,7 +85,7 @@ export default function QuestionScreen({
             Soul<span style={{ color: 'var(--accent)' }}>+</span>AI
           </div>
 
-          {/* Theme toggle — outer right edge = right bound */}
+          {/* Theme toggle. Outer right edge = right bound */}
           {onToggleTheme ? (
             <button
               onClick={onToggleTheme}
@@ -100,7 +100,7 @@ export default function QuestionScreen({
           )}
         </div>
 
-        {/* Row 2: progress bar — full width, no extra padding,
+        {/* Row 2: progress bar. Full width, no extra padding,
             so its left/right ends sit directly under the button outer edges */}
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>

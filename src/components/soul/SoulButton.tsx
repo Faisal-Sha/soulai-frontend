@@ -10,9 +10,9 @@ type SoulButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   block?: boolean
   /** Trailing arrow icon (Home “Talk this through” style). */
   showArrow?: boolean
-  /** Figma primary-button State=Loading — spinner replaces label. */
+  /** Figma primary-button State=Loading. Spinner replaces label. */
   loading?: boolean
-  /** Figma primary-button State=Error — red fill + warning icon. */
+  /** Figma primary-button State=Error. Red fill + warning icon. */
   error?: boolean
 }
 

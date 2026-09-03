@@ -91,7 +91,7 @@ export function SoulPeopleShareScreen() {
               Share with {partnerName}
             </h1>
             <p className="soul-people__subtitle soul-people__subtitle--share">
-              She reads one line — then her own.
+              She reads one line. Then her own.
             </p>
           </section>
 
@@ -118,7 +118,7 @@ export function SoulPeopleShareScreen() {
           </article>
 
           <p className="soul-people__share-note">
-            Nothing else travels with the link — birth details and the rest of the reading stay
+            Nothing else travels with the link. Birth details and the rest of the reading stay
             private.
           </p>
 

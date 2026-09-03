@@ -12,7 +12,7 @@ interface QuizNameScreenProps {
 
 /**
  * Figma DEV · 02.2 · Quiz · Name (node 437:2823)
- * Native keyboard only — no mock iOS keyboard chrome.
+ * Native keyboard only. No mock iOS keyboard chrome.
  */
 export default function QuizNameScreen({
   value = '',
@@ -49,7 +49,7 @@ export default function QuizNameScreen({
           <section className="soul-qn__hero">
             <h1 className="soul-qn__title">What can I call you?</h1>
             <p className="soul-qn__subtitle">
-              Just your first name — that&apos;s how I&apos;ll talk to you from here on.
+              Just your first name. That&apos;s how I&apos;ll talk to you from here on.
             </p>
           </section>
 

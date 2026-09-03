@@ -260,8 +260,21 @@ export async function ensureTodayNote(ownerProfileId: string): Promise<{
 
   if (error) throw new Error(error.message)
   if (data?.headline) {
+    const stored = String(data.headline)
+    if (stored.includes('\u2014')) {
+      const { error: refreshErr } = await supabase
+        .from('daily_notes')
+        .update({
+          headline: STATIC_DAILY_NOTE.headline,
+          sub: STATIC_DAILY_NOTE.sub,
+        })
+        .eq('owner_profile_id', ownerProfileId)
+        .eq('note_date', today)
+      if (refreshErr) throw new Error(refreshErr.message)
+      return { headline: STATIC_DAILY_NOTE.headline, sub: STATIC_DAILY_NOTE.sub }
+    }
     return {
-      headline: String(data.headline),
+      headline: stored,
       sub: typeof data.sub === 'string' && data.sub ? data.sub : STATIC_DAILY_NOTE.sub,
     }
   }

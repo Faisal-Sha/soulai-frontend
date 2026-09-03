@@ -1,4 +1,4 @@
-// FreeModeScreen — FigJam EXIT / RETURN (frontend shell)
+// FreeModeScreen. FigJam EXIT / RETURN (frontend shell)
 
 import PrimaryButton from '../atoms/PrimaryButton'
 
@@ -35,7 +35,7 @@ export default function FreeModeScreen({ onBackToResult, onReturnPaywall }: Free
         Keep your free preview
       </h1>
       <p style={{ fontSize: 15, lineHeight: 1.55, color: 'var(--text-secondary)', margin: '0 0 24px' }}>
-        You can revisit locked sections anytime. Remarketing (email / ads) is ops-side — this screen is the UX exit node.
+        You can revisit locked sections anytime. Remarketing (email / ads) is ops-side. This screen is the UX exit node.
       </p>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 360, margin: '0 auto', width: '100%' }}>
@@ -46,7 +46,7 @@ export default function FreeModeScreen({ onBackToResult, onReturnPaywall }: Free
       </div>
 
       <p style={{ marginTop: 28, fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5 }}>
-        Abandoned quiz / email recovery — frontend placeholder for later CRM wiring.
+        Abandoned quiz / email recovery. Frontend placeholder for later CRM wiring.
       </p>
     </div>
   )

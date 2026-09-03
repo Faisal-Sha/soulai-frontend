@@ -13,7 +13,7 @@ export type ReadingChapter = {
   id: ReadingChapterId
   title: string
   blurb: string
-  /** e.g. "2 of 6 · 6 min" — omit when fully read */
+  /** e.g. "2 of 6 · 6 min". Omit when fully read */
   meta?: string
   read?: boolean
 }
@@ -29,7 +29,7 @@ export const READING_CHAPTERS: ReadingChapter[] = [
   {
     id: 'your-pattern',
     title: 'Your pattern',
-    blurb: "You read a boundary as a rejection — yours and other people's.",
+    blurb: "You read a boundary as a rejection. Yours and other people's.",
     meta: '2 of 6 · 6 min',
   },
   {

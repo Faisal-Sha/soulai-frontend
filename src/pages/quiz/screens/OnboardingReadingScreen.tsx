@@ -5,7 +5,7 @@ import bgReading from '../assets/onboarding/bg-reading.png'
 import glassBead from '../assets/onboarding/glass-bead.svg'
 import sheen from '../assets/onboarding/sheen.svg'
 
-/** Figma 1017:4476 — next card starts 350ms after exit begins (not after it finishes). */
+/** Figma 1017:4476. Next card starts 350ms after exit begins (not after it finishes). */
 const FIRST_ENTER_DELAY_MS = 800
 const ENTER_MS = 500
 const HOLD_MS = 1800
@@ -21,7 +21,7 @@ const CARDS = [
   {
     id: 'money',
     label: 'Money',
-    body: "You earn in bursts, then cap yourself the moment things feel stable. Your block isn't money — it's committing to one path.",
+    body: "You earn in bursts, then cap yourself the moment things feel stable. Your block isn't money. It's committing to one path.",
     meta: "Maya's reading · 34",
   },
   {
@@ -128,11 +128,11 @@ export default function OnboardingReadingScreen({ onStart }: OnboardingReadingSc
           <div className="soul-ob__main">
             <section className="soul-ob__hero">
               <h1 className="soul-ob__title soul-ob__enter soul-ob__enter--title">
-                The better you know yourself, the further you go.
+                The better you know yourself, the further you go
               </h1>
               <p className="soul-ob__subtitle soul-ob__enter soul-ob__enter--subtitle">
-                I&apos;m your AI Mentor. Together we&apos;ll find what makes you you — your
-                strengths, your blocks — and turn it into real steps for your life, your
+                I&apos;m your AI Mentor. Together we&apos;ll find what makes you you: your
+                strengths, your blocks, and turn it into real steps for your life, your
                 relationships, your goals.
               </p>
             </section>

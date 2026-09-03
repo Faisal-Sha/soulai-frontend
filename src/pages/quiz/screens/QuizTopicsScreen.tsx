@@ -58,7 +58,7 @@ export default function QuizTopicsScreen({
           <section className="soul-qt__hero">
             <h1 className="soul-qt__title">Where do you want things to change?</h1>
             <p className="soul-qt__subtitle">
-              Pick as many as you want — it tells me where to focus for you first.
+              Pick as many as you want. It tells me where to focus for you first.
             </p>
           </section>
 

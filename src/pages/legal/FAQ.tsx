@@ -5,7 +5,7 @@ const FAQS = [
   {
     question: 'What happens after 7 days?',
     answer:
-      'After 7 days, your plan auto-renews at $6.99/month. You can cancel anytime before that — no questions asked.',
+      'After 7 days, your plan auto-renews at $6.99/month. You can cancel anytime before that. No questions asked.',
   },
   {
     question: 'Can I cancel anytime?',

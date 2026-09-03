@@ -1,4 +1,4 @@
-// Display tiers for FigJam "choose plan / compare" — only fullAccess is checkout-wired.
+// Display tiers for FigJam "choose plan / compare". Only fullAccess is checkout-wired.
 import type { PaywallPlan, PaywallPlanId } from '../types'
 
 export const PAYWALL_INTRO_PRICE = 0.99
@@ -17,12 +17,12 @@ export const PAYWALL_PLANS: Record<PaywallPlanId, PaywallPlan> = {
     perDay: '0.14',
     badge: 'Unlock now',
     features: [
-      { t: 'Your full Soulmate Portrait — 9 chapters' },
+      { t: 'Your full Soulmate Portrait. 9 chapters' },
       { t: 'A complete picture of you: your patterns, behavioral models, and what you truly want' },
       { t: 'Your core tendencies across every area of life' },
-      { t: 'Your karmic patterns — what keeps repeating' },
+      { t: 'Your karmic patterns. What keeps repeating' },
       { t: 'Compatibility with any partner, anytime' },
-      { t: 'A short thought on your day — every morning' },
+      { t: 'A short thought on your day. Every morning' },
     ],
   },
 }
@@ -52,7 +52,7 @@ export const PAYWALL_COMPARE_TIERS: PaywallCompareTier[] = [
     priceLabel: '$0',
     period: 'already unlocked',
     features: ['1 open chapter', 'Locked portrait teasers', 'Save & share (early)'],
-    dummyNote: 'You already have this — stay in free mode anytime.',
+    dummyNote: 'You already have this. Stay in free mode anytime.',
   },
   {
     id: 'fullAccess',
@@ -76,6 +76,6 @@ export const PAYWALL_COMPARE_TIERS: PaywallCompareTier[] = [
     priceLabel: '$14.99',
     period: 'per month · UI shell',
     features: ['Everything in Full Access', 'Priority mentor replies', 'Extra chat credits'],
-    dummyNote: 'Frontend shell only — not wired to Stripe yet.',
+    dummyNote: 'Frontend shell only. Not wired to Stripe yet.',
   },
 ]

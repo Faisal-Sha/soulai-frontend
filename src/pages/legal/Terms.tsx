@@ -44,7 +44,7 @@ const sections: LegalSection[] = [
   {
     title: "6. Restrictions on Use; Limited License",
     paragraphs: [
-      'All content made available through the Services ("Content"), including but not limited to text, graphics, logos, and icons; the quiz, its questions, and its underlying methodology; AI-generated readings, reports, and chat/agent responses; images, videos, and digital downloads; and software and app functionality, is the property of Soul Healing Centre Inc. or its licensors and is protected by copyright, trademark, and other intellectual property laws.',
+      'All content made available through the Services ("Content"), including but not limited to text, graphics, logos, and icons; the quiz, its questions, and its underlying methodology; AI-generated readings, reports, and chat/agent responses; images, videos, and digital downloads; and software and app functionality, is the property of Soul Healing Centre Inc. Or its licensors and is protected by copyright, trademark, and other intellectual property laws.',
       "The Company grants you a limited, non-exclusive, non-transferable license to access and use the App, the Website, and their Content for your own personal, non-commercial use only, including the reading/report generated for you personally.",
       "You may not:",
     ],
@@ -149,7 +149,7 @@ const sections: LegalSection[] = [
   {
     title: "19. Governing Law",
     paragraphs: [
-      "These Terms shall be governed by and interpreted in accordance with the laws of Canada and the applicable laws of the Province of Quebec, where Soul Healing Centre Inc. is registered, without regard to conflict of law principles.",
+      "These Terms shall be governed by and interpreted in accordance with the laws of Canada and the applicable laws of the Province of Quebec, where Soul Healing Centre Inc. Is registered, without regard to conflict of law principles.",
     ],
   },
   {

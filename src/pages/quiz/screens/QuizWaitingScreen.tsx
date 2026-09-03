@@ -29,7 +29,7 @@ const WAIT_CARDS = [
   },
 ] as const
 
-/** Figma 1017:4418 cohort — 12s play-once, then a short settle */
+/** Figma 1017:4418 cohort. 12s play-once, then a short settle */
 const SEQUENCE_MS = 12000
 const DONE_MS = 900
 

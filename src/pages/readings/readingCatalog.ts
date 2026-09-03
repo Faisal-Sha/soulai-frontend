@@ -37,7 +37,7 @@ export const READING_PACK: ChapterPack[] = [
         title: 'How you take things in',
         paragraphs: [
           'You process the world through feeling first, logic second. The body votes before the mind has a sentence.',
-          'That is not softness. It is speed in a different channel. You already know if a room is safe, a person is honest, a plan will cost you — and then you spend twenty minutes explaining the knowing as if it needed a proof.',
+          'That is not softness. It is speed in a different channel. You already know if a room is safe, a person is honest, a plan will cost you. And then you spend twenty minutes explaining the knowing as if it needed a proof.',
           'The work is not to feel less. It is to trust the first read enough that you do not talk yourself out of it.',
         ],
       },
@@ -65,7 +65,7 @@ export const READING_PACK: ChapterPack[] = [
   {
     id: 'your-pattern',
     title: 'Your pattern',
-    blurb: "You read a boundary as a rejection — yours and other people's.",
+    blurb: "You read a boundary as a rejection. Yours and other people's.",
     readTimeMin: 6,
     sections: PATTERN_SECTIONS,
   },
@@ -78,7 +78,7 @@ export const READING_PACK: ChapterPack[] = [
       {
         title: 'The myth of one lane',
         paragraphs: [
-          'You were never built to pick one thing and stay there. The pressure to choose a single identity is borrowed — it is not how your attention actually works.',
+          'You were never built to pick one thing and stay there. The pressure to choose a single identity is borrowed. It is not how your attention actually works.',
           'You move in seasons. A skill, a person, a problem gets all of you, then the heat moves. From the outside that looks like quitting. From the inside it is completion.',
         ],
       },
@@ -112,7 +112,7 @@ export const READING_PACK: ChapterPack[] = [
       {
         title: 'The easy version',
         paragraphs: [
-          "You hand people the version of yourself that's easiest to love — generous, unbothered, low maintenance — and it works, which is exactly the problem.",
+          "You hand people the version of yourself that's easiest to love. Generous, unbothered, low maintenance. And it works, which is exactly the problem.",
           'The version that worked is now the one they expect. Every month you keep it up, the cost of putting it down goes up.',
         ],
       },
@@ -177,7 +177,7 @@ export const READING_PACK: ChapterPack[] = [
       {
         title: 'Where it lands',
         paragraphs: [
-          'Your body keeps the score of decisions you keep postponing. The jaw, the sleep, the week after — that is the archive, not a random glitch.',
+          'Your body keeps the score of decisions you keep postponing. The jaw, the sleep, the week after. That is the archive, not a random glitch.',
         ],
       },
       {
@@ -273,7 +273,7 @@ export const READING_PACK: ChapterPack[] = [
       {
         title: 'The unfinished thing',
         paragraphs: [
-          'The next nine months ask you to finish something you abandoned. Not because the old project is sacred — because leaving it open is how the loop keeps running.',
+          'The next nine months ask you to finish something you abandoned. Not because the old project is sacred. Because leaving it open is how the loop keeps running.',
         ],
       },
       {
@@ -310,6 +310,6 @@ export function nextPack(id: ReadingChapterId): ChapterPack | null {
 
 export const STATIC_DAILY_NOTE = {
   headline:
-    'You move fastest right after you decide — and slowest while you look for permission.',
+    'You move fastest right after you decide. Slowest while you look for permission',
   sub: 'Today asks for a small decision made without asking anyone.',
 } as const

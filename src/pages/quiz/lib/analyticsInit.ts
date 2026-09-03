@@ -70,7 +70,7 @@ function getYandexCounterId(): number | null {
   return Number.isFinite(id) ? id : null
 }
 
-/** SPA page view — fires on /quiz route changes */
+/** SPA page view. Fires on /quiz route changes */
 export function trackYandexHit(url: string, options?: Record<string, unknown>): void {
   const counterId = getYandexCounterId()
   if (!counterId || typeof window === 'undefined') return
@@ -81,7 +81,7 @@ export function trackYandexHit(url: string, options?: Record<string, unknown>): 
   })
 }
 
-/** Custom goal/event — mirrors Amplitude event names */
+/** Custom goal/event. Mirrors Amplitude event names */
 export function trackYandexGoal(eventName: string, params?: Record<string, unknown>): void {
   const counterId = getYandexCounterId()
   if (!counterId || typeof window === 'undefined') return

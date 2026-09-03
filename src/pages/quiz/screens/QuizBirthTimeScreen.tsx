@@ -42,7 +42,7 @@ function digitsFromTime(time?: string): string {
 
 /**
  * Figma DEV · 02.3 · Quiz · Birth time (+ Clarification)
- * Nodes 437:2879 / 437:2906 — certainty chips appear once a time is entered.
+ * Nodes 437:2879 / 437:2906. Certainty chips appear once a time is entered.
  */
 export default function QuizBirthTimeScreen({
   time,
@@ -99,7 +99,7 @@ export default function QuizBirthTimeScreen({
           <section className="soul-bt__hero">
             <h1 className="soul-bt__title">What time were you born?</h1>
             <p className="soul-bt__subtitle">
-              If you know it, it makes your profile a bit sharper. If you don&apos;t — no
+              If you know it, it makes your profile a bit sharper. If you don&apos;t, no
               worries, we&apos;ll work with what we&apos;ve got.
             </p>
           </section>

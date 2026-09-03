@@ -5,7 +5,7 @@ export type SavedInsight = {
   source: string
   /** Display date e.g. Jul 22 */
   savedAt: string
-  /** Optional max height for clamped cards — Figma 955:7534 / 955:8400 */
+  /** Optional max height for clamped cards. Figma 955:7534 / 955:8400 */
   clampLines?: 3 | 4
 }
 
@@ -14,7 +14,7 @@ export const SAVED_INSIGHTS: SavedInsight[] = [
   {
     id: 'boundary-rejection',
     quote:
-      'You read a boundary as a rejection — yours and other people’s. Three weeks is long enough that the waiting has become the decision',
+      'You read a boundary as a rejection. Yours and other people’s. Three weeks is long enough that the waiting has become the decision',
     source: 'Your pattern',
     savedAt: 'Jul 22',
     clampLines: 3,

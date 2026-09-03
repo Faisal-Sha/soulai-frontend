@@ -4,7 +4,7 @@ import { initMetaPixel } from "@/pages/quiz/lib/metaPixel";
 import App from "./App.tsx";
 import "./index.css";
 
-// Meta Pixel from VITE_META_PIXEL_ID (.env) — not index.html
+// Meta Pixel from VITE_META_PIXEL_ID (.env). Not index.html
 initMetaPixel();
 
 registerSW({ immediate: true });

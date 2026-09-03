@@ -24,7 +24,7 @@ const sections: LegalSection[] = [
           'Collectively, these are referred to as our "Services."',
           "This policy applies to both Personal Information (data that identifies an individual) and Anonymous Information (data that does not identify a specific individual).",
           "Our Services may be offered to users located in various countries around the world. By using our Services, you understand that your information may be transferred to and processed in countries outside of your country of residence, including Canada and the United States.",
-          "For the purposes of applicable data protection laws, including the General Data Protection Regulation (GDPR), CENTRE DE GUERISON DE L'AME INC. acts as the data controller responsible for the collection and processing of personal information described in this Privacy Policy.",
+          "For the purposes of applicable data protection laws, including the General Data Protection Regulation (GDPR), CENTRE DE GUERISON DE L'AME INC. Acts as the data controller responsible for the collection and processing of personal information described in this Privacy Policy.",
         ],
       },
       {

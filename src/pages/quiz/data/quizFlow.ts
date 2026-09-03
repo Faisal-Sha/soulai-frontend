@@ -1,8 +1,8 @@
-// QUIZ_FLOW — ported verbatim from soul-v6.html QUESTIONS array
-// Question IDs and answer value keys are FINAL — do not rename
+// QUIZ_FLOW. Ported verbatim from soul-v6.html QUESTIONS array
+// Question IDs and answer value keys are FINAL. Do not rename
 //
 // UX remap (FigJam GET CLIENT): same screens, tagged with uxSection.
-// Order and analytics keys are unchanged — production-safe.
+// Order and analytics keys are unchanged. Production-safe.
 
 import type { QuizScreen, ScreenType } from '../types'
 
@@ -26,7 +26,7 @@ const QUESTIONS: QuizScreen[] = [
   {
     type: 'multi', id: 'focus', uxSection: 'quiz_questions',
     title: 'Where do you want things to change?',
-    sub: 'Pick as many as you want — it tells me where to focus for you first.',
+    sub: 'Pick as many as you want. It tells me where to focus for you first.',
     options: [
       { v: 'money-career', label: 'Money & career' },
       { v: 'family-roots', label: 'Family & roots' },
@@ -46,7 +46,7 @@ const QUESTIONS: QuizScreen[] = [
   {
     type: 'text', id: 'name', uxSection: 'quiz_name',
     title: 'What can I call you?',
-    sub: "Just your first name — that's how I'll talk to you from here on.",
+    sub: "Just your first name. That's how I'll talk to you from here on.",
     placeholder: 'Enter your name',
     ctaLabel: 'Continue',
   },
@@ -55,13 +55,13 @@ const QUESTIONS: QuizScreen[] = [
   {
     type: 'date', id: 'birthdate', uxSection: 'quiz_birth_data',
     title: 'When were you born?',
-    sub: "This is where your profile begins — it's what makes it about you, not everyone.",
+    sub: "This is where your profile begins. It's what makes it about you, not everyone.",
     ctaLabel: 'Continue',
   },
   {
     type: 'text', id: 'birth-time', uxSection: 'quiz_birth_data',
     title: 'What time were you born?',
-    sub: "If you know it, it makes your profile a bit sharper. If you don't — no worries, we'll work with what we've got.",
+    sub: "If you know it, it makes your profile a bit sharper. If you don't, no worries, we'll work with what we've got.",
     placeholder: '--:--',
     ctaLabel: 'Continue',
     optional: true,
@@ -69,7 +69,7 @@ const QUESTIONS: QuizScreen[] = [
   {
     type: 'text', id: 'birth-place', uxSection: 'quiz_birth_data',
     title: 'Where were you born?',
-    sub: 'The place you come from shapes how you think — it helps me read your patterns more accurately.',
+    sub: 'The place you come from shapes how you think. It helps me read your patterns more accurately.',
     placeholder: 'Select option',
     ctaLabel: 'Continue',
   },
@@ -104,10 +104,10 @@ export const LEGACY_QUESTIONS: QuizScreen[] = [
     title: 'Your age range?',
     sub: 'Your life stage shapes which archetype is closest right now.',
     options: [
-      { v: '18-24', label: '18 – 24' },
-      { v: '25-34', label: '25 – 34' },
-      { v: '35-44', label: '35 – 44' },
-      { v: '45-54', label: '45 – 54' },
+      { v: '18-24', label: '18-24' },
+      { v: '25-34', label: '25-34' },
+      { v: '35-44', label: '35-44' },
+      { v: '45-54', label: '45-54' },
       { v: '55+',   label: '55 and above' },
     ],
   },
@@ -131,7 +131,7 @@ export const LEGACY_QUESTIONS: QuizScreen[] = [
   {
     type: 'single', id: 'hope', uxSection: 'quiz_questions',
     title: 'What are you hoping to discover?',
-    sub: 'Be honest — this shapes what your portrait reveals first.',
+    sub: 'Be honest. This shapes what your portrait reveals first.',
     options: [
       { v: 'who',       label: 'Who my true soulmate really is' },
       { v: 'when',      label: "When they'll finally show up" },
@@ -146,7 +146,7 @@ export const LEGACY_QUESTIONS: QuizScreen[] = [
     title: 'Do you believe you have a soulmate?',
     sub: 'Your belief is part of your energetic signature.',
     options: [
-      { v: 'yes',       label: 'Yes — I feel them out there' },
+      { v: 'yes',       label: 'Yes. I feel them out there' },
       { v: 'hope',      label: 'I hope so' },
       { v: 'unsure',    label: "I'm not sure anymore" },
       { v: 'multiple',  label: 'I believe in multiple soul connections' },
@@ -171,11 +171,11 @@ export const LEGACY_QUESTIONS: QuizScreen[] = [
     title: 'How do you receive love best?',
     sub: 'Your love language is a frequency. Your soulmate matches it.',
     options: [
-      { v: 'words', icon: '💬', label: 'Words — tell me how you feel' },
-      { v: 'touch', icon: '🤗', label: 'Touch — hold me' },
-      { v: 'time',  icon: '⏳', label: 'Time — be fully present with me' },
-      { v: 'acts',  icon: '🛠',  label: 'Acts — show me through what you do' },
-      { v: 'gifts', icon: '🎁', label: 'Gifts — small, thoughtful, meaningful' },
+      { v: 'words', icon: '💬', label: 'Words. Tell me how you feel' },
+      { v: 'touch', icon: '🤗', label: 'Touch. Hold me' },
+      { v: 'time',  icon: '⏳', label: 'Time. Be fully present with me' },
+      { v: 'acts',  icon: '🛠',  label: 'Acts. Show me through what you do' },
+      { v: 'gifts', icon: '🎁', label: 'Gifts. Small, thoughtful, meaningful' },
     ],
   },
   {
@@ -195,11 +195,11 @@ export const LEGACY_QUESTIONS: QuizScreen[] = [
     title: 'Which energy describes you most?',
     sub: 'Your dominant energy determines the one that completes you.',
     options: [
-      { v: 'fire',  icon: '🔥', label: 'Fire — passionate, driven, intense' },
-      { v: 'water', icon: '💧', label: 'Water — intuitive, emotional, deep' },
-      { v: 'earth', icon: '🌿', label: 'Earth — grounded, loyal, steady' },
-      { v: 'air',   icon: '🌬', label: 'Air — curious, witty, free' },
-      { v: 'mix',   icon: '✨', label: "A mix — I shift depending on who I'm with" },
+      { v: 'fire',  icon: '🔥', label: 'Fire. Passionate, driven, intense' },
+      { v: 'water', icon: '💧', label: 'Water. Intuitive, emotional, deep' },
+      { v: 'earth', icon: '🌿', label: 'Earth. Grounded, loyal, steady' },
+      { v: 'air',   icon: '🌬', label: 'Air. Curious, witty, free' },
+      { v: 'mix',   icon: '✨', label: "A mix. I shift depending on who I'm with" },
     ],
   },
   {
@@ -207,11 +207,11 @@ export const LEGACY_QUESTIONS: QuizScreen[] = [
     title: "Your soulmate's presence feels like…",
     sub: 'Trust your first instinct.',
     options: [
-      { v: 'calm',      icon: '🌙', label: 'A deep calm — finally, I can exhale' },
-      { v: 'spark',     icon: '⚡', label: 'An electric spark — alive and magnetic' },
-      { v: 'familiar',  icon: '🪶', label: "Familiar — like I've known them forever" },
-      { v: 'mystery',   icon: '🌀', label: 'A mystery — pulling me into the unknown' },
-      { v: 'mirror',    icon: '🪞', label: 'A mirror — they see me completely' },
+      { v: 'calm',      icon: '🌙', label: 'A deep calm. Finally, I can exhale' },
+      { v: 'spark',     icon: '⚡', label: 'An electric spark. Alive and magnetic' },
+      { v: 'familiar',  icon: '🪶', label: "Familiar. Like I've known them forever" },
+      { v: 'mystery',   icon: '🌀', label: 'A mystery. Pulling me into the unknown' },
+      { v: 'mirror',    icon: '🪞', label: 'A mirror. They see me completely' },
     ],
   },
   {
@@ -219,17 +219,17 @@ export const LEGACY_QUESTIONS: QuizScreen[] = [
     title: 'How will your love begin?',
     sub: 'Soulmate connections unfold in patterns. What\'s yours?',
     options: [
-      { v: 'slow',        icon: '🌱', label: 'Slowly — a friendship that deepens' },
-      { v: 'instant',     icon: '⚡', label: 'Instantly — a thunderbolt' },
-      { v: 'return',      icon: '♾',  label: 'A reunion — someone returning to me' },
-      { v: 'unexpected',  icon: '🎲', label: "Unexpected — someone I didn't see coming" },
-      { v: 'transform',   icon: '🦋', label: 'A transformation — someone already near me' },
+      { v: 'slow',        icon: '🌱', label: 'Slowly. A friendship that deepens' },
+      { v: 'instant',     icon: '⚡', label: 'Instantly. A thunderbolt' },
+      { v: 'return',      icon: '♾',  label: 'A reunion. Someone returning to me' },
+      { v: 'unexpected',  icon: '🎲', label: "Unexpected. Someone I didn't see coming" },
+      { v: 'transform',   icon: '🦋', label: 'A transformation. Someone already near me' },
     ],
   },
   {
     type: 'single', id: 'soulmate-strength', uxSection: 'quiz_questions',
     title: 'What strength will draw you in?',
-    sub: "Soulmates don't complete you — they activate you.",
+    sub: "Soulmates don't complete you. They activate you.",
     options: [
       { v: 'emotional', icon: '💝', label: 'Emotional depth and openness' },
       { v: 'intellect', icon: '🧠', label: 'Sharp mind and curiosity' },
@@ -248,7 +248,7 @@ export const LEGACY_QUESTIONS: QuizScreen[] = [
     title: 'How will they show tenderness?',
     sub: 'The small things reveal the soul.',
     options: [
-      { v: 'listen',   icon: '👂', label: 'Listening — really, really listening' },
+      { v: 'listen',   icon: '👂', label: 'Listening. Really, really listening' },
       { v: 'protect',  icon: '🛡',  label: 'Protecting what matters to me' },
       { v: 'remember', icon: '🎀', label: 'Remembering the details' },
       { v: 'play',     icon: '🎈', label: "Making me laugh when I'm heavy" },
@@ -272,29 +272,29 @@ export const LEGACY_QUESTIONS: QuizScreen[] = [
     title: 'How will you recognize them?',
     sub: 'The body knows before the mind does.',
     options: [
-      { v: 'eyes',   icon: '👁',  label: 'Through their eyes — a knowing' },
+      { v: 'eyes',   icon: '👁',  label: 'Through their eyes. A knowing' },
       { v: 'chest',  icon: '💗', label: 'A warm opening in my chest' },
       { v: 'calm',   icon: '🌙', label: "A calm I haven't felt in years" },
       { v: 'dream',  icon: '💭', label: 'Through a dream or a sign' },
-      { v: 'slowly', icon: '☀️', label: "Slowly — I'll just know one morning" },
+      { v: 'slowly', icon: '☀️', label: "Slowly. I'll just know one morning" },
     ],
   },
 
-  // birth data moved earlier — Figma DEV 02.3 after name
+  // birth data moved earlier. Figma DEV 02.3 after name
 
   {
     type: 'single', id: 'ready', uxSection: 'quiz_questions',
     title: 'How ready are you to meet them?',
     sub: 'Energetic readiness is its own signal.',
     options: [
-      { v: 'fully',  icon: '🌟', label: "Fully — I've been waiting" },
-      { v: 'mostly', icon: '🌗', label: "Mostly — there's still work to do" },
+      { v: 'fully',  icon: '🌟', label: "Fully. I've been waiting" },
+      { v: 'mostly', icon: '🌗', label: "Mostly. There's still work to do" },
       { v: 'unsure', icon: '🤷', label: "I don't know how to answer this" },
       { v: 'scared', icon: '😬', label: 'Honestly? A little scared' },
     ],
   },
 
-  // name moved earlier — Figma DEV 02.2 after reinforcement
+  // name moved earlier. Figma DEV 02.2 after reinforcement
 ]
 
 // ── Build the full QUIZ_FLOW ──
@@ -313,7 +313,7 @@ export const QUESTION_SCREEN_TYPES: ScreenType[] = [
   'single', 'multi', 'yesno', 'slider', 'visual', 'date', 'text', 'email',
 ]
 
-// Legacy alias — useQuizEngine imports this name
+// Legacy alias. UseQuizEngine imports this name
 export const QUESTION_TYPES = QUESTION_SCREEN_TYPES
 
 // ── All screen types that count as "question" steps for progress bar ──

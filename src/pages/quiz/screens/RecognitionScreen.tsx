@@ -1,4 +1,4 @@
-// RecognitionScreen — mid-quiz reinforcement after birthdate question
+// RecognitionScreen. Mid-quiz reinforcement after birthdate question
 // Logic ported verbatim from soul-v6.html buildRecognition()
 
 import PrimaryButton from '../atoms/PrimaryButton'

@@ -20,7 +20,7 @@ const DEMO = {
   planLine: '$6.99 a month · renews 6 September',
   notificationsLine: 'Balanced · most mornings',
   /** Figma Account · Full copy (805:2143) */
-  subtitle: 'She reads one line — then her own.',
+  subtitle: 'She reads one line. Then her own.',
   endedDay: '6 September',
   resumePrice: '$6.99',
 } as const
@@ -88,7 +88,7 @@ function formatEndedOn(raw?: string | null) {
 
 /**
  * Figma WIP · Account · Full (805:2128)
- * Subscription ended (955:10342) — `/account?ended=1`
+ * Subscription ended (955:10342). `/account?ended=1`
  * Hub for profile, plan, notifications, and account rows.
  */
 export function SoulAccountScreen() {
@@ -279,7 +279,7 @@ export function SoulAccountScreen() {
             </button>
           </article>
 
-          {/* Rows — Account · Full (805:2228) */}
+          {/* Rows. Account · Full (805:2228) */}
           <div className="soul-account__card soul-account__card--rows">
             <button
               type="button"
@@ -308,7 +308,7 @@ export function SoulAccountScreen() {
                   className="soul-account__row"
                   onClick={() =>
                     toast.message('Download everything', {
-                      description: 'Export comes next — not wired yet.',
+                      description: 'Export comes next. Not wired yet.',
                     })
                   }
                 >

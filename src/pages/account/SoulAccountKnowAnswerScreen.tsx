@@ -99,7 +99,7 @@ export function SoulAccountKnowAnswerScreen() {
             What I know about you
           </h1>
           <p className="soul-account__subtitle">
-            Your birth data gives me the shape. What you tell me here gives me the detail — and every
+            Your birth data gives me the shape. What you tell me here gives me the detail. And every
             answer changes what I say next.
           </p>
         </section>

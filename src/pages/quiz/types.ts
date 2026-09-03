@@ -1,5 +1,5 @@
-// Quiz funnel — TypeScript interfaces
-// Field names are FINAL — do not rename without explicit approval
+// Quiz funnel. TypeScript interfaces
+// Field names are FINAL. Do not rename without explicit approval
 
 export type ScreenType =
   | 'intro'
@@ -12,7 +12,7 @@ export type ScreenType =
   | 'email-gate'     // NEW: dedicated email gate screen
   | 'teaser'         // NEW: locked portrait teaser
   | 'paywall'        // NEW: full paywall screen
-  | 'free-mode'      // FigJam EXIT / RETURN — free mode shell
+  | 'free-mode'      // FigJam EXIT / RETURN. Free mode shell
   | 'results'
   | 'single'
   | 'multi'
@@ -31,7 +31,7 @@ export interface QuizScreenOption {
   icon?: string
 }
 
-/** FigJam GET CLIENT section — metadata only; does not affect routing or analytics. */
+/** FigJam GET CLIENT section. Metadata only; does not affect routing or analytics. */
 export type QuizUxSection =
   | 'quiz_intro'
   | 'quiz_questions'
@@ -65,11 +65,11 @@ export interface QuizScreen {
   placeholder?: string
   ctaLabel?: string
   optional?: boolean
-  /** UX phase tag for remap / future UI — ignored by engine today */
+  /** UX phase tag for remap / future UI. Ignored by engine today */
   uxSection?: QuizUxSection
 }
 
-// Answer field names are FINAL — do not rename
+// Answer field names are FINAL. Do not rename
 export interface QuizAnswers {
   focus?: string | string[]
   gender?: string
@@ -88,7 +88,7 @@ export interface QuizAnswers {
   'soulmate-flaw'?: string
   recognition?: string
   birthdate?: { day: string; month: string; year: string }
-  /** Frontend-only UX fields — stored in answers JSON; backend ignores unknown keys */
+  /** Frontend-only UX fields. Stored in answers JSON; backend ignores unknown keys */
   'birth-time-known'?: string
   'birth-time'?: string
   'birth-place'?: string

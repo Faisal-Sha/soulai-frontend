@@ -10,7 +10,7 @@ import iconChevronRight from './assets/icon-chevron-right.svg'
 type SoulPeopleScreenProps = {
   /** Override list; empty array = Empty state. Default: demo list. */
   people?: PeopleEntry[]
-  /** Force subscription-ended shell — Figma 955:8631 */
+  /** Force subscription-ended shell. Figma 955:8631 */
   subscriptionEnded?: boolean
 }
 
@@ -28,7 +28,7 @@ const ENDED_BANNER = {
     'Everything you already read stays open. To read a new pair, resume your subscription.',
 } as const
 
-/** Figma 796:3360 — dashed ring 40 + plus 18
+/** Figma 796:3360. Dashed ring 40 + plus 18
  * Ring uses stroke/on-dark (#ffffff59); plus uses brand white (#fffdfa).
  */
 function AddSomeoneIcon() {
@@ -73,7 +73,7 @@ function AddSomeoneIcon() {
 
 /**
  * Figma WIP · People · Empty (744:1413) · List (744:1577)
- * Subscription ended (955:8631) — `/people?ended=1`
+ * Subscription ended (955:8631). `/people?ended=1`
  * Preview: `/people?people=empty` · `/people` (list demo)
  */
 export function SoulPeopleScreen({ people, subscriptionEnded: endedProp }: SoulPeopleScreenProps) {
@@ -188,7 +188,7 @@ export function SoulPeopleScreen({ people, subscriptionEnded: endedProp }: SoulP
             <div className="soul-people__empty-copy">
               <p className="soul-people__lead">No one here yet.</p>
               <p className="soul-people__subtitle">
-                It works best with someone you already know well — a partner, a parent, a close
+                It works best with someone you already know well. A partner, a parent, a close
                 friend.
               </p>
             </div>

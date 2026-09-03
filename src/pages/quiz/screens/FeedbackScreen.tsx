@@ -1,4 +1,4 @@
-// FeedbackScreen — interstitial after soulmate-strength question
+// FeedbackScreen. Interstitial after soulmate-strength question
 // Ported from soul-v6.html renderQuestion() feedback type
 
 import PrimaryButton from '../atoms/PrimaryButton'
@@ -13,7 +13,7 @@ const FEEDBACK_MAP: Record<string, string> = {
   emotional: 'Those who seek Emotional Depth in their soulmate are drawn to vulnerability, presence, and the kind of love that holds you whole.',
   intellect: 'Those who seek Intelligence in their soulmate are drawn to meaningful conversations and shared growth.',
   spiritual: 'Those who seek Spiritual Wisdom in their soulmate are drawn to depth of presence, intuition, and a love that feels like a homecoming.',
-  ambition:  'Those who seek Ambition in their soulmate are drawn to partners who match their fire — building something real, side by side.',
+  ambition:  'Those who seek Ambition in their soulmate are drawn to partners who match their fire. Building something real, side by side.',
   humor:     'Those who seek Humor in their soulmate are drawn to lightness, play, and a partner who can disarm any heaviness.',
   kindness:  'Those who seek Kindness in their soulmate are drawn to gentleness, steadiness, and love expressed in quiet daily acts.',
 }

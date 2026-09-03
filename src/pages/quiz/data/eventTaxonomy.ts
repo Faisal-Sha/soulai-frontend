@@ -1,5 +1,5 @@
-// Soul+AI quiz funnel event taxonomy — sourced from soulplus-event-taxonomy_updated.xlsx
-// Event names are FINAL — do not rename without marketing approval.
+// Soul+AI quiz funnel event taxonomy. Sourced from soulplus-event-taxonomy_updated.xlsx
+// Event names are FINAL. Do not rename without marketing approval.
 
 import type { QuizScreen } from '../types'
 
@@ -9,7 +9,7 @@ export interface ScreenTaxonomyEntry {
   screenKey: string
   route: string
   viewedEvent: string
-  /** Omitted for screens that use dedicated events instead (e.g. paywall) */
+  /** Omitted for screens that use dedicated events instead (e.g. Paywall) */
   passedEvent?: string
   /** Meta standard event on Viewed (Amplitude always fires) */
   metaEventViewed?: string

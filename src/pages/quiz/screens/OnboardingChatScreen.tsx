@@ -10,7 +10,7 @@ interface OnboardingChatScreenProps {
 
 /**
  * Figma DEV · 01.2 · Onboarding · Chat (node 437:3029)
- * Mobile 390×844 — 1:1 from design.
+ * Mobile 390×844. 1:1 from design.
  */
 export default function OnboardingChatScreen({ onStart, onBack }: OnboardingChatScreenProps) {
   const touchX = useRef<number | null>(null)
@@ -52,7 +52,7 @@ export default function OnboardingChatScreen({ onStart, onBack }: OnboardingChat
                 Looking for the right move for you? Ask me!
               </h1>
               <p className="soul-ob__subtitle soul-ob-chat__enter soul-ob-chat__enter--subtitle">
-                My advice comes only from your patterns and your profile — nothing generic.
+                My advice comes only from your patterns and your profile. Nothing generic.
                 I&apos;ll show you the options; the choice is always yours.
               </p>
             </section>
@@ -68,7 +68,7 @@ export default function OnboardingChatScreen({ onStart, onBack }: OnboardingChat
                 <div className="soul-ob-chat__row soul-ob-chat__row--mentor">
                   <div className="soul-ob-chat__bubble soul-ob-chat__bubble--mentor soul-ob-chat__enter soul-ob-chat__enter--mentor">
                     <p>
-                      Because being needed feels safer to you than being chosen — so you pick
+                      Because being needed feels safer to you than being chosen. So you pick
                       people you can rescue, and call it love, Jane.
                     </p>
                     <p>
@@ -83,7 +83,7 @@ export default function OnboardingChatScreen({ onStart, onBack }: OnboardingChat
 
                 <div className="soul-ob-chat__row soul-ob-chat__row--user">
                   <div className="soul-ob-chat__bubble soul-ob-chat__bubble--user soul-ob-chat__enter soul-ob-chat__enter--user2">
-                    Wait — you actually caught that? Okay, let&apos;s get into it.
+                    Wait. You actually caught that? Okay, let&apos;s get into it.
                   </div>
                 </div>
               </div>

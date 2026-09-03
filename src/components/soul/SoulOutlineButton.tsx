@@ -11,7 +11,7 @@ type SoulOutlineButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 }
 
 /**
- * Figma WIP · secondary-button (244:2245) — outline “Skip” / retry CTA.
+ * Figma WIP · secondary-button (244:2245). Outline “Skip” / retry CTA.
  * States: Default · Hover · Pressed · Loading · Disabled · Error
  */
 export function SoulOutlineButton({

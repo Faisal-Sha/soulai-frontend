@@ -466,7 +466,7 @@ export function SoulPatternChapterScreen() {
             <div className="soul-pattern__end">
               <hr className="soul-pattern__end-rule" />
               <div className="soul-pattern__end-copy">
-                <p className="soul-pattern__end-title">You’ve finished {title}.</p>
+                <p className="soul-pattern__end-title">You’ve finished {title}</p>
                 <p className="soul-pattern__end-meta">
                   {sectionCount} sections · {words.toLocaleString()} words
                 </p>

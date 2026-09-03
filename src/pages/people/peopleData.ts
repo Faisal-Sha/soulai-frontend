@@ -22,7 +22,7 @@ export function compatHomeSummary(names: string[]) {
   return `${names[0]}, ${names[1]} and ${extra} more`
 }
 
-/** Figma preview list — `/people?people=demo` */
+/** Figma preview list. `/people?people=demo` */
 export const DEMO_PEOPLE: PeopleEntry[] = [
   {
     id: 'kate',

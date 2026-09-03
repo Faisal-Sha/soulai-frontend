@@ -1,7 +1,7 @@
 export type KnowQuestion = {
   id: string
   prompt: string
-  /** Figma preview copy only — not used for signed-in profiles */
+  /** Figma preview copy only. Not used for signed-in profiles */
   demoAnswer?: string
   answer?: string
 }
@@ -37,7 +37,7 @@ export const KNOW_SECTIONS: KnowSection[] = [
       {
         id: 'core-right',
         prompt:
-          'When you know something is right but cannot explain why — what happens next?',
+          'When you know something is right but cannot explain why. What happens next?',
         demoAnswer: 'I look for a reason good enough to say out loud.',
       },
     ],
@@ -111,7 +111,7 @@ export const KNOW_SECTIONS: KnowSection[] = [
       },
       {
         id: 'money-twice',
-        prompt: 'What would change if you had twice as much — and what would not?',
+        prompt: 'What would change if you had twice as much, and what would not?',
       },
     ],
   },

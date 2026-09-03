@@ -60,7 +60,7 @@ type SoulNavProps = {
 }
 
 /**
- * Shared app nav — same destinations on Home, Readings, People, Profile, and Chat.
+ * Shared app nav. Same destinations on Home, Readings, People, Profile, and Chat.
  */
 export function SoulNav({ active, variant = 'dock', className = '' }: SoulNavProps) {
   const { pathname } = useLocation()

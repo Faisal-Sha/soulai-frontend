@@ -21,7 +21,7 @@ describe('trial ending window', () => {
     const copy = trialBannerCopy('2026-09-07T10:00:00.000Z', {
       now: Date.parse('2026-09-06T10:00:00.000Z'),
     })
-    expect(copy.title).toBe('Your trial ends tomorrow.')
+    expect(copy.title).toBe('Your trial ends tomorrow')
     expect(copy.detail).toMatch(/\$6\.99\/month starts/)
   })
 
@@ -30,7 +30,7 @@ describe('trial ending window', () => {
       cancelled: true,
       now: Date.parse('2026-09-06T10:00:00.000Z'),
     })
-    expect(copy.title).toBe('Your access ends tomorrow.')
+    expect(copy.title).toBe('Your access ends tomorrow')
     expect(copy.detail).toMatch(/cancelled/i)
     expect(copy.detail).not.toMatch(/\$6\.99\/month starts/)
   })

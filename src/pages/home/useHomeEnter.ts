@@ -1,7 +1,7 @@
 import { useEffect, type RefObject } from 'react'
 
 /**
- * Home entrance — Figma 1017:3606 + animation-spec 1053:3226
+ * Home entrance. Figma 1017:3606 + animation-spec 1053:3226
  * IntersectionObserver threshold 0.1, play once (Figma prototype loops).
  */
 export function useHomeEnter(

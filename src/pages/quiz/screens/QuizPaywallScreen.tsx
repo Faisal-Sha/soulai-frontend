@@ -74,7 +74,7 @@ const FAQ_ITEMS = [
   {
     id: 'faq-1',
     q: 'Can I cancel anytime?',
-    a: 'Yes. Cancel anytime from your profile — one tap. No penalties, no hidden fees.',
+    a: 'Yes. Cancel anytime from your profile. One tap. No penalties, no hidden fees.',
   },
   {
     id: 'faq-2',
@@ -149,13 +149,13 @@ export default function QuizPaywallScreen({
             <section className="soul-pw__hero">
               <h1 className="soul-pw__title">Everything opens right now!</h1>
               <p className="soul-pw__body">
-                Your full profile — everything about you and your patterns, your
+                Your full profile. Everything about you and your patterns, your
                 behavior models and recommendations, your personal mentor, your
                 notes every morning.
               </p>
               <p className="soul-pw__body">All of it opens the moment you tap.</p>
               <p className="soul-pw__body">
-                Nobody&apos;s forcing you. But honestly — you should try this!
+                Nobody&apos;s forcing you. But honestly. You should try this!
               </p>
             </section>
 
@@ -203,9 +203,9 @@ export default function QuizPaywallScreen({
                 block
                 disabled={isProcessing}
                 onClick={handleCheckout}
-                aria-label={`Start my 7 days — ${priceLabel}`}
+                aria-label={`Start my 7 days for ${priceLabel}`}
               >
-                {isProcessing ? 'Starting checkout…' : `Start my 7 days — ${priceLabel}`}
+                {isProcessing ? 'Starting checkout…' : `Start my 7 days for ${priceLabel}`}
               </SoulButton>
               <p className="soul-pw__cta-sub">
                 {priceLabel} today · Then {renewalLabel}/month · Cancel anytime

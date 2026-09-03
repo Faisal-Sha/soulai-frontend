@@ -22,7 +22,7 @@ const STEPS = [
   {
     n: '3',
     title: 'Tap “Add”',
-    detail: 'That’s it — the icon appears on your screen',
+    detail: 'That’s it. The icon appears on your screen',
     icon: iconCheckStep,
   },
 ] as const
@@ -82,7 +82,7 @@ export function AddToHomeSheet({ open, onClose }: AddToHomeSheetProps) {
           ))}
         </ol>
         <p className="soul-home__sheet-note">
-          On iPhone this is also what lets me send your morning note — notifications do not work in
+          On iPhone this is also what lets me send your morning note. Notifications do not work in
           the browser.
         </p>
         <SoulButton block onClick={onClose}>

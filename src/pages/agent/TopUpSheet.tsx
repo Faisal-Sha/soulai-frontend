@@ -40,7 +40,7 @@ function brandFromNumber(num: string): string {
 }
 
 /**
- * Chat · Top-up payment sheet — Figma DEV 625:2810 / 625:2975
+ * Chat · Top-up payment sheet. Figma DEV 625:2810 / 625:2975
  * Change-card is a UI shell (no dedicated Figma frame) matching the sheet language.
  */
 export function TopUpSheet({

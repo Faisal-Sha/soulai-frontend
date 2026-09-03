@@ -1,4 +1,4 @@
-// Soul+AI quiz funnel analytics — Amplitude (all events) + GTM dataLayer (Meta subset) + Yandex Metrica
+// Soul+AI quiz funnel analytics. Amplitude (all events) + GTM dataLayer (Meta subset) + Yandex Metrica
 import { Identify } from '@amplitude/analytics-browser'
 import { amplitude, initQuizAnalytics, trackYandexGoal, trackYandexHit } from './analyticsInit'
 import { trackMetaPixel } from './metaPixel'
@@ -164,7 +164,7 @@ export function updateFunnelSegmentation(answers: QuizAnswers): void {
 
 // ── Screen Viewed / Passed ────────────────────────────────────────────────────
 
-/** Meta mapped events — Amplitude dedupe does not block Meta. */
+/** Meta mapped events. Amplitude dedupe does not block Meta. */
 function fireMetaIfMapped(
   metaEvent: string | undefined,
   dedupeKey: string,
@@ -190,7 +190,7 @@ export function trackScreenViewed(screenKey: string, extra?: Record<string, unkn
     markFired('viewed', screenKey)
   }
 
-  // Meta: PageView (welcome) / ViewContent (paywall) — standard names only
+  // Meta: PageView (welcome) / ViewContent (paywall). Standard names only
   fireMetaIfMapped(
     taxonomy.metaEventViewed,
     `meta-viewed:${screenKey}:${taxonomy.metaEventViewed}`,
@@ -219,7 +219,7 @@ export async function trackScreenPassed(
     markFired('passed', screenKey)
   }
 
-  // Meta: CompleteRegistration (name) / Lead (email) — even if Amplitude already fired
+  // Meta: CompleteRegistration (name) / Lead (email). Even if Amplitude already fired
   fireMetaIfMapped(
     taxonomy.metaEventPassed,
     `meta-passed:${screenKey}:${taxonomy.metaEventPassed}`,
@@ -270,7 +270,7 @@ export function trackPaywallViewed(selectedPlan: string): void {
   trackScreenViewed('paywall', { content_ids: [selectedPlan] })
 }
 
-/** Fires once per paywall visit — single plan, no picker */
+/** Fires once per paywall visit. Single plan, no picker */
 export function trackPaywallPlanSelected(plan: string, price: number): void {
   trackPaywallEvent(PAYWALL_EVENTS.planSelected, { plan, price }, undefined, `plan-selected:${plan}`)
 }
@@ -369,7 +369,7 @@ export async function trackPurchaseCompletedFromSession(stripeSessionId: string)
 
 /**
  * Confirm main paywall purchase on /processing after Stripe redirect.
- * Single-plan flow — no Upsell B; uses session_id + checkout context from sessionStorage.
+ * Single-plan flow. No Upsell B; uses session_id + checkout context from sessionStorage.
  */
 export async function confirmPaywallPurchaseFromCheckout(stripeSessionId: string): Promise<void> {
   initQuizAnalytics()
@@ -401,7 +401,7 @@ export function trackProcessingSheetAnswered(sheetId: string, value: string): vo
   })
 }
 
-// ── Post-funnel (tracking only — no flow changes) ─────────────────────────────
+// ── Post-funnel (tracking only. No flow changes) ─────────────────────────────
 
 export function trackCreateAccountViewed(): void {
   if (wasFired('viewed', 'create-account')) return
@@ -469,7 +469,7 @@ export type CheckoutCompletedProps = {
   lead_id?: string | null
 }
 
-/** Browser-side purchase confirmation — does not modify Stripe/webhook flows */
+/** Browser-side purchase confirmation. Does not modify Stripe/webhook flows */
 export async function reportPaywallCheckoutCompleted(
   data: { subscription_purchase?: CheckoutCompletedProps } | null | undefined,
 ): Promise<void> {

@@ -39,7 +39,7 @@ export function SoulAccountNotificationsScreen() {
   const [morningNote, setMorningNote] = useState(true)
   const [nudges, setNudges] = useState(true)
   const [morningTime] = useState('08:00')
-  const [quietHours] = useState('22:00 — 08:00')
+  const [quietHours] = useState('22:00. 08:00')
   const { installOpen, openInstall, closeInstall } = useSoulSheetParams()
 
   const frequencyLabel = useMemo(() => {

@@ -32,13 +32,13 @@ const FREE_CARDS = [
     id: 'core-self',
     title: 'Core Self',
     meta: '1 / 42',
-    body: "You process the world through feeling first and logic second. That isn't a weakness to manage — it's the instrument you read people with. The trouble only starts when you apologise for the signal before you've even read it.",
+    body: "You process the world through feeling first and logic second. That isn't a weakness to manage. It's the instrument you read people with. The trouble only starts when you apologise for the signal before you've even read it.",
   },
   {
     id: 'your-pattern',
     title: 'Your Pattern',
     meta: '1 / 42',
-    body: "You start strong, then quietly retreat the moment things get real. Your profile shows exactly where that exit door sits — and it isn't where you think.",
+    body: "You start strong, then quietly retreat the moment things get real. Your profile shows exactly where that exit door sits. And it isn't where you think.",
   },
 ] as const
 
@@ -46,17 +46,17 @@ const LOCKED_CARDS = [
   {
     id: 'purpose',
     title: 'Purpose',
-    body: 'You were never built to pick one thing and stay there. What everyone reads as restlessness is actually the shape of how you learn — and your chart names the exact conditions under which you finally settle, which is not the ones you keep trying to force.',
+    body: 'You were never built to pick one thing and stay there. What everyone reads as restlessness is actually the shape of how you learn. And your chart names the exact conditions under which you finally settle, which is not the ones you keep trying to force.',
   },
   {
     id: 'relationships',
     title: 'Relationships',
-    body: "You hand people the version of yourself that's easiest to love. It works — right up until the moment you need something back, and discover you've trained them not to ask. Your chart shows where that habit began.",
+    body: "You hand people the version of yourself that's easiest to love. It works. Right up until the moment you need something back, and discover you've trained them not to ask. Your chart shows where that habit began.",
   },
   {
     id: 'money',
     title: 'Money',
-    body: "You earn in bursts, then cap yourself the moment things feel stable. Your block isn't money — it's what staying in one place would mean about you, and your chart is unusually direct about where that fear was formed.",
+    body: "You earn in bursts, then cap yourself the moment things feel stable. Your block isn't money. It's what staying in one place would mean about you, and your chart is unusually direct about where that fear was formed.",
   },
   {
     id: 'year-ahead',
@@ -115,7 +115,7 @@ export default function QuizResultFreeScreen({
               <h1 className="soul-rs__title">{name}, your profile is ready!</h1>
             </div>
             <p className="soul-rs__subtitle">
-              Written for you — and shaped by what&apos;s on your mind.
+              Written for you. And shaped by what&apos;s on your mind.
             </p>
           </section>
 
@@ -188,7 +188,7 @@ export default function QuizResultFreeScreen({
             </h2>
             <p className="soul-rs__paywall-body">
               Nine chapters about you, your life, and your best next move. Ask me
-              anything from them — I&apos;ll show you exactly what you need. Every
+              anything from them. I&apos;ll show you exactly what you need. Every
               morning, a short note about your day. And that&apos;s before
               compatibility and everything else.
             </p>
@@ -203,8 +203,8 @@ export default function QuizResultFreeScreen({
               ))}
             </ul>
             <div className="soul-rs__paywall-cta">
-              <SoulButton block onClick={onUnlock} aria-label="Unlock everything — $0.99">
-                Unlock everything — $0.99
+              <SoulButton block onClick={onUnlock} aria-label="Unlock everything for $0.99">
+                Unlock everything for $0.99
               </SoulButton>
               <p className="soul-rs__paywall-sub">
                 $0.99 for 7 days, then $6.99/month · Cancel anytime

@@ -41,11 +41,11 @@ export function trialBannerCopy(
     : 'soon'
 
   if (opts?.cancelled) {
-    let title = 'Your access ends soon.'
+    let title = 'Your access ends soon'
     if (daysLeft !== null) {
-      if (daysLeft <= 0) title = 'Your access ends today.'
-      else if (daysLeft === 1) title = 'Your access ends tomorrow.'
-      else title = `Your access ends in ${daysLeft} days.`
+      if (daysLeft <= 0) title = 'Your access ends today'
+      else if (daysLeft === 1) title = 'Your access ends tomorrow'
+      else title = `Your access ends in ${daysLeft} days`
     }
     const detail = valid
       ? `You cancelled. Everything stays open until ${dateLabel}.`
@@ -53,11 +53,11 @@ export function trialBannerCopy(
     return { title, detail }
   }
 
-  let title = 'Your trial ends soon.'
+  let title = 'Your trial ends soon'
   if (daysLeft !== null) {
-    if (daysLeft <= 0) title = 'Your trial ends today.'
-    else if (daysLeft === 1) title = 'Your trial ends tomorrow.'
-    else title = `Your trial ends in ${daysLeft} days.`
+    if (daysLeft <= 0) title = 'Your trial ends today'
+    else if (daysLeft === 1) title = 'Your trial ends tomorrow'
+    else title = `Your trial ends in ${daysLeft} days`
   }
 
   const detail = `$6.99/month starts ${dateLabel}. Cancel anytime.`

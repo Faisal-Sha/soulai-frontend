@@ -27,7 +27,7 @@ function toBirthPlaceData(result: CitySearchResult): BirthPlaceData {
 
 /**
  * Figma DEV · 02.3 · Quiz · Place of birth (node 437:2940)
- * Combobox — Photon city search as you type, or enter any place manually.
+ * Combobox. Photon city search as you type, or enter any place manually.
  */
 export default function QuizBirthPlaceScreen({
   value = '',
@@ -87,7 +87,7 @@ export default function QuizBirthPlaceScreen({
           <section className="soul-bp__hero">
             <h1 className="soul-bp__title">Where were you born?</h1>
             <p className="soul-bp__subtitle">
-              The place you come from shapes how you think — it helps me read your patterns
+              The place you come from shapes how you think. It helps me read your patterns
               more accurately.
             </p>
           </section>
@@ -138,7 +138,7 @@ export default function QuizBirthPlaceScreen({
                 </button>
               </div>
               <p className="soul-bp__helper">
-                Pick a city or type your own — any place works.
+                Pick a city or type your own. Any place works.
               </p>
 
               {showList && (

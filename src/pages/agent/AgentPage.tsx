@@ -126,7 +126,7 @@ function ThinkingRow() {
         <span className="soul-chat__typing-dot" />
         <span className="soul-chat__typing-dot" />
       </div>
-      <p className="soul-chat__typing-label">Still with you — going through your chapters.</p>
+      <p className="soul-chat__typing-label">Still with you. Going through your chapters.</p>
     </div>
   )
 }
@@ -135,7 +135,7 @@ function FailedBubble({ onRetry }: { onRetry: () => void }) {
   return (
     <div className="soul-chat__bubble soul-chat__bubble--failed">
       <p className="soul-chat__bubble-text">
-        I lost that one — something interrupted me on my side. Your message is saved.
+        I lost that one. Something interrupted me on my side. Your message is saved.
       </p>
       <button type="button" className="soul-chat__retry" onClick={onRetry}>
         <img src={iconRetry} alt="" width={14} height={14} />
@@ -157,7 +157,7 @@ function LimitGateCard({
   return (
     <div className="soul-chat__gate" role="dialog" aria-label="Message limit">
       <div className="soul-chat__gate-copy">
-        <p className="soul-chat__gate-title">You&apos;ve used today&apos;s messages.</p>
+        <p className="soul-chat__gate-title">You&apos;ve used today&apos;s messages</p>
         <p className="soul-chat__gate-body">
           Your conversation is saved. Come back tomorrow, or keep going now.
         </p>
@@ -184,7 +184,7 @@ function EndedGateCard({
   return (
     <div className="soul-chat__gate" role="dialog" aria-label="Subscription ended">
       <div className="soul-chat__gate-copy">
-        <p className="soul-chat__gate-title">Your subscription ended.</p>
+        <p className="soul-chat__gate-title">Your subscription ended</p>
         <p className="soul-chat__gate-body">
           Your profile and everything you saved stay yours. Resume to keep talking.
         </p>
@@ -276,7 +276,7 @@ function MessageActions({ content }: { content: string }) {
 }
 
 /**
- * SOUL+AI Chat — Figma DEV Empty / Generating / Response
+ * SOUL+AI Chat. Figma DEV Empty / Generating / Response
  * Wired: threads, history, send, delete. Top-up / limits = UI shell for now.
  */
 export default function AgentPage() {
@@ -682,7 +682,7 @@ export default function AgentPage() {
     void handleSend(retryMessage, { isRetry: true })
   }
 
-  // V2 is open — no auth gate until login ships.
+  // V2 is open. No auth gate until login ships.
 
   const showWelcome = messages !== null && messages.length === 0 && !thinking
   const lastAssistantIdx =
@@ -740,12 +740,12 @@ export default function AgentPage() {
         <div className="soul-chat__hist-body">
           {threadsError ? (
             <div className="soul-chat__hist-empty">
-              <p className="soul-chat__hist-empty-title">Could not load history.</p>
+              <p className="soul-chat__hist-empty-title">Could not load history</p>
               <p className="soul-chat__hist-empty-sub">{threadsError}</p>
             </div>
           ) : !threads.length ? (
             <div className="soul-chat__hist-empty">
-              <p className="soul-chat__hist-empty-title">No conversations yet.</p>
+              <p className="soul-chat__hist-empty-title">No conversations yet</p>
               <p className="soul-chat__hist-empty-sub">
                 Anything you talk through with your mentor is saved here.
               </p>
@@ -851,7 +851,7 @@ export default function AgentPage() {
                 <>
                   <img className="soul-chat__orb" src={orbChat} alt="" width={64} height={64} />
                   <div className="soul-chat__empty-copy">
-                    <h1 className="soul-chat__empty-title">Ask me anything about you.</h1>
+                    <h1 className="soul-chat__empty-title">Ask me anything about you</h1>
                     <p className="soul-chat__empty-sub">I&apos;ve read all nine chapters.</p>
                   </div>
                 </>

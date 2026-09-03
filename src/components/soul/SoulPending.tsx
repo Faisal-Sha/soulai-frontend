@@ -7,7 +7,7 @@ type SoulPendingProps = {
   label?: string
 }
 
-/** Placeholder while list/progress loads — avoids empty / demo flash. */
+/** Placeholder while list/progress loads. Avoids empty / demo flash. */
 export function SoulPending({
   rows = 6,
   variant = 'rows',

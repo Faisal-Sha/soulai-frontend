@@ -12,7 +12,7 @@ interface QuizReinforceScreenProps {
 
 /**
  * Figma DEV · 02.1.1 · Quiz · Reinforcement (node 437:2781)
- * Mobile: stacked. Desktop: split — orb between copy paras, card up on the right.
+ * Mobile: stacked. Desktop: split. Orb between copy paras, card up on the right.
  */
 export default function QuizReinforceScreen({ onNext }: QuizReinforceScreenProps) {
   return (
@@ -39,7 +39,7 @@ export default function QuizReinforceScreen({ onNext }: QuizReinforceScreenProps
               <h1 className="soul-rf__title">Awesome!</h1>
               <p className="soul-rf__subtitle">
                 Those who seek Ambition in their soulmate are drawn to partners who match their
-                fire — building something real, side by side.
+                fire. Building something real, side by side.
               </p>
             </section>
 
@@ -48,7 +48,7 @@ export default function QuizReinforceScreen({ onNext }: QuizReinforceScreenProps
             </div>
 
             <p className="soul-rf__proof-copy">
-              14,248 people came in with the same things on their mind — Love &amp; relationships,
+              14,248 people came in with the same things on their mind. Love &amp; relationships,
               Purpose. Here&apos;s what they say after.
             </p>
 

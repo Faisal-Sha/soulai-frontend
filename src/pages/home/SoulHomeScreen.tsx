@@ -45,32 +45,32 @@ type SoulHomeScreenProps = {
   shelfReady?: boolean
   compatSummary?: string
   isPremium?: boolean
-  /** Trial banner — Figma 616:1545 */
+  /** Trial banner. Figma 616:1545 */
   trialTitle?: string
   trialDetail?: string
-  /** Unpaid home resume price — Figma 949:5189 */
+  /** Unpaid home resume price. Figma 949:5189 */
   resumePrice?: string
 }
 
 const NOTE = {
-  headline: 'You move fastest right after you decide — and slowest while you look for permission.',
+  headline: 'You move fastest right after you decide. Slowest while you look for permission',
   sub: 'Today asks for a small decision made without asking anyone.',
   unpaidSub: 'Resume to talk it through with your mentor.',
 } as const
 
 const UNPAID_BANNER = {
   title: 'Your subscription ended',
-  detail: "Everything you've built stays — reading, insights, conversations.",
+  detail: "Everything you've built stays. Reading, insights, conversations.",
 } as const
 
 const POOL_NOTE = {
-  headline: "You've seen everything your reading had to offer.",
+  headline: "You've seen everything your reading had to offer",
   sub: 'The rest happens in conversation. Your chapters stay yours either way.',
 } as const
 
 const WELCOME_BACK = {
   title: 'Welcome back',
-  body: "Payment successful. Everything's unlocked. Preparing today's insight — it'll be ready in a moment.",
+  body: "Payment successful. Everything's unlocked. Preparing today's insight. It'll be ready in a moment.",
 } as const
 
 function formatHomeDate(d = new Date()) {
@@ -78,7 +78,7 @@ function formatHomeDate(d = new Date()) {
 }
 
 /**
- * SOUL+AI Home — Figma DEV
+ * SOUL+AI Home. Figma DEV
  * Unpaid #1: Home · subscription ended (949:5169)
  * Unpaid #2: Home · reading pool exhausted (950:5833)
  * Paid: Home · payment confirmation (952:6176)
@@ -96,7 +96,7 @@ export function SoulHomeScreen({
   shelfReady = true,
   compatSummary = 'Anna, Mark and 2 more',
   isPremium = true,
-  trialTitle = 'Your trial ends tomorrow.',
+  trialTitle = 'Your trial ends tomorrow',
   trialDetail = '$6.99/month starts soon. Cancel anytime.',
   resumePrice = '$6.99',
 }: SoulHomeScreenProps) {

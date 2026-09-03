@@ -49,7 +49,7 @@ export function SoulForgotPasswordScreen() {
       <section className="soul-auth__hero">
         <h1 className="soul-auth__title">Forgot your password?</h1>
         <p className="soul-auth__subtitle">
-          Enter the email on this account — I’ll send a reset link.
+          Enter the email on this account. I’ll send a reset link.
         </p>
       </section>
 

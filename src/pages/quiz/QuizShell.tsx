@@ -121,7 +121,7 @@ export default function QuizShell() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname])
 
-  // Screen Viewed on step change — reset scroll so new screens open at the top
+  // Screen Viewed on step change. Reset scroll so new screens open at the top
   useEffect(() => {
     const shell = document.querySelector('.quiz-shell')
     if (shell instanceof HTMLElement) shell.scrollTop = 0
@@ -464,7 +464,7 @@ export default function QuizShell() {
     }
   }
 
-  /* Full-bleed SOUL screens — outside quiz-inner (transform / max-width trap). */
+  /* Full-bleed SOUL screens. Outside quiz-inner (transform / max-width trap). */
   if (isSoulBleed) {
     return (
       <div className="quiz-shell quiz-shell--onboarding" data-theme={theme}>

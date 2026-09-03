@@ -57,7 +57,7 @@ export function SoulPeopleReportScreen() {
   const talkSection = (title: string, body: string) => {
     navigate('/agent', {
       state: {
-        starter: `Talk through this with me — You and ${partnerName}, “${title}”:\n\n${body}`,
+        starter: `Talk through this with me. You and ${partnerName}, “${title}”:\n\n${body}`,
         quotedNote: title,
         newChat: true,
       },
@@ -67,7 +67,7 @@ export function SoulPeopleReportScreen() {
   const askAboutPair = () => {
     navigate('/agent', {
       state: {
-        starter: `Ask about you two — me and ${partnerName}.`,
+        starter: `Ask about you two. Me and ${partnerName}.`,
         quotedNote: `You and ${partnerName}`,
         newChat: true,
       },
