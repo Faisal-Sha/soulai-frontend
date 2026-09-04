@@ -1,3 +1,4 @@
+import { useCopy } from '@/i18n'
 import { SoulSpinner } from './SoulSpinner'
 import './soul-ui.css'
 
@@ -11,20 +12,22 @@ type SoulPendingProps = {
 export function SoulPending({
   rows = 6,
   variant = 'rows',
-  label = 'Loading',
+  label,
 }: SoulPendingProps) {
+  const t = useCopy()
+  const resolvedLabel = label ?? t('common.pending.loading', 'Loading')
   if (variant === 'center') {
     return (
-      <div className="soul-pending soul-pending--center" role="status" aria-label={label}>
-        <SoulSpinner size={22} label={label} />
-        <p className="soul-pending__label">{label}</p>
+      <div className="soul-pending soul-pending--center" role="status" aria-label={resolvedLabel}>
+        <SoulSpinner size={22} label={resolvedLabel} />
+        <p className="soul-pending__label">{resolvedLabel}</p>
       </div>
     )
   }
 
   const kind = variant === 'cards' ? 'soul-pending__card' : 'soul-pending__block'
   return (
-    <div className="soul-pending" role="status" aria-label={label} aria-busy="true">
+    <div className="soul-pending" role="status" aria-label={resolvedLabel} aria-busy="true">
       {Array.from({ length: rows }, (_, i) => (
         <div key={i} className={kind}>
           <span className="soul-pending__bar soul-pending__bar--title" />

@@ -1,3 +1,5 @@
+import { getLocale, translate } from '@/i18n'
+
 /** Paywall Day 5 email + Stripe `trial_will_end` (3 days before trial_end). */
 export const TRIAL_ENDING_WINDOW_DAYS = 3
 
@@ -50,6 +52,22 @@ export function trialBannerCopy(
     const detail = valid
       ? `You cancelled. Everything stays open until ${dateLabel}.`
       : 'You cancelled. You will not be charged $6.99.'
+    if (getLocale() !== 'en') {
+      const locale = getLocale()
+      if (daysLeft !== null) {
+        if (daysLeft <= 0) title = translate(locale, 'home.trialNotice.accessToday', 'Your access ends today')
+        else if (daysLeft === 1) title = translate(locale, 'home.trialNotice.accessTomorrow', 'Your access ends tomorrow')
+        else title = translate(locale, 'home.trialNotice.accessInDays', `Your access ends in ${daysLeft} days`, { days: daysLeft })
+      } else {
+        title = translate(locale, 'home.trialNotice.accessSoon', 'Your access ends soon')
+      }
+      return {
+        title,
+        detail: valid
+          ? translate(locale, 'home.trialNotice.cancelledUntil', `You cancelled. Everything stays open until ${dateLabel}.`, { date: dateLabel })
+          : translate(locale, 'home.trialNotice.cancelledNoCharge', 'You cancelled. You will not be charged $6.99.'),
+      }
+    }
     return { title, detail }
   }
 
@@ -61,5 +79,19 @@ export function trialBannerCopy(
   }
 
   const detail = `$6.99/month starts ${dateLabel}. Cancel anytime.`
+  if (getLocale() !== 'en') {
+    const locale = getLocale()
+    if (daysLeft !== null) {
+      if (daysLeft <= 0) title = translate(locale, 'home.trialNotice.endsToday', 'Your trial ends today')
+      else if (daysLeft === 1) title = translate(locale, 'home.trialNotice.endsTomorrow', 'Your trial ends tomorrow')
+      else title = translate(locale, 'home.trialNotice.endsInDays', `Your trial ends in ${daysLeft} days`, { days: daysLeft })
+    } else {
+      title = translate(locale, 'home.trialNotice.endsSoon', 'Your trial ends soon')
+    }
+    return {
+      title,
+      detail: translate(locale, 'home.trialNotice.detail', `$6.99/month starts ${dateLabel}. Cancel anytime.`, { date: dateLabel }),
+    }
+  }
   return { title, detail }
 }

@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { SoulButton, SoulOutlineButton } from '@/components/soul'
+import { useCopy } from '@/i18n'
 import '@/pages/home/soul-home.css'
 
 export type CancelPlanSheetView = 'cancel' | 'keep' | 'done'
@@ -30,6 +31,7 @@ export function CancelPlanSheet({
   onConfirmCancel,
   onConfirmKeep,
 }: CancelPlanSheetProps) {
+  const t = useCopy()
   useEffect(() => {
     if (!open) return
     const onKey = (e: KeyboardEvent) => {
@@ -44,23 +46,29 @@ export function CancelPlanSheet({
   const titleId = 'soul-cancel-plan-title'
   const title =
     view === 'done'
-      ? 'Plan cancelled'
+      ? t('account.cancel.titleDone', 'Plan cancelled')
       : view === 'keep'
-        ? 'Keep your plan?'
-        : 'Cancel your plan?'
+        ? t('account.cancel.titleKeep', 'Keep your plan?')
+        : t('account.cancel.titleCancel', 'Cancel your plan?')
   const sub =
-    view === 'done'
-      ? `You keep access until ${accessUntil}. You will not be charged $6.99.`
-      : view === 'keep'
-        ? `$6.99/month starts ${accessUntil}. Cancel anytime before then.`
-        : `You keep access until ${accessUntil}. You will not be charged $6.99.`
+    view === 'done' || view === 'cancel'
+      ? t(
+          'account.cancel.subAccess',
+          `You keep access until ${accessUntil}. You will not be charged $6.99.`,
+          { date: accessUntil },
+        )
+      : t(
+          'account.cancel.subKeep',
+          `$6.99/month starts ${accessUntil}. Cancel anytime before then.`,
+          { date: accessUntil },
+        )
 
   return createPortal(
     <div className="soul-home__sheet-root" role="presentation">
       <button
         type="button"
         className="soul-home__sheet-dim"
-        aria-label="Close"
+        aria-label={t('account.cancel.closeAria', 'Close')}
         disabled={busy}
         onClick={onClose}
       />
@@ -88,29 +96,29 @@ export function CancelPlanSheet({
         </div>
         <p className="soul-home__sheet-note">
           {view === 'keep'
-            ? 'One tap. Your trial stays on.'
+            ? t('account.cancel.noteKeep', 'One tap. Your trial stays on.')
             : view === 'done'
-              ? 'You can keep the plan again before that date.'
-              : 'One tap. Access stays until then.'}
+              ? t('account.cancel.noteDone', 'You can keep the plan again before that date.')
+              : t('account.cancel.noteCancel', 'One tap. Access stays until then.')}
         </p>
         <div className="soul-home__sheet-actions">
           {view === 'done' ? (
             <SoulButton block onClick={onClose}>
-              Done
+              {t('account.cancel.done', 'Done')}
             </SoulButton>
           ) : view === 'keep' ? (
             <>
               <SoulButton block loading={busy} onClick={onConfirmKeep}>
-                Keep plan
+                {t('account.plan.keepPlan', 'Keep plan')}
               </SoulButton>
               <SoulOutlineButton block disabled={busy} onClick={onClose}>
-                Not now
+                {t('account.cancel.notNow', 'Not now')}
               </SoulOutlineButton>
             </>
           ) : (
             <>
               <SoulButton block disabled={busy} onClick={onClose}>
-                Keep plan
+                {t('account.plan.keepPlan', 'Keep plan')}
               </SoulButton>
               <SoulOutlineButton
                 block
@@ -118,7 +126,9 @@ export function CancelPlanSheet({
                 error={error}
                 onClick={onConfirmCancel}
               >
-                {error ? 'Try again' : 'Cancel plan'}
+                {error
+                  ? t('account.cancel.tryAgain', 'Try again')
+                  : t('account.plan.cancelPlan', 'Cancel plan')}
               </SoulOutlineButton>
             </>
           )}

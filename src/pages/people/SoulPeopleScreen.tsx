@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { SoulBrand, SoulNav, SoulPending, SoulRippleBg } from '@/components/soul'
+import { useCopy, useI18n } from '@/i18n'
 import { useUser } from '@/hooks/useUser'
-import { DEMO_PEOPLE, initialFromName, peopleListSubtitle, type PeopleEntry } from './peopleData'
+import { getDemoPeople, initialFromName, peopleListSubtitle, type PeopleEntry } from './peopleData'
 import { listPeople } from './peopleApi'
 import './soul-people.css'
 import iconChevronRight from './assets/icon-chevron-right.svg'
@@ -78,6 +79,8 @@ function AddSomeoneIcon() {
  */
 export function SoulPeopleScreen({ people, subscriptionEnded: endedProp }: SoulPeopleScreenProps) {
   const navigate = useNavigate()
+  const t = useCopy()
+  const { locale } = useI18n()
   const [params] = useSearchParams()
   const { user, profile, subscription, isPremium, loading } = useUser()
   const [livePeople, setLivePeople] = useState<PeopleEntry[] | null>(null)
@@ -108,7 +111,7 @@ export function SoulPeopleScreen({ people, subscriptionEnded: endedProp }: SoulP
     return () => {
       cancelled = true
     }
-  }, [people, profile?.id, params, loading])
+  }, [people, profile?.id, params, loading, locale])
 
   const waitingLive =
     Boolean(user) &&
@@ -120,10 +123,10 @@ export function SoulPeopleScreen({ people, subscriptionEnded: endedProp }: SoulP
   const entries = useMemo(() => {
     if (people) return people
     if (params.get('people') === 'empty') return []
-    if (params.get('people') === 'demo') return DEMO_PEOPLE
+    if (params.get('people') === 'demo') return getDemoPeople()
     if (user || loading) return livePeople ?? []
-    return DEMO_PEOPLE
-  }, [people, params, user, loading, livePeople])
+    return getDemoPeople()
+  }, [people, params, user, loading, livePeople, locale])
 
   const isEmpty = !waitingLive && entries.length === 0
 
@@ -154,11 +157,11 @@ export function SoulPeopleScreen({ people, subscriptionEnded: endedProp }: SoulP
             type="button"
             className="soul-people__brand"
             onClick={() => navigate('/')}
-            aria-label="SOUL+AI home"
+            aria-label={t('people.homeAria', 'SOUL+AI home')}
           >
             <SoulBrand />
           </button>
-          <div className="soul-people__header-nav" aria-label="Desktop navigation">
+          <div className="soul-people__header-nav" aria-label={t('people.desktopNavAria', 'Desktop navigation')}>
             <SoulNav variant="desktop" />
           </div>
         </header>
@@ -166,11 +169,11 @@ export function SoulPeopleScreen({ people, subscriptionEnded: endedProp }: SoulP
         {subscriptionEnded ? (
           <div className="soul-people__notice" role="status">
             <div className="soul-people__notice-copy">
-              <p className="soul-people__notice-title">{ENDED_BANNER.title}</p>
-              <p className="soul-people__notice-detail">{ENDED_BANNER.detail}</p>
+              <p className="soul-people__notice-title">{t('people.ended.title', ENDED_BANNER.title)}</p>
+              <p className="soul-people__notice-detail">{t('people.ended.detail', ENDED_BANNER.detail)}</p>
             </div>
             <Link className="soul-people__notice-manage" to="/account/plan">
-              Manage
+              {t('home.trialNotice.manage', 'Manage')}
             </Link>
           </div>
         ) : null}
@@ -180,16 +183,18 @@ export function SoulPeopleScreen({ people, subscriptionEnded: endedProp }: SoulP
           aria-labelledby="soul-people-title"
         >
           <h1 id="soul-people-title" className="soul-people__title">
-            People
+            {t('people.title', 'People')}
           </h1>
           {waitingLive ? (
-            <p className="soul-people__subtitle">Loading…</p>
+            <p className="soul-people__subtitle">{t('people.loading', 'Loading…')}</p>
           ) : isEmpty ? (
             <div className="soul-people__empty-copy">
-              <p className="soul-people__lead">No one here yet.</p>
+              <p className="soul-people__lead">{t('people.emptyLead', 'No one here yet.')}</p>
               <p className="soul-people__subtitle">
-                It works best with someone you already know well. A partner, a parent, a close
-                friend.
+                {t(
+                  'people.emptySub',
+                  'It works best with someone you already know well. A partner, a parent, a close friend.',
+                )}
               </p>
             </div>
           ) : (
@@ -199,19 +204,19 @@ export function SoulPeopleScreen({ people, subscriptionEnded: endedProp }: SoulP
 
         <section
           className={`soul-people__body${isEmpty ? '' : ' soul-people__body--list'}${subscriptionEnded && !isEmpty ? ' soul-people__body--ended' : ''}`}
-          aria-label={isEmpty ? 'Add someone' : 'People list'}
+          aria-label={isEmpty ? t('people.addAria', 'Add someone') : t('people.listAria', 'People list')}
         >
           {!subscriptionEnded ? (
             <button type="button" className="soul-people__add" onClick={onAdd}>
               <span className="soul-people__add-inner">
                 <AddSomeoneIcon />
-                <span className="soul-people__add-label">Add someone</span>
+                <span className="soul-people__add-label">{t('people.addSomeone', 'Add someone')}</span>
               </span>
             </button>
           ) : null}
 
           {waitingLive ? (
-            <SoulPending rows={3} label="Loading people" />
+            <SoulPending rows={3} label={t('people.loadingPeople', 'Loading people')} />
           ) : !isEmpty ? (
             <>
               {!subscriptionEnded ? (

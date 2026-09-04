@@ -1,5 +1,6 @@
 import { isValidBirthdate } from '../lib/dateValidation'
 import type { BirthdateValue } from '../lib/dateValidation'
+import { useCopy } from '@/i18n'
 
 interface DateInputProps {
   value: BirthdateValue | undefined
@@ -13,6 +14,7 @@ const FIELDS = [
 ]
 
 export default function DateInput({ value = { day: '', month: '', year: '' }, onChange }: DateInputProps) {
+  const t = useCopy()
   const fieldsFilled = Boolean(value.day && value.month && value.year.length === 4)
   const isInvalid = fieldsFilled && !isValidBirthdate(value)
 
@@ -47,7 +49,7 @@ export default function DateInput({ value = { day: '', month: '', year: '' }, on
             }}
           >
             <div style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-muted)', marginBottom: 4 }}>
-              {f.label}
+              {t(`quiz.dateInput.${f.k}`, f.label)}
             </div>
             <input
               id={`date-${f.k}`}
@@ -56,7 +58,7 @@ export default function DateInput({ value = { day: '', month: '', year: '' }, on
               maxLength={f.maxLength}
               placeholder={f.placeholder}
               value={value[f.k] || ''}
-              aria-label={f.label}
+              aria-label={t(`quiz.dateInput.${f.k}`, f.label)}
               aria-invalid={isInvalid}
               aria-describedby={isInvalid ? 'quiz-birthdate-error' : undefined}
               onChange={e => {
@@ -91,7 +93,7 @@ export default function DateInput({ value = { day: '', month: '', year: '' }, on
             textAlign: 'center',
           }}
         >
-          Please enter a valid date of birth.
+          {t('quiz.dateInput.invalid', 'Please enter a valid date of birth.')}
         </p>
       )}
       {!isInvalid && <div style={{ marginBottom: 12 }} />}

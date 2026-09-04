@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { SoulBrand, SoulButton, SoulProgress } from '@/components/soul'
+import { SoulLangSwitch, useCopy } from '@/i18n'
 import { useCitySearch } from '../hooks/useCitySearch'
 import { getCityDisplayMeta, type CitySearchResult } from '../services/citySearch'
 import type { BirthPlaceData } from '../types'
@@ -35,6 +36,7 @@ export default function QuizBirthPlaceScreen({
   onContinue,
   canProceed,
 }: QuizBirthPlaceScreenProps) {
+  const t = useCopy()
   const [open, setOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
@@ -48,8 +50,8 @@ export default function QuizBirthPlaceScreen({
   const showList = open && (loading || error || results.length > 0 || showCustom)
 
   useEffect(() => {
-    const t = window.setTimeout(() => inputRef.current?.focus(), 120)
-    return () => window.clearTimeout(t)
+    const focusTimer = window.setTimeout(() => inputRef.current?.focus(), 120)
+    return () => window.clearTimeout(focusTimer)
   }, [])
 
   useEffect(() => {
@@ -78,6 +80,7 @@ export default function QuizBirthPlaceScreen({
         <div className="soul-bp__content">
           <header className="soul-bp__header">
             <SoulBrand />
+            <SoulLangSwitch />
           </header>
 
           <div className="soul-bp__progress-wrap">
@@ -85,17 +88,19 @@ export default function QuizBirthPlaceScreen({
           </div>
 
           <section className="soul-bp__hero">
-            <h1 className="soul-bp__title">Where were you born?</h1>
+            <h1 className="soul-bp__title">{t('quiz.birthPlace.title', 'Where were you born?')}</h1>
             <p className="soul-bp__subtitle">
-              The place you come from shapes how you think. It helps me read your patterns
-              more accurately.
+              {t(
+                'quiz.birthPlace.sub',
+                'The place you come from shapes how you think. It helps me read your patterns more accurately.',
+              )}
             </p>
           </section>
 
           <div className="soul-bp__form">
             <div className="soul-bp__field" ref={wrapRef}>
               <label className="soul-bp__label" htmlFor="soul-bp-input">
-                Place of birth
+                {t('quiz.birthPlace.label', 'Place of birth')}
               </label>
               <div className={`soul-bp__input-wrap${open ? ' soul-bp__input-wrap--open' : ''}`}>
                 <input
@@ -108,7 +113,7 @@ export default function QuizBirthPlaceScreen({
                   aria-controls="soul-bp-list"
                   aria-autocomplete="list"
                   autoComplete="off"
-                  placeholder="City, Country"
+                  placeholder={t('quiz.birthPlace.placeholder', 'City, Country')}
                   value={value}
                   onChange={(e) => {
                     onPlaceChange(e.target.value, null)
@@ -127,7 +132,7 @@ export default function QuizBirthPlaceScreen({
                 <button
                   type="button"
                   className="soul-bp__chevron-btn"
-                  aria-label={open ? 'Close options' : 'Open options'}
+                  aria-label={open ? t('quiz.birthPlace.closeOptions', 'Close options') : t('quiz.birthPlace.openOptions', 'Open options')}
                   tabIndex={-1}
                   onClick={() => {
                     setOpen((v) => !v)
@@ -138,19 +143,19 @@ export default function QuizBirthPlaceScreen({
                 </button>
               </div>
               <p className="soul-bp__helper">
-                Pick a city or type your own. Any place works.
+                {t('quiz.birthPlace.helper', 'Pick a city or type your own. Any place works.')}
               </p>
 
               {showList && (
                 <ul id="soul-bp-list" className="soul-bp__list" role="listbox">
                   {loading && query.length >= 2 && (
                     <li className="soul-bp__list-status" aria-live="polite">
-                      Searching…
+                      {t('quiz.birthPlace.searching', 'Searching…')}
                     </li>
                   )}
                   {error && !loading && (
                     <li className="soul-bp__list-status soul-bp__list-status--error">
-                      Could not load cities. Type your place manually.
+                      {t('quiz.birthPlace.cityError', 'Could not load cities. Type your place manually.')}
                     </li>
                   )}
                   {showCustom && (
@@ -161,7 +166,7 @@ export default function QuizBirthPlaceScreen({
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => pick(query, null)}
                       >
-                        Use &ldquo;{query}&rdquo;
+                        {t('quiz.birthPlace.useQuery', `Use “${query}”`, { query })}
                       </button>
                     </li>
                   )}
@@ -193,12 +198,12 @@ export default function QuizBirthPlaceScreen({
                 block
                 onClick={onContinue}
                 disabled={!canProceed}
-                aria-label="Continue"
+                aria-label={t('quiz.birthPlace.continue', 'Continue')}
               >
-                Continue
+                {t('quiz.birthPlace.continue', 'Continue')}
               </SoulButton>
               <p className="soul-bp__privacy">
-                Your details stay private and are never shared.
+                {t('quiz.birthPlace.privacy', 'Your details stay private and are never shared.')}
               </p>
             </div>
           </div>

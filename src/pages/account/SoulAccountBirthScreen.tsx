@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { SoulBrand, SoulButton, SoulField, SoulNav, SoulRippleBg } from '@/components/soul'
+import { useCopy } from '@/i18n'
 import iconCalendar from '@/components/soul/assets/icon-calendar.svg'
 import iconClock from '@/components/soul/assets/icon-clock.svg'
 import { useUser } from '@/hooks/useUser'
@@ -73,6 +74,7 @@ function isValidTimeDigits(digits: string): boolean {
  */
 export function SoulAccountBirthScreen() {
   const navigate = useNavigate()
+  const t = useCopy()
   const { user, profile, loading, updateIdentity } = useUser()
   const [name, setName] = useState('')
   const [dobDigits, setDobDigits] = useState('')
@@ -122,10 +124,10 @@ export function SoulAccountBirthScreen() {
         birth_time: isValidTimeDigits(timeDigits) ? formatTimeDisplay(timeDigits) : null,
         birth_place: place.trim() || null,
       })
-      toast.success('Birth details saved')
+      toast.success(t('account.birth.saved', 'Birth details saved'))
       navigate('/account', { replace: true })
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Could not save'
+      const message = err instanceof Error ? err.message : t('errors.account.save', 'Could not save')
       toast.error(message)
     } finally {
       setSaving(false)
@@ -145,23 +147,26 @@ export function SoulAccountBirthScreen() {
               type="button"
               className="soul-account__back"
               onClick={() => navigate('/account')}
-              aria-label="Back to account"
+              aria-label={t('account.backAria', 'Back to account')}
             >
               <img src={iconBack} alt="" width={22} height={22} />
             </button>
             <SoulBrand />
           </div>
-          <div className="soul-account__header-nav" aria-label="Desktop navigation">
+          <div className="soul-account__header-nav" aria-label={t('account.desktopNavAria', 'Desktop navigation')}>
             <SoulNav variant="desktop" />
           </div>
         </header>
 
         <section className="soul-account__intro" aria-labelledby="soul-account-birth-title">
           <h1 id="soul-account-birth-title" className="soul-account__title">
-            Birth details
+            {t('account.birth.title', 'Birth details')}
           </h1>
           <p className="soul-account__subtitle">
-            Changing these rewrites your reading. Use the same facts you were born with.
+            {t(
+              'account.birth.subtitle',
+              'Changing these rewrites your reading. Use the same facts you were born with.',
+            )}
           </p>
         </section>
 
@@ -174,20 +179,20 @@ export function SoulAccountBirthScreen() {
         >
           <SoulField
             htmlFor="birth-name"
-            label="Your name"
+            label={t('account.birth.name', 'Your name')}
             inputProps={{
               id: 'birth-name',
               value: name,
               onChange: (e) => setName(e.target.value),
               autoComplete: 'name',
-              placeholder: 'How I should address you',
+              placeholder: t('account.birth.namePlaceholder', 'How I should address you'),
             }}
           />
           <SoulField
             htmlFor="birth-date"
-            label="Date of birth"
+            label={t('account.birth.dob', 'Date of birth')}
             tone={dobInvalid ? 'error' : 'none'}
-            message={dobInvalid ? 'Please enter a valid date of birth.' : undefined}
+            message={dobInvalid ? t('account.birth.dobInvalid', 'Please enter a valid date of birth.') : undefined}
           >
             <div
               className={[
@@ -204,7 +209,7 @@ export function SoulAccountBirthScreen() {
                 type="text"
                 inputMode="numeric"
                 autoComplete="bday"
-                placeholder="DD / MM / YYYY"
+                placeholder={t('account.birth.dobPlaceholder', 'DD / MM / YYYY')}
                 value={formatDobDisplay(dobDigits)}
                 aria-invalid={dobInvalid || undefined}
                 onChange={(e) => applyDobDigits(e.target.value)}
@@ -212,7 +217,7 @@ export function SoulAccountBirthScreen() {
               <button
                 type="button"
                 className="soul-account__picker-btn"
-                aria-label="Open calendar"
+                aria-label={t('account.birth.calendarAria', 'Open calendar')}
                 onClick={() =>
                   dobNativeRef.current?.showPicker?.() ?? dobNativeRef.current?.click()
                 }
@@ -239,11 +244,11 @@ export function SoulAccountBirthScreen() {
           </SoulField>
           <SoulField
             htmlFor="birth-time"
-            label="Time of birth"
+            label={t('account.birth.time', 'Time of birth')}
             message={
               timeInvalid
-                ? 'Enter a valid time (HH:MM), or leave blank.'
-                : 'Leave blank if you do not know it.'
+                ? t('account.birth.timeInvalid', 'Enter a valid time (HH:MM), or leave blank.')
+                : t('account.birth.timeBlank', 'Leave blank if you do not know it.')
             }
             tone={timeInvalid ? 'error' : 'helper'}
           >
@@ -261,7 +266,7 @@ export function SoulAccountBirthScreen() {
                 className="soul-input__control"
                 type="text"
                 inputMode="numeric"
-                placeholder="HH:MM"
+                placeholder={t('account.birth.timePlaceholder', 'HH:MM')}
                 value={formatTimeDisplay(timeDigits)}
                 aria-invalid={timeInvalid || undefined}
                 onChange={(e) => applyTimeDigits(e.target.value)}
@@ -269,7 +274,7 @@ export function SoulAccountBirthScreen() {
               <button
                 type="button"
                 className="soul-account__picker-btn"
-                aria-label="Open time picker"
+                aria-label={t('account.birth.timeAria', 'Open time picker')}
                 onClick={() =>
                   timeNativeRef.current?.showPicker?.() ?? timeNativeRef.current?.click()
                 }
@@ -297,13 +302,13 @@ export function SoulAccountBirthScreen() {
           </SoulField>
           <SoulField
             htmlFor="birth-place"
-            label="Place of birth"
+            label={t('account.birth.place', 'Place of birth')}
             inputProps={{
               id: 'birth-place',
               value: place,
               onChange: (e) => setPlace(e.target.value),
               autoComplete: 'off',
-              placeholder: 'City, country',
+              placeholder: t('account.birth.placePlaceholder', 'City, country'),
             }}
           />
           <SoulButton
@@ -312,7 +317,7 @@ export function SoulAccountBirthScreen() {
             className="soul-account__birth-save"
             disabled={!canSave}
           >
-            {saving ? 'Saving…' : 'Save'}
+            {saving ? t('account.birth.saving', 'Saving…') : t('account.birth.save', 'Save')}
           </SoulButton>
         </form>
       </div>

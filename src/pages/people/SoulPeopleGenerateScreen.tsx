@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { SoulBrand, SoulNav, SoulRippleBg } from '@/components/soul'
+import { useCopy } from '@/i18n'
 import { useUser } from '@/hooks/useUser'
 import { displayName } from '@/pages/account/profileDisplay'
 import { DEMO_PEOPLE, initialFromName } from './peopleData'
@@ -44,6 +45,7 @@ function draftName(personId: string) {
  */
 export function SoulPeopleGenerateScreen() {
   const navigate = useNavigate()
+  const t = useCopy()
   const { personId = 'anna' } = useParams()
   const { profile } = useUser()
   const profileRef = useRef(profile)
@@ -113,13 +115,13 @@ export function SoulPeopleGenerateScreen() {
               type="button"
               className="soul-people__back"
               onClick={() => navigate('/people')}
-              aria-label="Back to People"
+              aria-label={t('people.backAria', 'Back to People')}
             >
               <img src={iconChevron} alt="" width={22} height={22} />
             </button>
             <SoulBrand />
           </div>
-          <div className="soul-people__header-nav" aria-label="Desktop navigation">
+          <div className="soul-people__header-nav" aria-label={t('people.desktopNavAria', 'Desktop navigation')}>
             <SoulNav variant="desktop" />
           </div>
         </header>
@@ -132,10 +134,10 @@ export function SoulPeopleGenerateScreen() {
             id="soul-people-gen-title"
             className="soul-people__title soul-people-gen__enter soul-people-gen__enter--title"
           >
-            Reading you and {name}
+            {t('people.generate.title', `Reading you and ${name}`, { name })}
           </h1>
           <p className="soul-people__subtitle soul-people__subtitle--generate soul-people-gen__enter soul-people-gen__enter--subtitle">
-            Five parts. I take them in order.
+            {t('people.generate.sub', 'Five parts. I take them in order.')}
           </p>
         </section>
 
@@ -165,13 +167,13 @@ export function SoulPeopleGenerateScreen() {
           {STEPS.map((label, i) => (
             <li key={label} className={`soul-people__check soul-people__check--${i + 1}`}>
               <span aria-hidden="true">✓</span>
-              <span>{label}</span>
+              <span>{t(`people.generate.steps.${i + 1}`, label)}</span>
             </li>
           ))}
         </ul>
 
         <p className="soul-people__gen-note soul-people-gen__enter soul-people-gen__enter--note">
-          This one takes a minute. You can leave. It will be here when you come back.
+          {t('people.generate.note', 'This one takes a minute. You can leave. It will be here when you come back.')}
         </p>
       </div>
 

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useCopy } from '@/i18n'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -8,6 +9,7 @@ interface EmailInputProps {
 }
 
 export default function EmailInput({ value = '', onChange }: EmailInputProps) {
+  const t = useCopy()
   const [touched, setTouched] = useState(false)
   const isInvalid = touched && value.length > 0 && !EMAIL_RE.test(value)
 
@@ -40,7 +42,7 @@ export default function EmailInput({ value = '', onChange }: EmailInputProps) {
             lineHeight: 1.2,
           }}
         >
-          ✦ Your portrait is ready
+          {t('quiz.emailInput.ready', '✦ Your portrait is ready')}
         </div>
         <div
           style={{
@@ -52,7 +54,7 @@ export default function EmailInput({ value = '', onChange }: EmailInputProps) {
             lineHeight: 1.2,
           }}
         >
-          Where should we send it?
+          {t('quiz.emailInput.where', 'Where should we send it?')}
         </div>
 
         {/* Input */}
@@ -60,9 +62,9 @@ export default function EmailInput({ value = '', onChange }: EmailInputProps) {
           id="quiz-email"
           type="email"
           autoComplete="email"
-          placeholder="you@example.com"
+          placeholder={t('quiz.emailInput.placeholder', 'you@example.com')}
           value={value}
-          aria-label="Email address"
+          aria-label={t('quiz.emailInput.aria', 'Email address')}
           aria-describedby={isInvalid ? 'quiz-email-error' : undefined}
           aria-invalid={isInvalid}
           onChange={e => onChange(e.target.value)}
@@ -93,7 +95,7 @@ export default function EmailInput({ value = '', onChange }: EmailInputProps) {
             role="alert"
             style={{ fontSize: 12, color: 'var(--danger)', margin: 0, textAlign: 'left' }}
           >
-            Please enter a valid email address.
+            {t('quiz.emailInput.invalid', 'Please enter a valid email address.')}
           </p>
         )}
 
@@ -108,9 +110,9 @@ export default function EmailInput({ value = '', onChange }: EmailInputProps) {
           }}
         >
           {[
-            { icon: '✦', num: '148K', label: 'portraits sent' },
-            { icon: '◉', num: '91%',  label: 'find clarity' },
-            { icon: '★', num: '4.8',  label: 'avg rating' },
+            { icon: '✦', num: '148K', label: t('quiz.emailInput.portraits', 'portraits sent') },
+            { icon: '◉', num: '91%',  label: t('quiz.emailInput.clarity', 'find clarity') },
+            { icon: '★', num: '4.8',  label: t('quiz.emailInput.rating', 'avg rating') },
           ].map(s => (
             <div key={s.num} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
               <div
@@ -141,7 +143,7 @@ export default function EmailInput({ value = '', onChange }: EmailInputProps) {
       {/* Privacy note */}
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12, lineHeight: 1.4, color: 'var(--text-muted)' }}>
         <span style={{ color: 'var(--success)', flexShrink: 0 }}>✓</span>
-        <span>Your answers are private and never shared with third parties.</span>
+        <span>{t('quiz.emailInput.privacy', 'Your answers are private and never shared with third parties.')}</span>
       </div>
     </div>
   )

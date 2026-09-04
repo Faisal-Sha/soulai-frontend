@@ -1,4 +1,5 @@
 import type { QuizScreenOption } from '../types'
+import { useCopy } from '@/i18n'
 
 interface MultiSelectProps {
   options: QuizScreenOption[]
@@ -8,6 +9,7 @@ interface MultiSelectProps {
 }
 
 export default function MultiSelect({ options, value = [], onChange, max }: MultiSelectProps) {
+  const t = useCopy()
   const toggle = (v: string) => {
     const set = new Set(value)
     if (set.has(v)) {
@@ -23,7 +25,10 @@ export default function MultiSelect({ options, value = [], onChange, max }: Mult
     <div>
       {max && (
         <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-muted)', marginBottom: 12 }}>
-          {value.length} of {max} selected
+          {t('quiz.question.selectedOf', `${value.length} of ${max} selected`, {
+            count: value.length,
+            max: max ?? 0,
+          })}
         </div>
       )}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

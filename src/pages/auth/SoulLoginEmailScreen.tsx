@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { SoulButton, SoulField } from '@/components/soul'
 import iconArrowLink from '@/components/soul/assets/icon-arrow-link.svg'
 import { AuthLayout } from './AuthLayout'
+import { useCopy } from '@/i18n'
 import { isValidEmail } from './authValidation'
 import bgSignInEmail from './assets/bg-signin-email.png'
 import {
@@ -19,6 +20,7 @@ import { useLeaveIfSignedIn } from './useLeaveIfSignedIn'
  */
 export function SoulLoginEmailScreen() {
   const navigate = useNavigate()
+  const t = useCopy()
   const location = useLocation()
   const stored = readStoredAuth()
   const preset = (location.state as { email?: string } | null)?.email ?? stored.email
@@ -51,18 +53,18 @@ export function SoulLoginEmailScreen() {
   return (
     <AuthLayout bg={bgSignInEmail} name="Sign in · Email">
       <section className="soul-auth__hero">
-        <h1 className="soul-auth__title">Welcome back</h1>
+        <h1 className="soul-auth__title">{t('auth.login.title', 'Welcome back')}</h1>
         <p className="soul-auth__subtitle">
-          Use the email you gave me when I wrote your reading.
+          {t('auth.login.subtitle', 'Use the email you gave me when I wrote your reading.')}
         </p>
       </section>
 
       <form className="soul-auth__stack soul-auth__stack--form" onSubmit={onSubmit} noValidate>
         <SoulField
           htmlFor="soul-auth-email"
-          label="Your email"
+          label={t('auth.email.label', 'Your email')}
           tone={submitted && !emailOk ? 'error' : 'none'}
-          message={submitted && !emailOk ? 'Enter a valid email.' : undefined}
+          message={submitted && !emailOk ? t('auth.email.invalid', 'Enter a valid email.') : undefined}
           inputProps={{
             id: 'soul-auth-email',
             size: 'lg',
@@ -70,19 +72,19 @@ export function SoulLoginEmailScreen() {
             name: 'email',
             autoComplete: 'email',
             inputMode: 'email',
-            placeholder: 'name@email.com',
+            placeholder: t('auth.email.placeholder', 'name@email.com'),
             value: email,
             onChange: (e) => setEmail(e.target.value),
           }}
         />
 
         <SoulButton type="submit" block disabled={!email.trim()} loading={loading}>
-          Send me a link
+          {t('auth.email.sendLink', 'Send me a link')}
         </SoulButton>
 
         <Link to="/quiz/welcome" className="soul-auth__quiz">
           <span>
-            New here? <u>Take the quiz</u>
+            {t('auth.login.newHere', 'New here?')} <u>{t('auth.login.takeQuiz', 'Take the quiz')}</u>
           </span>
           <img src={iconArrowLink} alt="" width={15} height={15} />
         </Link>

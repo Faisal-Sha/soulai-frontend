@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { SoulBrand, SoulFooter, SoulNav, SoulPending, SoulRippleBg } from '@/components/soul'
+import { useCopy, useI18n } from '@/i18n'
 import { useUser } from '@/hooks/useUser'
 import {
-  READING_CHAPTERS,
+  getReadingChapters,
+  localizeReadingChapter,
   type ReadingChapter,
   type ReadingChapterId,
 } from './chapters'
@@ -11,6 +13,7 @@ import {
   ensureReading,
   summarizeProgress,
   toListChapter,
+  type ChapterProgressRow,
   type ReadingProgress,
 } from './readingsApi'
 import './soul-readings.css'
@@ -44,9 +47,12 @@ export function SoulReadingsScreen({
   isPremium: isPremiumProp,
 }: SoulReadingsScreenProps) {
   const { user, profile, isPremium: premiumFromSession, subscription, loading } = useUser()
+  const t = useCopy()
+  const { locale } = useI18n()
   const isPremium = isPremiumProp ?? premiumFromSession
   const live = Boolean(user)
   const [searchParams] = useSearchParams()
+  const [rows, setRows] = useState<ChapterProgressRow[] | null>(null)
   const [list, setList] = useState<ReadingChapter[]>([])
   const [progress, setProgress] = useState<ReadingProgress | null>(null)
   const [ready, setReady] = useState(false)
@@ -61,7 +67,8 @@ export function SoulReadingsScreen({
   useEffect(() => {
     if (loading) return
     if (!profile?.id) {
-      setList(READING_CHAPTERS)
+      setRows(null)
+      setList(getReadingChapters())
       setProgress(null)
       setReady(true)
       return
@@ -69,13 +76,16 @@ export function SoulReadingsScreen({
     setReady(false)
     let cancelled = false
     void ensureReading(profile.id)
-      .then((rows) => {
+      .then((loaded) => {
         if (cancelled) return
-        setList(rows.map(toListChapter))
-        setProgress(summarizeProgress(rows))
+        setRows(loaded)
+        setProgress(summarizeProgress(loaded))
       })
       .catch(() => {
-        if (!cancelled) setList([])
+        if (!cancelled) {
+          setRows([])
+          setList([])
+        }
       })
       .finally(() => {
         if (!cancelled) setReady(true)
@@ -84,6 +94,14 @@ export function SoulReadingsScreen({
       cancelled = true
     }
   }, [profile?.id, loading])
+
+  useEffect(() => {
+    if (!profile?.id) {
+      setList(getReadingChapters())
+      return
+    }
+    if (rows) setList(rows.map(toListChapter))
+  }, [locale, profile?.id, rows])
 
   const waiting = loading || (live && !ready)
   const chaptersRead = chaptersReadProp ?? (waiting ? 0 : live ? progress?.chaptersRead ?? 0 : 3)
@@ -101,7 +119,7 @@ export function SoulReadingsScreen({
     navigate(`/readings/${chapter.id}${q}`)
   }
 
-  const displayList = live ? list : READING_CHAPTERS
+  const displayList = (live ? list : getReadingChapters()).map(localizeReadingChapter)
 
   return (
     <div className="soul-readings">
@@ -115,35 +133,43 @@ export function SoulReadingsScreen({
             type="button"
             className="soul-readings__brand"
             onClick={() => navigate('/')}
-            aria-label="SOUL+AI home"
+            aria-label={t('readings.homeAria', 'SOUL+AI home')}
           >
             <SoulBrand />
           </button>
-          <div className="soul-readings__header-nav" aria-label="Desktop navigation">
+          <div className="soul-readings__header-nav" aria-label={t('readings.desktopNavAria', 'Desktop navigation')}>
             <SoulNav variant="desktop" />
           </div>
         </header>
 
         <section className="soul-readings__intro" aria-labelledby="soul-readings-title">
           <h1 id="soul-readings-title" className="soul-readings__title">
-            Your readings
+            {t('readings.title', 'Your readings')}
           </h1>
           <p className="soul-readings__subtitle">
-            Nine chapters, written from your birth data and everything you&apos;ve told me
-            since.
+            {t(
+              'readings.subtitle',
+              "Nine chapters, written from your birth data and everything you've told me since.",
+            )}
           </p>
 
-          <div className="soul-readings__progress" aria-label="Reading progress">
+          <div className="soul-readings__progress" aria-label={t('readings.progressAria', 'Reading progress')}>
             {waiting ? (
-              <SoulPending rows={1} label="Checking your chapters" />
+              <SoulPending rows={1} label={t('readings.checkingChapters', 'Checking your chapters')} />
             ) : (
               <>
                 <div className="soul-readings__progress-meta">
                   <span>
-                    {chaptersRead} of {chaptersTotal} chapters read
+                    {t('readings.chaptersRead', `${chaptersRead} of ${chaptersTotal} chapters read`, {
+                      read: chaptersRead,
+                      total: chaptersTotal,
+                    })}
                   </span>
                   <span>
-                    {wordsRead.toLocaleString()} / {wordsTotal.toLocaleString()} words
+                    {t('readings.wordsProgress', `${wordsRead.toLocaleString()} / ${wordsTotal.toLocaleString()} words`, {
+                      read: wordsRead.toLocaleString(),
+                      total: wordsTotal.toLocaleString(),
+                    })}
                   </span>
                 </div>
                 <div className="soul-readings__progress-track" aria-hidden="true">
@@ -154,9 +180,9 @@ export function SoulReadingsScreen({
           </div>
         </section>
 
-        <section className="soul-readings__chapters" aria-label="Chapters">
+        <section className="soul-readings__chapters" aria-label={t('readings.chaptersAria', 'Chapters')}>
           {waiting ? (
-            <SoulPending rows={9} label="Loading chapters" />
+            <SoulPending rows={9} label={t('readings.loadingChapters', 'Loading chapters')} />
           ) : (
             displayList.map((chapter) => (
               <ChapterRow

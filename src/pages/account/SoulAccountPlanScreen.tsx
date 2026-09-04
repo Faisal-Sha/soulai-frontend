@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { SoulBrand, SoulNav, SoulRippleBg } from '@/components/soul'
+import { useCopy } from '@/i18n'
 import { useUser } from '@/hooks/useUser'
 import { supabase } from '@/integrations/supabase/client'
 import { ResumeSheet } from '@/pages/home/ResumeSheet'
@@ -41,6 +42,7 @@ const ENDED_STATUSES = new Set([
  */
 export function SoulAccountPlanScreen() {
   const navigate = useNavigate()
+  const t = useCopy()
   const [searchParams] = useSearchParams()
   const { user, isPremium, subscription, refetch } = useUser()
   const [signingOut, setSigningOut] = useState(false)
@@ -84,24 +86,45 @@ export function SoulAccountPlanScreen() {
   )
 
   const priceTitle = subscriptionEnded
-    ? 'Ended'
+    ? t('account.plan.ended', 'Ended')
     : trialing
-      ? '7-day trial'
-      : DEMO_PLAN.priceTitle
+      ? t('account.plan.trial7', '7-day trial')
+      : t('account.plan.monthly', DEMO_PLAN.priceTitle)
 
   const planBody = subscriptionEnded
-    ? `Ended on ${renewLabel}. Resume anytime.`
+    ? t('account.plan.endedResume', `Ended on ${renewLabel}. Resume anytime.`, { date: renewLabel })
     : trialing && cancelledAtPeriodEnd
-      ? `Access until ${renewLabel}. You will not be charged $6.99.`
+      ? t(
+          'account.plan.accessUntilNoCharge',
+          `Access until ${renewLabel}. You will not be charged $6.99.`,
+          { date: renewLabel },
+        )
       : trialing
-        ? `$6.99/month starts ${renewLabel} unless you cancel.`
-        : `Renews on ${renewLabel}. Cancel anytime - it stays active until then.`
+        ? t(
+            'account.plan.startsUnlessCancel',
+            `$6.99/month starts ${renewLabel} unless you cancel.`,
+            { date: renewLabel },
+          )
+        : t(
+            'account.plan.renewsCancel',
+            `Renews on ${renewLabel}. Cancel anytime - it stays active until then.`,
+            { date: renewLabel },
+          )
 
   const messagesMeta = live
-    ? 'Included with your plan · usage tracking comes with chat'
-    : `${DEMO_PLAN.messagesLeft} of ${DEMO_PLAN.messagesTotal} left today · ${DEMO_PLAN.topUpPrice} adds another ${DEMO_PLAN.topUpAmount}`
+    ? t('account.plan.messagesLive', 'Included with your plan · usage tracking comes with chat')
+    : t(
+        'account.plan.messagesDemo',
+        `${DEMO_PLAN.messagesLeft} of ${DEMO_PLAN.messagesTotal} left today · ${DEMO_PLAN.topUpPrice} adds another ${DEMO_PLAN.topUpAmount}`,
+        {
+          left: DEMO_PLAN.messagesLeft,
+          total: DEMO_PLAN.messagesTotal,
+          price: DEMO_PLAN.topUpPrice,
+          amount: DEMO_PLAN.topUpAmount,
+        },
+      )
 
-  const paymentMethod = live ? 'Card on file' : DEMO_PLAN.paymentMethod
+  const paymentMethod = live ? t('account.plan.cardOnFile', 'Card on file') : DEMO_PLAN.paymentMethod
 
   const billingHistory = useMemo(() => {
     if (!live) return DEMO_PLAN.history
@@ -111,7 +134,7 @@ export function SoulAccountPlanScreen() {
           month: 'long',
         })
       : renewLabel
-    return [{ id: 'intro', date, detail: 'Seven-day trial', amount: '$0.99' }]
+    return [{ id: 'intro', date, detail: t('account.plan.historyTrial', 'Seven-day trial'), amount: '$0.99' }]
   }, [live, subscription?.created_at, renewLabel])
 
   const onResume = () => openResume('confirm')
@@ -133,7 +156,8 @@ export function SoulAccountPlanScreen() {
       if (action === 'cancel') setSheetView('done')
       else setSheetView(null)
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Could not update plan'
+      const message =
+        err instanceof Error ? err.message : t('errors.account.updatePlan', 'Could not update plan')
       toast.error(message)
       setPlanError(true)
     } finally {
@@ -150,7 +174,7 @@ export function SoulAccountPlanScreen() {
       localStorage.removeItem('supabase.auth.token')
       navigate('/login', { replace: true })
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Could not sign out'
+      const message = err instanceof Error ? err.message : t('errors.account.signOut', 'Could not sign out')
       toast.error(message)
       setSigningOut(false)
     }
@@ -176,13 +200,13 @@ export function SoulAccountPlanScreen() {
               onClick={() =>
                 navigate(subscriptionEnded ? '/account?ended=1' : '/account')
               }
-              aria-label="Back to account"
+              aria-label={t('account.backAria', 'Back to account')}
             >
               <img src={iconBack} alt="" width={22} height={22} />
             </button>
             <SoulBrand />
           </div>
-          <div className="soul-account__header-nav" aria-label="Desktop navigation">
+          <div className="soul-account__header-nav" aria-label={t('account.desktopNavAria', 'Desktop navigation')}>
             <SoulNav variant="desktop" />
           </div>
         </header>
@@ -192,7 +216,7 @@ export function SoulAccountPlanScreen() {
           aria-labelledby="soul-account-plan-title"
         >
           <h1 id="soul-account-plan-title" className="soul-account__title">
-            Your plan
+            {t('account.plan.title', 'Your plan')}
           </h1>
         </section>
 
@@ -204,7 +228,9 @@ export function SoulAccountPlanScreen() {
             </div>
             {subscriptionEnded ? (
               <button type="button" className="soul-account__text-link" onClick={onResume}>
-                Resume · {DEMO_PLAN.resumePrice}/mo
+                {t('account.plan.resume', `Resume · ${DEMO_PLAN.resumePrice}/mo`, {
+                  price: DEMO_PLAN.resumePrice,
+                })}
                 <img src={iconArrow} alt="" width={14} height={14} />
               </button>
             ) : null}
@@ -212,7 +238,7 @@ export function SoulAccountPlanScreen() {
 
           <article className="soul-account__card soul-account__card--frost">
             <div className="soul-account__card-heading">
-              <h2 className="soul-account__card-title">Messages</h2>
+              <h2 className="soul-account__card-title">{t('account.plan.messages', 'Messages')}</h2>
               <p className="soul-account__card-meta">{messagesMeta}</p>
             </div>
             <button
@@ -220,14 +246,14 @@ export function SoulAccountPlanScreen() {
               className="soul-account__text-link"
               onClick={() => navigate('/agent')}
             >
-              Add messages
+              {t('account.plan.addMessages', 'Add messages')}
               <img src={iconArrowLight} alt="" width={14} height={14} />
             </button>
           </article>
 
           <article className="soul-account__card soul-account__card--frost">
             <div className="soul-account__card-heading">
-              <h2 className="soul-account__card-title">Payment method</h2>
+              <h2 className="soul-account__card-title">{t('account.plan.paymentMethod', 'Payment method')}</h2>
               <p className="soul-account__card-meta">{paymentMethod}</p>
             </div>
             <button
@@ -235,7 +261,7 @@ export function SoulAccountPlanScreen() {
               className="soul-account__text-link"
               onClick={() => openResume('methods')}
             >
-              Change
+              {t('account.plan.change', 'Change')}
               <img src={iconArrowLight} alt="" width={14} height={14} />
             </button>
           </article>
@@ -247,7 +273,13 @@ export function SoulAccountPlanScreen() {
                 <div className="soul-account__row soul-account__row--billing">
                   <span className="soul-account__row-text">
                     <span className="soul-account__row-label">{row.date}</span>
-                    <span className="soul-account__row-hint">{row.detail}</span>
+                    <span className="soul-account__row-hint">
+                      {row.id === 'msg-pack'
+                        ? t('account.plan.historyPack', row.detail)
+                        : row.id === 'trial' || row.id === 'intro'
+                          ? t('account.plan.historyTrial', row.detail)
+                          : row.detail}
+                    </span>
                   </span>
                   <span className="soul-account__row-amount">{row.amount}</span>
                 </div>
@@ -264,7 +296,9 @@ export function SoulAccountPlanScreen() {
               onClick={onSignOut}
               disabled={signingOut}
             >
-              {signingOut ? 'Signing out…' : 'Sign out'}
+              {signingOut
+                ? t('account.plan.signingOut', 'Signing out…')
+                : t('account.plan.signOut', 'Sign out')}
             </button>
           ) : cancelledAtPeriodEnd ? (
             <button
@@ -275,7 +309,7 @@ export function SoulAccountPlanScreen() {
                 setSheetView('keep')
               }}
             >
-              Keep plan
+              {t('account.plan.keepPlan', 'Keep plan')}
             </button>
           ) : (
             <button
@@ -286,7 +320,7 @@ export function SoulAccountPlanScreen() {
                 setSheetView('cancel')
               }}
             >
-              Cancel plan
+              {t('account.plan.cancelPlan', 'Cancel plan')}
             </button>
           )}
         </div>

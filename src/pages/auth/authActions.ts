@@ -1,3 +1,4 @@
+import { getLocale, translate } from '@/i18n'
 import { supabase } from '@/integrations/supabase/client'
 
 export type OAuthProvider = 'google' | 'apple'
@@ -71,11 +72,22 @@ export async function resolveSignedInPath(userId: string, requested = APP_HOME) 
 export function authErrorMessage(err: unknown) {
   const raw = err instanceof Error ? err.message : String(err || 'Something went wrong')
   if (/signups not allowed/i.test(raw) || /user not found/i.test(raw)) {
-    return 'I don’t have an account with that email. Take the quiz and subscribe to start.'
+    const en = 'I don’t have an account with that email. Take the quiz and subscribe to start.'
+    return getLocale() !== 'en' ? translate(getLocale(), 'auth.errors.noAccount', en) : en
   }
-  if (/invalid login/i.test(raw)) return 'That didn’t work. Try the link again.'
-  if (/rate limit|too many/i.test(raw)) return 'Too many tries. Wait a minute, then send another link.'
-  return raw.replace(/loginfailed/gi, 'That didn’t work')
+  if (/invalid login/i.test(raw)) {
+    const en = 'That didn’t work. Try the link again.'
+    return getLocale() !== 'en' ? translate(getLocale(), 'auth.errors.invalidLogin', en) : en
+  }
+  if (/rate limit|too many/i.test(raw)) {
+    const en = 'Too many tries. Wait a minute, then send another link.'
+    return getLocale() !== 'en' ? translate(getLocale(), 'auth.errors.rateLimit', en) : en
+  }
+  const fallback = raw.replace(/loginfailed/gi, 'That didn’t work')
+  if (getLocale() !== 'en' && fallback === 'Something went wrong') {
+    return translate(getLocale(), 'auth.errors.generic', 'Something went wrong')
+  }
+  return fallback
 }
 
 export async function signInWithOAuth(provider: OAuthProvider, redirectPath?: string) {

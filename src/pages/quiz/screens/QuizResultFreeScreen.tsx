@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { SoulBrand, SoulButton } from '@/components/soul'
+import { SoulLangSwitch, useCopy, type CopyFn } from '@/i18n'
 import type { QuizAnswers } from '../types'
 import '../quiz-result-free.css'
 import bgResult from '../assets/onboarding/bg-result.png'
@@ -20,6 +21,23 @@ const MONTHS = [
   'November',
   'December',
 ] as const
+
+const MONTH_KEYS = [
+  'january',
+  'february',
+  'march',
+  'april',
+  'may',
+  'june',
+  'july',
+  'august',
+  'september',
+  'october',
+  'november',
+  'december',
+] as const
+
+const LOCKED_ROW_IDS = ['triggers', 'boundaries', 'attachment'] as const
 
 const LOCKED_ROWS = [
   'Emotional triggers',
@@ -103,10 +121,11 @@ export default function QuizResultFreeScreen({
   onUnlock,
   onSave,
 }: QuizResultFreeScreenProps) {
-  const name = answers.name?.trim() || 'friend'
+  const t = useCopy()
+  const name = answers.name?.trim() || t('quiz.result.friend', 'friend')
   const place =
     typeof answers['birth-place'] === 'string' ? answers['birth-place'].trim() : ''
-  const birthLabel = formatBirthdate(answers.birthdate)
+  const birthLabel = formatBirthdate(answers.birthdate, t)
   const meta = [place, birthLabel].filter(Boolean).join(' · ')
 
   return (
@@ -122,15 +141,18 @@ export default function QuizResultFreeScreen({
         <div className="soul-rs__content">
           <header className="soul-rs__header">
             <SoulBrand />
+            <SoulLangSwitch />
           </header>
 
           <section className="soul-rs__hero">
             <div className="soul-rs__hero-top">
               {meta ? <p className="soul-rs__meta">{meta}</p> : null}
-              <h1 className="soul-rs__title">{name}, your profile is ready!</h1>
+              <h1 className="soul-rs__title">
+                {t('quiz.result.title', `${name}, your profile is ready!`, { name })}
+              </h1>
             </div>
             <p className="soul-rs__subtitle">
-              In our main readings we use 9 chapters
+              {t('quiz.result.subtitle', 'In our main readings we use 9 chapters')}
             </p>
           </section>
 
@@ -140,31 +162,43 @@ export default function QuizResultFreeScreen({
                 <div className="soul-rs__card-head">
                   <div className="soul-rs__card-title-row">
                     <SphereBullet />
-                    <h2 className="soul-rs__card-title">{card.title}</h2>
+                    <h2 className="soul-rs__card-title">
+                      {t(`quiz.result.freeCards.${card.id}.title`, card.title)}
+                    </h2>
                   </div>
                   <span className="soul-rs__card-meta">{card.meta}</span>
                 </div>
                 <hr className="soul-rs__card-rule" />
-                <p className="soul-rs__card-body">{card.body}</p>
+                <p className="soul-rs__card-body">
+                  {t(`quiz.result.freeCards.${card.id}.body`, card.body)}
+                </p>
                 <ul className="soul-rs__locked-list">
-                  {LOCKED_ROWS.map((label) => (
+                  {LOCKED_ROWS.map((label, i) => (
                     <li key={label} className="soul-rs__locked-row">
                       <span className="soul-rs__lock" aria-hidden="true">
                         🔒
                       </span>
-                      <span>{label}</span>
+                      <span>{t(`quiz.result.lockedRows.${LOCKED_ROW_IDS[i]}`, label)}</span>
                     </li>
                   ))}
-                  <li className="soul-rs__locked-more">+ 5 more in this section</li>
+                  <li className="soul-rs__locked-more">
+                    {t('quiz.result.lockedMore', '+ 5 more in this section')}
+                  </li>
                 </ul>
                 <SoulButton
                   block
                   showArrow
                   className="soul-rs__words-cta"
                   onClick={onUnlock}
-                  aria-label="134 of 1580 words unlocked"
+                  aria-label={t('quiz.result.wordsUnlocked', '134 of 1580 words unlocked', {
+                    words: 134,
+                    total: 1580,
+                  })}
                 >
-                  134 of 1580 words unlocked
+                  {t('quiz.result.wordsUnlocked', '134 of 1580 words unlocked', {
+                    words: 134,
+                    total: 1580,
+                  })}
                 </SoulButton>
               </article>
             ))}
@@ -173,16 +207,20 @@ export default function QuizResultFreeScreen({
               <article key={card.id} className="soul-rs__card soul-rs__card--locked">
                 <div className="soul-rs__card-title-row">
                   <SphereBullet />
-                  <h2 className="soul-rs__card-title">{card.title}</h2>
+                  <h2 className="soul-rs__card-title">
+                    {t(`quiz.result.lockedCards.${card.id}.title`, card.title)}
+                  </h2>
                 </div>
                 <hr className="soul-rs__card-rule" />
                 <div className="soul-rs__locked-copy">
-                  <p className="soul-rs__card-body soul-rs__card-body--clear">{card.body}</p>
+                  <p className="soul-rs__card-body soul-rs__card-body--clear">
+                    {t(`quiz.result.lockedCards.${card.id}.body`, card.body)}
+                  </p>
                   <p className="soul-rs__card-body soul-rs__card-body--soft" aria-hidden="true">
-                    {card.body}
+                    {t(`quiz.result.lockedCards.${card.id}.body`, card.body)}
                   </p>
                   <p className="soul-rs__card-body soul-rs__card-body--heavy" aria-hidden="true">
-                    {card.body}
+                    {t(`quiz.result.lockedCards.${card.id}.body`, card.body)}
                   </p>
                 </div>
                 <button
@@ -190,7 +228,7 @@ export default function QuizResultFreeScreen({
                   className="soul-rs__unlock-pill"
                   onClick={onUnlock}
                 >
-                  Unlock
+                  {t('quiz.result.unlock', 'Unlock')}
                 </button>
               </article>
             ))}
@@ -198,43 +236,49 @@ export default function QuizResultFreeScreen({
 
           <section className="soul-rs__paywall">
             <h2 className="soul-rs__paywall-title">
-              We&apos;ve barely started. There&apos;s so much more of you I want to show
-              you!
+              {t(
+                'quiz.result.paywallTitle',
+                "We've barely started. There's so much more of you I want to show you!",
+              )}
             </h2>
             <p className="soul-rs__paywall-body">
-              Nine chapters about you, your life, and your best next move. Ask me
-              anything from them. I&apos;ll show you exactly what you need. Every
-              morning, a short note about your day. And that&apos;s before
-              compatibility and everything else.
+              {t(
+                'quiz.result.paywallBody',
+                "Nine chapters about you, your life, and your best next move. Ask me anything from them. I'll show you exactly what you need. Every morning, a short note about your day. And that's before compatibility and everything else.",
+              )}
             </p>
             <ul className="soul-rs__checklist">
-              {CHECKLIST.map((item) => (
+              {CHECKLIST.map((item, i) => (
                 <li key={item} className="soul-rs__check">
                   <span className="soul-rs__tick" aria-hidden="true">
                     ✓
                   </span>
-                  <span>{item}</span>
+                  <span>{t(`quiz.result.checklist.${i + 1}`, item)}</span>
                 </li>
               ))}
             </ul>
             <div className="soul-rs__paywall-cta">
-              <SoulButton block onClick={onUnlock} aria-label="Unlock everything">
-                Unlock everything
+              <SoulButton
+                block
+                onClick={onUnlock}
+                aria-label={t('quiz.result.unlockEverything', 'Unlock everything')}
+              >
+                {t('quiz.result.unlockEverything', 'Unlock everything')}
               </SoulButton>
             </div>
           </section>
 
           <footer className="soul-rs__footer">
             <button type="button" className="soul-rs__save" onClick={onSave}>
-              Save my profile
+              {t('quiz.result.saveProfile', 'Save my profile')}
             </button>
             <p className="soul-rs__legal">
               <Link to="/terms" target="_blank" rel="noopener noreferrer">
-                Terms
+                {t('quiz.result.terms', 'Terms')}
               </Link>
               {' & '}
               <Link to="/privacy" target="_blank" rel="noopener noreferrer">
-                Privacy Policy
+                {t('quiz.result.privacy', 'Privacy Policy')}
               </Link>
             </p>
           </footer>
@@ -257,12 +301,14 @@ function SphereBullet() {
 
 function formatBirthdate(
   birthdate: QuizAnswers['birthdate'],
+  t: CopyFn,
 ): string {
   if (!birthdate?.month || !birthdate?.day || !birthdate?.year) return ''
   const monthIdx = parseInt(birthdate.month, 10) - 1
   const month = MONTHS[monthIdx]
-  if (!month) return ''
+  const monthKey = MONTH_KEYS[monthIdx]
+  if (!month || !monthKey) return ''
   const day = parseInt(birthdate.day, 10)
   if (!Number.isFinite(day)) return ''
-  return `${month} ${day}, ${birthdate.year}`
+  return `${t(`common.months.${monthKey}`, month)} ${day}, ${birthdate.year}`
 }

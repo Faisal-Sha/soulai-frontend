@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { SoulBrand, SoulButton, SoulProgress } from '@/components/soul'
+import { SoulLangSwitch, useCopy } from '@/i18n'
 import '../quiz-email.css'
 import bgEmail from '../assets/onboarding/bg-email.png'
 
@@ -22,12 +23,13 @@ export default function QuizEmailScreen({
   onContinue,
   isLoading = false,
 }: QuizEmailScreenProps) {
+  const t = useCopy()
   const inputRef = useRef<HTMLInputElement>(null)
   const canProceed = EMAIL_RE.test(value.trim()) && !isLoading
 
   useEffect(() => {
-    const t = window.setTimeout(() => inputRef.current?.focus(), 120)
-    return () => window.clearTimeout(t)
+    const focusTimer = window.setTimeout(() => inputRef.current?.focus(), 120)
+    return () => window.clearTimeout(focusTimer)
   }, [])
 
   return (
@@ -43,6 +45,7 @@ export default function QuizEmailScreen({
         <div className="soul-em__content">
           <header className="soul-em__header">
             <SoulBrand />
+            <SoulLangSwitch />
           </header>
 
           <div className="soul-em__progress-wrap">
@@ -50,16 +53,18 @@ export default function QuizEmailScreen({
           </div>
 
           <section className="soul-em__hero">
-            <h1 className="soul-em__title">Where can I reach you?</h1>
+            <h1 className="soul-em__title">{t('quiz.email.title', 'Where can I reach you?')}</h1>
             <p className="soul-em__subtitle">
-              After you subscribe I’ll send a login link here. Until then you can stay with the
-              free preview.
+              {t(
+                'quiz.email.sub',
+                'After you subscribe I’ll send a login link here. Until then you can stay with the free preview.',
+              )}
             </p>
           </section>
 
           <div className="soul-em__form">
             <label className="soul-em__field" htmlFor="soul-em-input">
-              <span className="soul-em__label">Your email</span>
+              <span className="soul-em__label">{t('quiz.email.label', 'Your email')}</span>
               <div className="soul-em__input-wrap">
                 <input
                   ref={inputRef}
@@ -70,7 +75,7 @@ export default function QuizEmailScreen({
                   autoComplete="email"
                   inputMode="email"
                   enterKeyHint="done"
-                  placeholder="Enter your email"
+                  placeholder={t('quiz.email.placeholder', 'Enter your email')}
                   value={value}
                   onChange={(e) => onChange(e.target.value)}
                   onKeyDown={(e) => {
@@ -81,7 +86,9 @@ export default function QuizEmailScreen({
                   }}
                 />
               </div>
-              <p className="soul-em__helper">We&apos;ll use this to personalise your reading.</p>
+              <p className="soul-em__helper">
+                {t('quiz.email.helper', "We'll use this to personalise your reading.")}
+              </p>
             </label>
 
             <div className="soul-em__actions">
@@ -90,21 +97,21 @@ export default function QuizEmailScreen({
                 onClick={onContinue}
                 disabled={!canProceed}
                 loading={isLoading}
-                aria-label="Continue"
+                aria-label={t('quiz.email.continue', 'Continue')}
               >
-                Continue
+                {t('quiz.email.continue', 'Continue')}
               </SoulButton>
               <p className="soul-em__privacy">
-                Your details stay private and are never shared.
+                {t('quiz.email.privacy', 'Your details stay private and are never shared.')}
               </p>
               <p className="soul-em__legal">
-                By continuing you agree to our{' '}
+                {t('quiz.email.legalPrefix', 'By continuing you agree to our')}{' '}
                 <Link to="/terms" target="_blank" rel="noopener noreferrer">
-                  Terms
+                  {t('quiz.email.terms', 'Terms')}
                 </Link>
                 {' & '}
                 <Link to="/privacy" target="_blank" rel="noopener noreferrer">
-                  Privacy Policy
+                  {t('quiz.email.privacyPolicy', 'Privacy Policy')}
                 </Link>
               </p>
             </div>

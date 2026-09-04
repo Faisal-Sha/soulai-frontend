@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { getLocale, translate } from '@/i18n'
 import { supabase } from '@/integrations/supabase/client'
 import { toast } from 'sonner'
 import {
@@ -47,7 +48,12 @@ export function useCheckout({
       setIsProcessing(planId)
       const payload = getPayload()
       const email = payload.answers.email || payload.email
-      if (!email) throw new Error('Add your email in the quiz first.')
+      if (!email) {
+        const en = 'Add your email in the quiz first.'
+        throw new Error(
+          getLocale() !== 'en' ? translate(getLocale(), 'errors.checkout.addEmail', en) : en,
+        )
+      }
       persistCheckoutAnalytics(planId, null)
 
       const mapped = PLAN_MAP[planId]
@@ -75,12 +81,23 @@ export function useCheckout({
         throw new Error(detail || error.message)
       }
       if (data?.error) throw new Error(data.error)
-      if (!data?.url) throw new Error('No checkout URL returned')
+      if (!data?.url) {
+        const en = 'No checkout URL returned'
+        throw new Error(
+          getLocale() !== 'en' ? translate(getLocale(), 'errors.checkout.noUrl', en) : en,
+        )
+      }
 
       await new Promise((resolve) => setTimeout(resolve, 400))
       window.location.href = data.url
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to start checkout. Please try again.'
+      const fallback = 'Failed to start checkout. Please try again.'
+      const message =
+        err instanceof Error
+          ? err.message
+          : getLocale() !== 'en'
+            ? translate(getLocale(), 'errors.checkout.failed', fallback)
+            : fallback
       console.error('[useCheckout] error:', err)
       trackPaywallPaymentFailed(message)
       toast.error(message)

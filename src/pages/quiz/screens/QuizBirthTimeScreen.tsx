@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { SoulBrand, SoulButton, SoulChip, SoulProgress } from '@/components/soul'
+import { SoulLangSwitch, useCopy } from '@/i18n'
 import '../quiz-birthtime.css'
 import bgBirthTime from '../assets/onboarding/bg-birthtime.png'
 
@@ -52,6 +53,7 @@ export default function QuizBirthTimeScreen({
   onContinue,
   onSkip,
 }: QuizBirthTimeScreenProps) {
+  const t = useCopy()
   const [digits, setDigits] = useState(() => digitsFromTime(time))
   const inputRef = useRef<HTMLInputElement>(null)
   const nativeRef = useRef<HTMLInputElement>(null)
@@ -61,8 +63,8 @@ export default function QuizBirthTimeScreen({
   }, [time])
 
   useEffect(() => {
-    const t = window.setTimeout(() => inputRef.current?.focus(), 120)
-    return () => window.clearTimeout(t)
+    const focusTimer = window.setTimeout(() => inputRef.current?.focus(), 120)
+    return () => window.clearTimeout(focusTimer)
   }, [])
 
   const valid = isValidTime(digits)
@@ -90,6 +92,7 @@ export default function QuizBirthTimeScreen({
         <div className="soul-bt__content">
           <header className="soul-bt__header">
             <SoulBrand />
+            <SoulLangSwitch />
           </header>
 
           <div className="soul-bt__progress-wrap">
@@ -97,16 +100,18 @@ export default function QuizBirthTimeScreen({
           </div>
 
           <section className="soul-bt__hero">
-            <h1 className="soul-bt__title">What time were you born?</h1>
+            <h1 className="soul-bt__title">{t('quiz.birthTime.title', 'What time were you born?')}</h1>
             <p className="soul-bt__subtitle">
-              If you know it, it makes your profile a bit sharper. If you don&apos;t, no
-              worries, we&apos;ll work with what we&apos;ve got.
+              {t(
+                'quiz.birthTime.sub',
+                "If you know it, it makes your profile a bit sharper. If you don't, no worries, we'll work with what we've got.",
+              )}
             </p>
           </section>
 
           <div className="soul-bt__form">
             <label className="soul-bt__field" htmlFor="soul-bt-input">
-              <span className="soul-bt__label">Your birth time</span>
+              <span className="soul-bt__label">{t('quiz.birthTime.label', 'Your birth time')}</span>
               <div className="soul-bt__input-wrap">
                 <input
                   ref={inputRef}
@@ -114,7 +119,7 @@ export default function QuizBirthTimeScreen({
                   className="soul-bt__input"
                   type="text"
                   inputMode="numeric"
-                  placeholder="--:--"
+                  placeholder={t('quiz.birthTime.placeholder', '--:--')}
                   value={formatTime(digits)}
                   onChange={(e) => applyDigits(e.target.value)}
                   onKeyDown={(e) => {
@@ -127,7 +132,7 @@ export default function QuizBirthTimeScreen({
                 <button
                   type="button"
                   className="soul-bt__clock-btn"
-                  aria-label="Open time picker"
+                  aria-label={t('quiz.birthTime.timeAria', 'Open time picker')}
                   onClick={() => nativeRef.current?.showPicker?.() ?? nativeRef.current?.click()}
                 >
                   <ClockIcon />
@@ -146,17 +151,28 @@ export default function QuizBirthTimeScreen({
                   }}
                 />
               </div>
-              <p className="soul-bt__helper">A precise time makes for a sharper reading.</p>
+              <p className="soul-bt__helper">
+                {t('quiz.birthTime.helper', 'A precise time makes for a sharper reading.')}
+              </p>
             </label>
 
             {showCertainty && (
               <div className="soul-bt__certainty">
-                <p className="soul-bt__certainty-title">How sure are you about this time?</p>
-                <div className="soul-bt__chips" role="group" aria-label="Time certainty">
+                <p className="soul-bt__certainty-title">
+                  {t('quiz.birthTime.certaintyTitle', 'How sure are you about this time?')}
+                </p>
+                <div className="soul-bt__chips" role="group" aria-label={t('quiz.birthTime.certaintyAria', 'Time certainty')}>
                   {CERTAINTY.map((opt) => (
                     <SoulChip
                       key={opt.v}
-                      label={opt.label}
+                      label={t(
+                        opt.v === 'yes'
+                          ? 'quiz.birthTime.exact'
+                          : opt.v === 'approximate'
+                            ? 'quiz.birthTime.approximate'
+                            : 'quiz.birthTime.guess',
+                        opt.label,
+                      )}
                       selected={selected === opt.v}
                       onClick={() => onChangeCertainty(opt.v)}
                       className="soul-bt__chip"
@@ -171,15 +187,15 @@ export default function QuizBirthTimeScreen({
                 block
                 onClick={onContinue}
                 disabled={!canProceed}
-                aria-label="Continue"
+                aria-label={t('quiz.birthTime.continue', 'Continue')}
               >
-                Continue
+                {t('quiz.birthTime.continue', 'Continue')}
               </SoulButton>
               <button type="button" className="soul-bt__skip" onClick={onSkip}>
-                I don&apos;t know my birth time
+                {t('quiz.birthTime.skip', "I don't know my birth time")}
               </button>
               <p className="soul-bt__privacy">
-                Your details stay private and are never shared.
+                {t('quiz.birthTime.privacy', 'Your details stay private and are never shared.')}
               </p>
             </div>
           </div>

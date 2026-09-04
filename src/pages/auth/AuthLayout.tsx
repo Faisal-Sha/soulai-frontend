@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { SoulBrand } from '@/components/soul'
+import { useCopy } from '@/i18n'
 import './soul-auth.css'
 
 type AuthLayoutProps = {
@@ -16,6 +17,7 @@ type AuthLayoutProps = {
  * Mobile full-bleed like quiz email; desktop centered column, no card.
  */
 export function AuthLayout({ bg, name, children, centered = false }: AuthLayoutProps) {
+  const t = useCopy()
   return (
     <div className="soul-auth" data-name={name}>
       <div className="soul-auth__bg" aria-hidden="true">
@@ -28,7 +30,7 @@ export function AuthLayout({ bg, name, children, centered = false }: AuthLayoutP
 
         <div className={centered ? 'soul-auth__content soul-auth__content--centered' : 'soul-auth__content'}>
           <header className="soul-auth__header">
-            <Link to="/" className="soul-auth__brand-link" aria-label="Soul+AI home">
+            <Link to="/" className="soul-auth__brand-link" aria-label={t('auth.homeAria', 'Soul+AI home')}>
               <SoulBrand />
             </Link>
           </header>

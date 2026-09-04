@@ -1,3 +1,4 @@
+import { getLocale, isEnglish, translate } from '@/i18n'
 import { PATTERN_SECTIONS, type PatternSection } from './patternContent'
 import type { ReadingChapterId } from './chapters'
 
@@ -300,6 +301,32 @@ export const READING_PACK: ChapterPack[] = [
 
 export function packById(id: string): ChapterPack | undefined {
   return READING_PACK.find((pack) => pack.id === id)
+}
+
+/** Static catalog overlay. Apply on display even when a stored English snapshot exists. */
+export function localizeStaticPack(pack: ChapterPack): ChapterPack {
+  if (isEnglish(getLocale())) return pack
+  const locale = getLocale()
+  return {
+    ...pack,
+    title: translate(locale, `readings.chapters.${pack.id}.title`, pack.title),
+    blurb: translate(locale, `readings.chapters.${pack.id}.blurb`, pack.blurb),
+    sections: pack.sections.map((section) => ({
+      ...section,
+      title: translate(
+        locale,
+        `readings.content.${pack.id}.s${section.n}.title`,
+        section.title,
+      ),
+      paragraphs: section.paragraphs.map((paragraph, i) =>
+        translate(
+          locale,
+          `readings.content.${pack.id}.s${section.n}.p${i + 1}`,
+          paragraph,
+        ),
+      ),
+    })),
+  }
 }
 
 export function nextPack(id: ReadingChapterId): ChapterPack | null {

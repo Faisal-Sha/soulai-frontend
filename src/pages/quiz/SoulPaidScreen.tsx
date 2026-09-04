@@ -4,6 +4,7 @@ import { AuthLayout } from '@/pages/auth/AuthLayout'
 import bgSignInEmail from '@/pages/auth/assets/bg-signin-email.png'
 import { MAGIC_LINK_HOURS, rememberAuthEmail } from '@/pages/auth/authActions'
 import { SoulButton } from '@/components/soul'
+import { useCopy } from '@/i18n'
 
 function readQuizEmail(): string {
   try {
@@ -21,6 +22,7 @@ function readQuizEmail(): string {
  * Guest stays here. They are not signed in yet.
  */
 export function SoulPaidScreen() {
+  const t = useCopy()
   const navigate = useNavigate()
   const email = useMemo(() => {
     const value = readQuizEmail()
@@ -32,11 +34,19 @@ export function SoulPaidScreen() {
     <AuthLayout bg={bgSignInEmail} name="Paid · Check your email" centered>
       <div className="soul-auth__check">
         <section className="soul-auth__hero soul-auth__hero--center">
-          <h1 className="soul-auth__title">You’re in</h1>
+          <h1 className="soul-auth__title">{t('auth.paid.title', 'You’re in')}</h1>
           <p className="soul-auth__subtitle">
             {email
-              ? `I sent a login link to ${email}. It works once and expires in ${MAGIC_LINK_HOURS} hours. The app opens when you tap it. Not before.`
-              : `I sent a login link to the email you used at checkout. It works once and expires in ${MAGIC_LINK_HOURS} hours.`}
+              ? t(
+                  'auth.paid.bodyWithEmail',
+                  `I sent a login link to ${email}. It works once and expires in ${MAGIC_LINK_HOURS} hours. The app opens when you tap it. Not before.`,
+                  { email, hours: MAGIC_LINK_HOURS },
+                )
+              : t(
+                  'auth.paid.bodyNoEmail',
+                  `I sent a login link to the email you used at checkout. It works once and expires in ${MAGIC_LINK_HOURS} hours.`,
+                  { hours: MAGIC_LINK_HOURS },
+                )}
           </p>
         </section>
 
@@ -50,10 +60,10 @@ export function SoulPaidScreen() {
               })
             }
           >
-            Open email instructions
+            {t('auth.paid.openInstructions', 'Open email instructions')}
           </SoulButton>
           <Link to="/quiz/teaser" className="soul-auth__alt">
-            Back to the free preview
+            {t('auth.paid.backPreview', 'Back to the free preview')}
           </Link>
         </div>
       </div>

@@ -15,6 +15,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { SoulBrand, SoulButton, SoulChip, SoulComposer, SoulNav } from '@/components/soul'
+import { getLocale, translate, useCopy } from '@/i18n'
 import {
   deleteThread,
   fetchHistory,
@@ -68,25 +69,50 @@ function wantsNewChatFromNav(state: unknown): boolean {
 }
 
 function truncate(text: string | undefined, n = 42) {
-  if (!text) return 'New conversation'
+  const empty = 'New conversation'
+  if (!text) {
+    return getLocale() !== 'en'
+      ? translate(getLocale(), 'agent.history.newTitle', empty)
+      : empty
+  }
   const t = text.trim().replace(/\s+/g, ' ')
   return t.length > n ? t.slice(0, n) + '…' : t
 }
 
 function formatHistoryMeta(thread: AgentThread): string {
+  const locale = getLocale()
   const count = thread.message_count ?? 0
-  const msgs = `${count} message${count === 1 ? '' : 's'}`
+  const msgsEn = `${count} message${count === 1 ? '' : 's'}`
+  const msgs =
+    locale !== 'en'
+      ? count === 1
+        ? translate(locale, 'agent.history.messageOne', msgsEn, { count })
+        : translate(locale, 'agent.history.messages', msgsEn, { count })
+      : msgsEn
   if (!thread.updated_at) return msgs
   const then = new Date(thread.updated_at).getTime()
   if (Number.isNaN(then)) return msgs
   const diffMs = Date.now() - then
   const mins = Math.floor(diffMs / 60000)
-  if (mins < 1) return `${msgs} · just now`
-  if (mins < 60) return `${msgs} · ${mins}m ago`
+  const join = (rel: string) => `${msgs} · ${rel}`
+  if (mins < 1) {
+    const en = 'just now'
+    return join(locale !== 'en' ? translate(locale, 'agent.history.justNow', en) : en)
+  }
+  if (mins < 60) {
+    const en = `${mins}m ago`
+    return join(locale !== 'en' ? translate(locale, 'agent.history.minsAgo', en, { n: mins }) : en)
+  }
   const hours = Math.floor(mins / 60)
-  if (hours < 24) return `${msgs} · ${hours}h ago`
+  if (hours < 24) {
+    const en = `${hours}h ago`
+    return join(locale !== 'en' ? translate(locale, 'agent.history.hoursAgo', en, { n: hours }) : en)
+  }
   const days = Math.floor(hours / 24)
-  if (days < 7) return `${msgs} · ${days}d ago`
+  if (days < 7) {
+    const en = `${days}d ago`
+    return join(locale !== 'en' ? translate(locale, 'agent.history.daysAgo', en, { n: days }) : en)
+  }
   return `${msgs} · ${new Date(thread.updated_at).toLocaleDateString(undefined, {
     month: 'short',
     day: 'numeric',
@@ -119,27 +145,34 @@ function UserBubble({ content }: { content: string }) {
 }
 
 function ThinkingRow() {
+  const t = useCopy()
   return (
-    <div className="soul-chat__typing" aria-live="polite" aria-label="Still with you">
+    <div className="soul-chat__typing" aria-live="polite" aria-label={t('agent.thinking.aria', 'Still with you')}>
       <div className="soul-chat__typing-bubble" aria-hidden="true">
         <span className="soul-chat__typing-dot" />
         <span className="soul-chat__typing-dot" />
         <span className="soul-chat__typing-dot" />
       </div>
-      <p className="soul-chat__typing-label">Still with you. Going through your chapters.</p>
+      <p className="soul-chat__typing-label">
+        {t('agent.thinking.label', 'Still with you. Going through your chapters.')}
+      </p>
     </div>
   )
 }
 
 function FailedBubble({ onRetry }: { onRetry: () => void }) {
+  const t = useCopy()
   return (
     <div className="soul-chat__bubble soul-chat__bubble--failed">
       <p className="soul-chat__bubble-text">
-        I lost that one. Something interrupted me on my side. Your message is saved.
+        {t(
+          'agent.failed.body',
+          'I lost that one. Something interrupted me on my side. Your message is saved.',
+        )}
       </p>
       <button type="button" className="soul-chat__retry" onClick={onRetry}>
         <img src={iconRetry} alt="" width={14} height={14} />
-        Try again
+        {t('agent.failed.retry', 'Try again')}
       </button>
     </div>
   )
@@ -154,20 +187,21 @@ function LimitGateCard({
   onAddMore: () => void
   onDismiss: () => void
 }) {
+  const t = useCopy()
   return (
-    <div className="soul-chat__gate" role="dialog" aria-label="Message limit">
+    <div className="soul-chat__gate" role="dialog" aria-label={t('agent.gate.limitAria', 'Message limit')}>
       <div className="soul-chat__gate-copy">
-        <p className="soul-chat__gate-title">You&apos;ve used today&apos;s messages</p>
+        <p className="soul-chat__gate-title">{t('agent.gate.limitTitle', "You've used today's messages")}</p>
         <p className="soul-chat__gate-body">
-          Your conversation is saved. Come back tomorrow, or keep going now.
+          {t('agent.gate.limitBody', 'Your conversation is saved. Come back tomorrow, or keep going now.')}
         </p>
       </div>
       <div className="soul-chat__gate-actions">
         <button type="button" className="soul-chat__gate-cta" onClick={onAddMore}>
-          Add 10 messages · $7
+          {t('agent.gate.add10', 'Add 10 messages · $7')}
         </button>
         <button type="button" className="soul-chat__gate-secondary" onClick={onDismiss}>
-          Not now
+          {t('agent.gate.notNow', 'Not now')}
         </button>
       </div>
     </div>
@@ -181,20 +215,24 @@ function EndedGateCard({
   onResume: () => void
   onOpenProfile: () => void
 }) {
+  const t = useCopy()
   return (
-    <div className="soul-chat__gate" role="dialog" aria-label="Subscription ended">
+    <div className="soul-chat__gate" role="dialog" aria-label={t('agent.gate.endedAria', 'Subscription ended')}>
       <div className="soul-chat__gate-copy">
-        <p className="soul-chat__gate-title">Your subscription ended</p>
+        <p className="soul-chat__gate-title">{t('agent.gate.endedTitle', 'Your subscription ended')}</p>
         <p className="soul-chat__gate-body">
-          Your profile and everything you saved stay yours. Resume to keep talking.
+          {t(
+            'agent.gate.endedBody',
+            'Your profile and everything you saved stay yours. Resume to keep talking.',
+          )}
         </p>
       </div>
       <div className="soul-chat__gate-actions">
         <button type="button" className="soul-chat__gate-cta" onClick={onResume}>
-          Resume · $6.99/mo
+          {t('agent.gate.resume', 'Resume · $6.99/mo')}
         </button>
         <button type="button" className="soul-chat__gate-secondary" onClick={onOpenProfile}>
-          Open my profile
+          {t('agent.gate.openProfile', 'Open my profile')}
         </button>
       </div>
     </div>
@@ -208,15 +246,16 @@ function isNetworkError(err: unknown): boolean {
 
 function MessageActions({ content }: { content: string }) {
   const navigate = useNavigate()
+  const t = useCopy()
   const { profile } = useUser()
   const [saved, setSaved] = useState(false)
 
   const onCopy = async () => {
     try {
       await navigator.clipboard.writeText(content)
-      toast.success('Copied')
+      toast.success(t('agent.actions.copied', 'Copied'))
     } catch {
-      toast.error('Could not copy')
+      toast.error(t('agent.actions.copyFail', 'Could not copy'))
     }
   }
 
@@ -229,14 +268,14 @@ function MessageActions({ content }: { content: string }) {
     void saveInsight({
       ownerProfileId: profile.id,
       quote: content,
-      source: 'Mentor',
+      source: t('agent.actions.sourceMentor', 'Mentor'),
       sourceKind: 'chat',
     })
       .then((row) => {
         if (row) setSaved(true)
       })
       .catch(() => {
-        toast.error('Could not save')
+        toast.error(t('agent.actions.saveFail', 'Could not save'))
       })
   }
 
@@ -250,7 +289,7 @@ function MessageActions({ content }: { content: string }) {
           onClick={onSave}
         >
           <img src={saved ? iconSaved : iconSave} alt="" width={15} height={15} />
-          {saved ? 'Saved' : 'Save'}
+          {saved ? t('agent.actions.saved', 'Saved') : t('agent.actions.save', 'Save')}
         </button>
         <button
           type="button"
@@ -258,17 +297,17 @@ function MessageActions({ content }: { content: string }) {
           onClick={() => navigate('/readings/your-pattern')}
         >
           <img src={iconChapter} alt="" width={15} height={15} />
-          Open chapter
+          {t('agent.actions.openChapter', 'Open chapter')}
         </button>
         <button type="button" className="soul-chat__action" onClick={() => void onCopy()}>
           <img src={iconCopy} alt="" width={15} height={15} />
-          Copy
+          {t('agent.actions.copy', 'Copy')}
         </button>
       </div>
       {saved ? (
         <div className="soul-chat__status-pill" role="status">
           <img src={iconCheck} alt="" width={13} height={13} />
-          <span>Saved to your insights</span>
+          <span>{t('agent.actions.savedInsights', 'Saved to your insights')}</span>
         </div>
       ) : null}
     </div>
@@ -280,6 +319,7 @@ function MessageActions({ content }: { content: string }) {
  * Wired: threads, history, send, delete. Top-up / limits = UI shell for now.
  */
 export default function AgentPage() {
+  const t = useCopy()
   const { user, subscription, isPremium } = useUser()
   const previewMode = true
   const userId = user?.id
@@ -318,7 +358,9 @@ export default function AgentPage() {
   const [topUpOpen, setTopUpOpen] = useState(false)
   const [topUpMode, setTopUpMode] = useState<TopUpSheetMode>('pay')
   const [topUpPaying, setTopUpPaying] = useState(false)
-  const [cardLabel, setCardLabel] = useState('Visa ending 4242')
+  const [cardLabel, setCardLabel] = useState(() =>
+    t('agent.topup.visaDefault', 'Visa ending 4242'),
+  )
   const [showTopUpSuccess, setShowTopUpSuccess] = useState(false)
   const [showLimitNote, setShowLimitNote] = useState(false)
   const { resumeOpen, resumeMode, openResume, closeResume } = useSoulSheetParams(AGENT_RESUME_EXTRA)
@@ -476,10 +518,13 @@ export default function AgentPage() {
   }, [])
 
   const showError = useCallback((err: unknown, fallback?: string) => {
-    const message = formatApiError(err) || fallback || 'Something went wrong. Please try again.'
+    const message =
+      formatApiError(err) ||
+      fallback ||
+      t('errors.agent.generic', 'Something went wrong. Please try again.')
     setThinking(false)
     toast.error(message)
-  }, [])
+  }, [t])
 
   const clearStatus = useCallback(() => {
     setThinking(false)
@@ -541,7 +586,7 @@ export default function AgentPage() {
         setMessages(history)
       } catch (err) {
         setMessages([])
-        showError(err, 'Could not load this conversation.')
+        showError(err, t('errors.agent.loadConversation', 'Could not load this conversation.'))
       }
     },
     [userId, closeDrawer, showError],
@@ -576,7 +621,7 @@ export default function AgentPage() {
         }
       }
     } catch (err) {
-      showError(err, 'Could not delete this conversation.')
+      showError(err, t('errors.agent.deleteConversation', 'Could not delete this conversation.'))
     } finally {
       setDeletingThreadId(null)
     }
@@ -719,7 +764,7 @@ export default function AgentPage() {
                 if (desktop) toggleSidebar()
                 else closeDrawer()
               }}
-              aria-label={desktop ? 'Collapse sidebar' : 'Back to chat'}
+              aria-label={desktop ? t('agent.history.collapse', 'Collapse sidebar') : t('agent.history.backToChat', 'Back to chat')}
             >
               <img src={iconBack} alt="" width={22} height={22} />
             </button>
@@ -729,52 +774,55 @@ export default function AgentPage() {
             type="button"
             className="soul-chat__hist-new"
             onClick={startNewChat}
-            aria-label="New conversation"
+            aria-label={t('agent.history.newAria', 'New conversation')}
           >
             <img src={iconNewChat} alt="" width={22} height={22} />
           </button>
         </header>
 
-        <h2 className="soul-chat__hist-title">Chat history</h2>
+        <h2 className="soul-chat__hist-title">{t('agent.history.title', 'Chat history')}</h2>
 
         <div className="soul-chat__hist-body">
           {threadsError ? (
             <div className="soul-chat__hist-empty">
-              <p className="soul-chat__hist-empty-title">Could not load history</p>
+              <p className="soul-chat__hist-empty-title">{t('agent.history.loadFail', 'Could not load history')}</p>
               <p className="soul-chat__hist-empty-sub">{threadsError}</p>
             </div>
           ) : !threads.length ? (
             <div className="soul-chat__hist-empty">
-              <p className="soul-chat__hist-empty-title">No conversations yet</p>
+              <p className="soul-chat__hist-empty-title">{t('agent.history.emptyTitle', 'No conversations yet')}</p>
               <p className="soul-chat__hist-empty-sub">
-                Anything you talk through with your mentor is saved here.
+                {t('agent.history.emptySub', 'Anything you talk through with your mentor is saved here.')}
               </p>
               <SoulButton
                 showArrow
                 className="soul-chat__hist-cta"
                 onClick={startNewChat}
               >
-                Start a conversation
+                {t('agent.history.start', 'Start a conversation')}
               </SoulButton>
             </div>
           ) : (
             <ul className="soul-chat__hist-list">
-              {threads.map((t) => {
-                const isDeleting = deletingThreadId === t.thread_id
+              {threads.map((thread) => {
+                const isDeleting = deletingThreadId === thread.thread_id
                 return (
-                  <li key={t.thread_id}>
+                  <li key={thread.thread_id}>
                     <button
                       type="button"
                       className={`soul-chat__hist-row${
-                        t.thread_id === currentThreadId ? ' soul-chat__hist-row--active' : ''
+                        thread.thread_id === currentThreadId ? ' soul-chat__hist-row--active' : ''
                       }`}
-                      onClick={() => void selectThread(t.thread_id)}
+                      onClick={() => void selectThread(thread.thread_id)}
                     >
                       <div className="soul-chat__hist-row-main">
                         <p className="soul-chat__hist-row-title">
-                          {truncate(t.preview || 'New conversation', 48)}
+                          {truncate(
+                            thread.preview || t('agent.history.newTitle', 'New conversation'),
+                            48,
+                          )}
                         </p>
-                        <p className="soul-chat__hist-row-meta">{formatHistoryMeta(t)}</p>
+                        <p className="soul-chat__hist-row-meta">{formatHistoryMeta(thread)}</p>
                       </div>
                       <img
                         className="soul-chat__hist-row-chevron"
@@ -787,11 +835,11 @@ export default function AgentPage() {
                     <button
                       type="button"
                       className="soul-chat__hist-row-delete"
-                      aria-label="Delete conversation"
+                      aria-label={t('agent.history.deleteAria', 'Delete conversation')}
                       disabled={isDeleting || !!deletingThreadId}
-                      onClick={(e) => requestDeleteThread(t.thread_id, e)}
+                      onClick={(e) => requestDeleteThread(thread.thread_id, e)}
                     >
-                      Delete
+                      {t('agent.history.delete', 'Delete')}
                     </button>
                   </li>
                 )
@@ -816,7 +864,7 @@ export default function AgentPage() {
                 type="button"
                 className="soul-chat__menu"
                 onClick={openDrawer}
-                aria-label="Open conversation history"
+                aria-label={t('agent.history.openAria', 'Open conversation history')}
               >
                 <img src={iconMenu} alt="" width={22} height={22} />
               </button>
@@ -824,21 +872,21 @@ export default function AgentPage() {
                 type="button"
                 className="soul-chat__sidebar-toggle"
                 onClick={toggleSidebar}
-                aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                aria-label={sidebarCollapsed ? t('agent.history.expand', 'Expand sidebar') : t('agent.history.collapse', 'Collapse sidebar')}
                 aria-expanded={!sidebarCollapsed}
               >
                 <img src={iconMenu} alt="" width={20} height={20} />
               </button>
               <SoulBrand />
             </div>
-            <div className="soul-chat__header-nav" aria-label="Desktop navigation">
+            <div className="soul-chat__header-nav" aria-label={t('agent.history.desktopNavAria', 'Desktop navigation')}>
               <SoulNav variant="desktop" />
             </div>
           </header>
 
           {offline ? (
             <div className="soul-chat__offline-banner" role="status">
-              You&apos;re offline. We&apos;ll send this when you&apos;re back.
+              {t('agent.offline', "You're offline. We'll send this when you're back.")}
             </div>
           ) : null}
 
@@ -851,8 +899,8 @@ export default function AgentPage() {
                 <>
                   <img className="soul-chat__orb" src={orbChat} alt="" width={64} height={64} />
                   <div className="soul-chat__empty-copy">
-                    <h1 className="soul-chat__empty-title">Ask me anything about you</h1>
-                    <p className="soul-chat__empty-sub">I&apos;ve read all nine chapters.</p>
+                    <h1 className="soul-chat__empty-title">{t('agent.empty.title', 'Ask me anything about you')}</h1>
+                    <p className="soul-chat__empty-sub">{t('agent.empty.sub', "I've read all nine chapters.")}</p>
                   </div>
                 </>
               ) : (
@@ -877,9 +925,14 @@ export default function AgentPage() {
                   {showTopUpSuccess ? <TopUpSuccessPill /> : null}
                   {showLimitNote && messagesLeft <= 0 && shellGate === 'limit' ? (
                     <p className="soul-chat__limit-note">
-                      You have used today&apos;s messages.
-                      <br />
-                      Your conversation is saved.
+                      {t('agent.limitNote', "You have used today's messages.\nYour conversation is saved.")
+                        .split('\n')
+                        .map((line, i, arr) => (
+                          <span key={line}>
+                            {line}
+                            {i < arr.length - 1 ? <br /> : null}
+                          </span>
+                        ))}
                     </p>
                   ) : null}
                 </>
@@ -907,21 +960,26 @@ export default function AgentPage() {
 
             {showWelcome && !chatLocked ? (
               <div className="soul-chat__chips">
-                {SUGGESTIONS.map((label, idx) => (
+                {SUGGESTIONS.map((label, idx) => {
+                  const key =
+                    idx === 0 ? 'agent.suggestions.money' : idx === 1 ? 'agent.suggestions.pull' : 'agent.suggestions.avoiding'
+                  const localized = t(key, label)
+                  return (
                   <SoulChip
                     key={label}
-                    label={label}
+                    label={localized}
                     selected={idx === 1}
                     disabled={isSending}
-                    onClick={() => void handleSend(label)}
+                    onClick={() => void handleSend(localized)}
                   />
-                ))}
+                  )
+                })}
               </div>
             ) : null}
 
             <SoulComposer
               value={input}
-              placeholder="What's on your mind?"
+              placeholder={t('agent.composer.placeholder', "What's on your mind?")}
               disabled={isSending || chatLocked}
               autoFocus={composerFocus}
               onChange={setInput}
@@ -930,24 +988,24 @@ export default function AgentPage() {
 
             <p className="soul-chat__counter">
               {shellGate === 'ended' ? (
-                'Chat is paused'
+                t('agent.counter.paused', 'Chat is paused')
               ) : messagesLeft <= 0 ? (
                 <>
-                  0 messages left today
+                  {t('agent.counter.zeroLeft', '0 messages left today')}
                   {gateCardHidden || showLimitNote ? (
                     <>
                       {' · '}
                       <button type="button" onClick={openTopUp}>
-                        Add more
+                        {t('agent.counter.addMore', 'Add more')}
                       </button>
                     </>
                   ) : null}
                 </>
               ) : (
                 <>
-                  {messagesLeft} messages left today ·{' '}
+                  {t('agent.counter.left', `${messagesLeft} messages left today`, { count: messagesLeft })} ·{' '}
                   <button type="button" onClick={openLimitGate}>
-                    Add more
+                    {t('agent.counter.addMore', 'Add more')}
                   </button>
                 </>
               )}
@@ -991,19 +1049,26 @@ export default function AgentPage() {
       >
         <AlertDialogContent className="z-[100]">
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete this conversation?</AlertDialogTitle>
+            <AlertDialogTitle>{t('agent.deleteDialog.title', 'Delete this conversation?')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently remove the chat and its history. This action cannot be undone.
+              {t(
+                'agent.deleteDialog.body',
+                'This will permanently remove the chat and its history. This action cannot be undone.',
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={!!deletingThreadId}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={!!deletingThreadId}>
+              {t('agent.deleteDialog.cancel', 'Cancel')}
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => void confirmDeleteThread()}
               disabled={!!deletingThreadId}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {deletingThreadId ? 'Deleting…' : 'Delete'}
+              {deletingThreadId
+                ? t('agent.history.deleting', 'Deleting…')
+                : t('agent.deleteDialog.confirm', 'Delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

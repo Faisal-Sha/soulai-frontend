@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useUser } from '@/hooks/useUser'
+import { useI18n } from '@/i18n'
 import { listSavedInsights } from '@/pages/insights/insightsApi'
 import { listPeople } from '@/pages/people/peopleApi'
 import { compatHomeSummary } from '@/pages/people/peopleData'
@@ -15,6 +16,7 @@ import { membershipDayNumber, resolveHomeVariant, trialBannerCopy } from './reso
 /** Wires SoulHomeScreen to profile + subscription. Figma previews still use `?home=`. */
 export function SoulHomeRoute() {
   const { user, profile, subscription, isPremium, loading } = useUser()
+  const { locale } = useI18n()
   const [searchParams] = useSearchParams()
   const previewKey = searchParams.get('home')
   const [compatSummary, setCompatSummary] = useState('Add someone close to you')
@@ -45,7 +47,7 @@ export function SoulHomeRoute() {
 
   useEffect(() => {
     if (!live || !profile?.id) {
-      setCompatSummary(live ? 'Add someone close to you' : 'Anna, Mark and 2 more')
+      setCompatSummary(live ? compatHomeSummary([]) : compatHomeSummary(['Anna', 'Mark', 'Kate', 'Leo']))
       setShelfReady(!live)
       return
     }
@@ -56,7 +58,7 @@ export function SoulHomeRoute() {
         if (!cancelled) setCompatSummary(compatHomeSummary(rows.map((r) => r.name)))
       })
       .catch(() => {
-        if (!cancelled) setCompatSummary('Add someone close to you')
+        if (!cancelled) setCompatSummary(compatHomeSummary([]))
       })
     const readingP = ensureReading(profile.id)
       .then((rows) => {
@@ -92,7 +94,7 @@ export function SoulHomeRoute() {
     return () => {
       cancelled = true
     }
-  }, [live, profile?.id])
+  }, [live, locale, profile?.id])
 
   return (
     <SoulHomeScreen
@@ -112,7 +114,7 @@ export function SoulHomeRoute() {
       dailySub={live ? dailySub : undefined}
       insightsCount={live ? insightsCount : 12}
       shelfReady={!live || shelfReady}
-      compatSummary={live ? compatSummary : 'Anna, Mark and 2 more'}
+      compatSummary={live ? compatSummary : compatHomeSummary(['Anna', 'Mark', 'Kate', 'Leo'])}
       trialTitle={trialCopy?.title}
       trialDetail={trialCopy?.detail}
     />

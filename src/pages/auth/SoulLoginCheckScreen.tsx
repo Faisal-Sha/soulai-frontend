@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-do
 import { toast } from 'sonner'
 import { SoulButton } from '@/components/soul'
 import { AuthLayout } from './AuthLayout'
+import { useCopy } from '@/i18n'
 import bgSignInEmail from './assets/bg-signin-email.png'
 import {
   MAGIC_LINK_HOURS,
@@ -27,6 +28,7 @@ type CheckState = {
  */
 export function SoulLoginCheckScreen() {
   const navigate = useNavigate()
+  const t = useCopy()
   const location = useLocation()
   const [params] = useSearchParams()
   const stored = readStoredAuth()
@@ -51,20 +53,28 @@ export function SoulLoginCheckScreen() {
   }, [seconds])
 
   const waiting = seconds > 0 && !expired
-  const title = expired ? 'That link has expired' : 'Check your email'
-  const cta = expired ? 'Send a new link' : 'Resend link'
+  const title = expired
+    ? t('auth.check.expiredTitle', 'That link has expired')
+    : t('auth.check.title', 'Check your email')
+  const cta = expired
+    ? t('auth.check.sendNew', 'Send a new link')
+    : t('auth.check.resend', 'Resend link')
 
   const body = useMemo(() => {
     if (!email) return ''
-    return `I sent a link to ${email}. It works once and expires in ${MAGIC_LINK_HOURS} hours.`
-  }, [email])
+    return t(
+      'auth.check.body',
+      `I sent a link to ${email}. It works once and expires in ${MAGIC_LINK_HOURS} hours.`,
+      { email, hours: MAGIC_LINK_HOURS },
+    )
+  }, [email, t])
 
   const resend = async () => {
     if (waiting || loading || !email) return
     setLoading(true)
     try {
       await sendAuthEmail(email, purpose, getPostAuthPath(location.search))
-      toast.success('I sent a new link.')
+      toast.success(t('auth.check.sentNew', 'I sent a new link.'))
       setSeconds(RESEND_SECONDS)
       if (expired) {
         navigate('/login/check', { replace: true, state: { email, purpose } })
@@ -88,9 +98,13 @@ export function SoulLoginCheckScreen() {
           <SoulButton type="button" block disabled={waiting} loading={loading} onClick={() => void resend()}>
             {cta}
           </SoulButton>
-          {waiting ? <p className="soul-auth__wait">Send again in {seconds}s</p> : null}
+          {waiting ? (
+            <p className="soul-auth__wait">
+              {t('auth.check.wait', `Send again in ${seconds}s`, { seconds })}
+            </p>
+          ) : null}
           <Link to={backTo} state={{ email }} className="soul-auth__alt">
-            Use a different email
+            {t('auth.check.differentEmail', 'Use a different email')}
           </Link>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { SoulBrand, SoulButton, SoulProgress } from '@/components/soul'
+import { SoulLangSwitch, useCopy } from '@/i18n'
 import { isValidBirthdate, type BirthdateValue } from '../lib/dateValidation'
 import '../quiz-birthdate.css'
 import bgBirthdate from '../assets/onboarding/bg-birthdate.png'
@@ -48,6 +49,7 @@ export default function QuizBirthdateScreen({
   onContinue,
   canProceed,
 }: QuizBirthdateScreenProps) {
+  const t = useCopy()
   const [digits, setDigits] = useState(() => digitsFromValue(value))
   const inputRef = useRef<HTMLInputElement>(null)
   const nativeRef = useRef<HTMLInputElement>(null)
@@ -57,8 +59,8 @@ export default function QuizBirthdateScreen({
   }, [value])
 
   useEffect(() => {
-    const t = window.setTimeout(() => inputRef.current?.focus(), 120)
-    return () => window.clearTimeout(t)
+    const focusTimer = window.setTimeout(() => inputRef.current?.focus(), 120)
+    return () => window.clearTimeout(focusTimer)
   }, [])
 
   const fieldsFilled = digits.length === 8
@@ -84,6 +86,7 @@ export default function QuizBirthdateScreen({
         <div className="soul-bd__content">
           <header className="soul-bd__header">
             <SoulBrand />
+            <SoulLangSwitch />
           </header>
 
           <div className="soul-bd__progress-wrap">
@@ -91,16 +94,18 @@ export default function QuizBirthdateScreen({
           </div>
 
           <section className="soul-bd__hero">
-            <h1 className="soul-bd__title">When were you born?</h1>
+            <h1 className="soul-bd__title">{t('quiz.birthdate.title', 'When were you born?')}</h1>
             <p className="soul-bd__subtitle">
-              This is where your profile begins. It&apos;s what makes it about you, not
-              everyone.
+              {t(
+                'quiz.birthdate.sub',
+                "This is where your profile begins. It's what makes it about you, not everyone.",
+              )}
             </p>
           </section>
 
           <div className="soul-bd__form">
             <label className="soul-bd__field" htmlFor="soul-bd-input">
-              <span className="soul-bd__label">Your birthdate</span>
+              <span className="soul-bd__label">{t('quiz.birthdate.label', 'Your birthdate')}</span>
               <div className={`soul-bd__input-wrap${isInvalid ? ' soul-bd__input-wrap--invalid' : ''}`}>
                 <input
                   ref={inputRef}
@@ -109,7 +114,7 @@ export default function QuizBirthdateScreen({
                   type="text"
                   inputMode="numeric"
                   autoComplete="bday"
-                  placeholder="DD / MM / YYYY"
+                  placeholder={t('quiz.birthdate.placeholder', 'DD / MM / YYYY')}
                   value={formatDisplay(digits)}
                   aria-invalid={isInvalid || undefined}
                   aria-describedby={isInvalid ? 'soul-bd-error' : undefined}
@@ -124,7 +129,7 @@ export default function QuizBirthdateScreen({
                 <button
                   type="button"
                   className="soul-bd__cal-btn"
-                  aria-label="Open calendar"
+                  aria-label={t('quiz.birthdate.calendarAria', 'Open calendar')}
                   onClick={() => nativeRef.current?.showPicker?.() ?? nativeRef.current?.click()}
                 >
                   <CalendarIcon />
@@ -150,7 +155,7 @@ export default function QuizBirthdateScreen({
 
             {isInvalid && (
               <p id="soul-bd-error" className="soul-bd__error" role="alert">
-                Please enter a valid date of birth.
+                {t('quiz.birthdate.invalid', 'Please enter a valid date of birth.')}
               </p>
             )}
 
@@ -159,12 +164,12 @@ export default function QuizBirthdateScreen({
                 block
                 onClick={onContinue}
                 disabled={!canProceed}
-                aria-label="Continue"
+                aria-label={t('quiz.birthdate.continue', 'Continue')}
               >
-                Continue
+                {t('quiz.birthdate.continue', 'Continue')}
               </SoulButton>
               <p className="soul-bd__privacy">
-                Your details stay private and are never shared.
+                {t('quiz.birthdate.privacy', 'Your details stay private and are never shared.')}
               </p>
             </div>
           </div>

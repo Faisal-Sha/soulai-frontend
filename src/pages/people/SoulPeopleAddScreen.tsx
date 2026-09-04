@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { SoulBrand, SoulButton, SoulField, SoulRippleBg } from '@/components/soul'
+import { useCopy } from '@/i18n'
 import { useUser } from '@/hooks/useUser'
 import { createPerson } from './peopleApi'
 import iconCalendar from '@/components/soul/assets/icon-calendar.svg'
@@ -72,6 +73,7 @@ function isValidTimeDigits(digits: string): boolean {
  */
 export function SoulPeopleAddScreen() {
   const navigate = useNavigate()
+  const t = useCopy()
   const { profile, isPremium } = useUser()
   const [saving, setSaving] = useState(false)
   const [name, setName] = useState('')
@@ -131,12 +133,12 @@ export function SoulPeopleAddScreen() {
   const onSubmit = async () => {
     if (!canSubmit || saving) return
     if (!isPremium) {
-      toast.message('Adding people is paused until you resume.')
+      toast.message(t('people.add.paused', 'Adding people is paused until you resume.'))
       navigate('/account/plan')
       return
     }
     if (!profile?.id) {
-      toast.message('Sign in to add someone')
+      toast.message(t('people.add.signIn', 'Sign in to add someone'))
       navigate('/login')
       return
     }
@@ -164,7 +166,7 @@ export function SoulPeopleAddScreen() {
       }
       navigate(`/people/generate/${encodeURIComponent(person.id)}`)
     } catch (err) {
-      toast.message(err instanceof Error ? err.message : 'Could not save this person')
+      toast.message(err instanceof Error ? err.message : t('errors.people.savePerson', 'Could not save this person'))
     } finally {
       setSaving(false)
     }
@@ -182,7 +184,7 @@ export function SoulPeopleAddScreen() {
               type="button"
               className="soul-people__back"
               onClick={() => navigate('/people')}
-              aria-label="Back to People"
+              aria-label={t('people.backAria', 'Back to People')}
             >
               <img src={iconChevron} alt="" width={22} height={22} />
             </button>
@@ -195,10 +197,10 @@ export function SoulPeopleAddScreen() {
           aria-labelledby="soul-people-add-title"
         >
           <h1 id="soul-people-add-title" className="soul-people__title">
-            Who should I read you with?
+            {t('people.add.title', 'Who should I read you with?')}
           </h1>
           <p className="soul-people__subtitle">
-            Their birth details, the same way you gave me yours.
+            {t('people.add.sub', 'Their birth details, the same way you gave me yours.')}
           </p>
         </section>
 
@@ -210,11 +212,11 @@ export function SoulPeopleAddScreen() {
           }}
         >
           <SoulField
-            label="Their name"
+            label={t('people.add.name', 'Their name')}
             htmlFor="people-name"
             inputProps={{
               id: 'people-name',
-              placeholder: 'Anna',
+              placeholder: t('people.add.namePlaceholder', 'Anna'),
               value: name,
               onChange: (e) => setName(e.target.value),
               autoComplete: 'name',
@@ -222,10 +224,10 @@ export function SoulPeopleAddScreen() {
           />
 
           <SoulField
-            label="Date of birth"
+            label={t('people.add.dob', 'Date of birth')}
             htmlFor="people-dob"
             tone={dobInvalid ? 'error' : 'none'}
-            message={dobInvalid ? 'Please enter a valid date of birth.' : undefined}
+            message={dobInvalid ? t('people.add.dobInvalid', 'Please enter a valid date of birth.') : undefined}
           >
             <div
               className={[
@@ -242,7 +244,7 @@ export function SoulPeopleAddScreen() {
                 type="text"
                 inputMode="numeric"
                 autoComplete="bday"
-                placeholder="DD / MM / YYYY"
+                placeholder={t('people.add.dobPlaceholder', 'DD / MM / YYYY')}
                 value={formatDobDisplay(dobDigits)}
                 aria-invalid={dobInvalid || undefined}
                 onChange={(e) => applyDobDigits(e.target.value)}
@@ -250,7 +252,7 @@ export function SoulPeopleAddScreen() {
               <button
                 type="button"
                 className="soul-people__picker-btn"
-                aria-label="Open calendar"
+                aria-label={t('people.add.calendarAria', 'Open calendar')}
                 onClick={() =>
                   dobNativeRef.current?.showPicker?.() ?? dobNativeRef.current?.click()
                 }
@@ -277,13 +279,13 @@ export function SoulPeopleAddScreen() {
           </SoulField>
 
           <SoulField
-            label="Time of birth · Optional"
+            label={t('people.add.time', 'Time of birth · Optional')}
             htmlFor="people-time"
             tone={timeInvalid ? 'error' : 'helper'}
             message={
               timeInvalid
-                ? 'Enter a valid time (HH:MM), or leave blank.'
-                : 'Without it I read the picture, not the detail.'
+                ? t('people.add.timeInvalid', 'Enter a valid time (HH:MM), or leave blank.')
+                : t('people.add.timeHelper', 'Without it I read the picture, not the detail.')
             }
           >
             <div
@@ -300,7 +302,7 @@ export function SoulPeopleAddScreen() {
                 className="soul-input__control"
                 type="text"
                 inputMode="numeric"
-                placeholder="Select time"
+                placeholder={t('people.add.timePlaceholder', 'Select time')}
                 value={formatTimeDisplay(timeDigits)}
                 aria-invalid={timeInvalid || undefined}
                 onChange={(e) => applyTimeDigits(e.target.value)}
@@ -308,7 +310,7 @@ export function SoulPeopleAddScreen() {
               <button
                 type="button"
                 className="soul-people__picker-btn"
-                aria-label="Open time picker"
+                aria-label={t('people.add.timeAria', 'Open time picker')}
                 onClick={() =>
                   timeNativeRef.current?.showPicker?.() ?? timeNativeRef.current?.click()
                 }
@@ -335,7 +337,7 @@ export function SoulPeopleAddScreen() {
             </div>
           </SoulField>
 
-          <SoulField label="Place of birth" htmlFor="people-place">
+          <SoulField label={t('people.add.place', 'Place of birth')} htmlFor="people-place">
             <div className="soul-people__place" ref={placeWrapRef}>
               <div
                 className={[
@@ -356,7 +358,7 @@ export function SoulPeopleAddScreen() {
                   aria-controls="people-place-list"
                   aria-autocomplete="list"
                   autoComplete="off"
-                  placeholder="Select city"
+                  placeholder={t('people.add.placePlaceholder', 'Select city')}
                   value={place}
                   onChange={(e) => {
                     setPlace(e.target.value)
@@ -370,7 +372,7 @@ export function SoulPeopleAddScreen() {
                 <button
                   type="button"
                   className="soul-people__picker-btn"
-                  aria-label={placeOpen ? 'Close city list' : 'Open city list'}
+                  aria-label={placeOpen ? t('people.add.closeCity', 'Close city list') : t('people.add.openCity', 'Open city list')}
                   tabIndex={-1}
                   onClick={() => {
                     setPlaceOpen((v) => !v)
@@ -398,10 +400,10 @@ export function SoulPeopleAddScreen() {
                   role="listbox"
                 >
                   {cityLoading && query.length >= 2 && (
-                    <li className="soul-people__place-status">Searching…</li>
+                    <li className="soul-people__place-status">{t('people.add.searching', 'Searching…')}</li>
                   )}
                   {cityError && !cityLoading && (
-                    <li className="soul-people__place-status">Could not load cities. Type manually.</li>
+                    <li className="soul-people__place-status">{t('people.add.cityError', 'Could not load cities. Type manually.')}</li>
                   )}
                   {showCustom && (
                     <li role="option" aria-selected={false}>
@@ -411,7 +413,7 @@ export function SoulPeopleAddScreen() {
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => pickPlace(query)}
                       >
-                        Use &ldquo;{query}&rdquo;
+                        {t('people.add.useQuery', `Use “${query}”`, { query })}
                       </button>
                     </li>
                   )}
@@ -443,10 +445,10 @@ export function SoulPeopleAddScreen() {
 
           <div className="soul-people__form-cta">
             <SoulButton type="submit" block disabled={!canSubmit || saving}>
-              {saving ? 'Saving…' : 'Read us together'}
+              {saving ? t('people.add.saving', 'Saving…') : t('people.add.cta', 'Read us together')}
             </SoulButton>
             <p className="soul-people__privacy">
-              Their details stay private and are never shared.
+              {t('people.add.privacy', 'Their details stay private and are never shared.')}
             </p>
           </div>
         </form>

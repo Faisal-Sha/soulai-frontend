@@ -2,12 +2,14 @@
 // Ported from soul-v6.html renderQuestion() social-proof type
 
 import PrimaryButton from '../atoms/PrimaryButton'
+import { useCopy } from '@/i18n'
 
 interface SocialProofScreenProps {
   onNext: () => void
 }
 
 export default function SocialProofScreen({ onNext }: SocialProofScreenProps) {
+  const t = useCopy()
   return (
     <div
       style={{
@@ -32,7 +34,10 @@ export default function SocialProofScreen({ onNext }: SocialProofScreenProps) {
             padding: '0 4px',
           }}
         >
-          <span style={{ color: 'var(--accent)' }}>148,000+ people</span> have read who they're meant to meet
+          <span style={{ color: 'var(--accent)' }}>
+            {t('quiz.socialProof.titlePrefix', '148,000+ people')}
+          </span>{' '}
+          {t('quiz.socialProof.title', "have read who they're meant to meet")}
         </h2>
 
         {/* Review card */}
@@ -58,10 +63,10 @@ export default function SocialProofScreen({ onNext }: SocialProofScreenProps) {
           >
             <div>
               <div style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: 14 }}>
-                Rebecca Bauman
+                {t('quiz.socialProof.reviewer', 'Rebecca Bauman')}
               </div>
               <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
-                October 7, 2025
+                {t('quiz.socialProof.date', 'October 7, 2025')}
               </div>
             </div>
             <div style={{ color: '#F4A93C', fontSize: 14, letterSpacing: 1 }}>★★★★★</div>
@@ -75,10 +80,13 @@ export default function SocialProofScreen({ onNext }: SocialProofScreenProps) {
               marginBottom: 8,
             }}
           >
-            "It described him before I met him."
+            {t('quiz.socialProof.quote', '"It described him before I met him."')}
           </div>
           <div style={{ fontSize: 13, lineHeight: 1.55, color: 'var(--text-secondary)' }}>
-            Did this on a slow Sunday, half-skeptical. The reading laid out his energy, how we'd meet, even the way I'd recognize him. Specific stuff. Not horoscope-vague. Three months later I went on a date with someone who matched almost every part of it. Not a sketch, not a guess. More like it was reading me, then telling me what fit.
+            {t(
+              'quiz.socialProof.body',
+              "Did this on a slow Sunday, half-skeptical. The reading laid out his energy, how we'd meet, even the way I'd recognize him. Specific stuff. Not horoscope-vague. Three months later I went on a date with someone who matched almost every part of it. Not a sketch, not a guess. More like it was reading me, then telling me what fit.",
+            )}
           </div>
         </div>
 
@@ -111,7 +119,8 @@ export default function SocialProofScreen({ onNext }: SocialProofScreenProps) {
             📊
           </div>
           <div>
-            <strong>900+ readings</strong> generated today.
+            <strong>{t('quiz.socialProof.readingsToday', '900+ readings', { count: 900 })}</strong>{' '}
+            {t('quiz.socialProof.readingsTodayRest', 'generated today.')}
           </div>
         </div>
 
@@ -143,7 +152,8 @@ export default function SocialProofScreen({ onNext }: SocialProofScreenProps) {
             💬
           </div>
           <div>
-            Trusted by <strong>148,000+</strong> people ·{' '}
+            {t('quiz.socialProof.trustedBy', 'Trusted by')} <strong>148,000+</strong>{' '}
+            {t('quiz.socialProof.trustedPeople', 'people')} ·{' '}
             <span style={{ color: '#F4A93C', fontSize: 11, letterSpacing: '0.5px' }}>★★★★★</span>
           </div>
         </div>
@@ -151,7 +161,7 @@ export default function SocialProofScreen({ onNext }: SocialProofScreenProps) {
 
       {/* CTA */}
       <div style={{ padding: '8px 0 28px' }}>
-        <PrimaryButton onClick={onNext}>Continue</PrimaryButton>
+        <PrimaryButton onClick={onNext}>{t('quiz.socialProof.continue', 'Continue')}</PrimaryButton>
       </div>
     </div>
   )

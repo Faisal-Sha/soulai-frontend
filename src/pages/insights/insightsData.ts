@@ -1,3 +1,10 @@
+import { getLocale, isEnglish, translate } from '@/i18n'
+import {
+  localizeCatalogQuote,
+  localizeInsightDate,
+  localizeInsightSource,
+} from '@/i18n/catalogSnippets'
+
 export type SavedInsight = {
   id: string
   quote: string
@@ -39,3 +46,29 @@ export const SAVED_INSIGHTS: SavedInsight[] = [
     clampLines: 3,
   },
 ]
+
+const DEMO_QUOTE_KEYS: Record<string, string> = {
+  'boundary-rejection': 'insights.demo.boundary',
+  'waiting-decision': 'insights.demo.waiting',
+  'easiest-to-love': 'insights.demo.easiest',
+  'earn-in-bursts': 'insights.demo.bursts',
+}
+
+export function localizeInsight(item: SavedInsight): SavedInsight {
+  if (isEnglish(getLocale())) return item
+  const locale = getLocale()
+  const demo = SAVED_INSIGHTS.find((row) => row.id === item.id || row.quote === item.quote)
+  const demoKey = demo ? DEMO_QUOTE_KEYS[demo.id] : undefined
+  return {
+    ...item,
+    quote: demoKey
+      ? translate(locale, demoKey, item.quote)
+      : localizeCatalogQuote(item.quote),
+    source: localizeInsightSource(item.source),
+    savedAt: localizeInsightDate(item.savedAt),
+  }
+}
+
+export function getSavedInsights(): SavedInsight[] {
+  return SAVED_INSIGHTS.map(localizeInsight)
+}

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { SoulButton } from '@/components/soul'
+import { useCopy } from '@/i18n'
 import type { ResumeSheetMode } from './useSoulSheetParams'
 import './soul-home.css'
 import iconBack from './assets/icon-sheet-back.svg'
@@ -91,6 +92,7 @@ export function ResumeSheet({
   onModeChange,
 }: ResumeSheetProps) {
   const navigate = useNavigate()
+  const t = useCopy()
   const [view, setView] = useState<ResumeSheetMode | 'add'>(modeProp)
   const [selected, setSelected] = useState<MethodId>('visa')
   const [customLabel, setCustomLabel] = useState<string | null>(null)
@@ -106,8 +108,18 @@ export function ResumeSheet({
 
   const confirmLabel = useMemo(() => {
     if (customLabel) return customLabel
-    return METHODS.find((m) => m.id === selected)?.confirmLabel ?? 'Visa ending 4242'
-  }, [customLabel, selected])
+    const method = METHODS.find((m) => m.id === selected)
+    if (!method) return t('home.resume.visaEnding', 'Visa ending 4242')
+    const key =
+      method.id === 'visa'
+        ? 'home.resume.visaEnding'
+        : method.id === 'mc'
+          ? 'home.resume.mcEnding'
+          : method.id === 'apple'
+            ? 'home.resume.applePay'
+            : 'home.resume.newCard'
+    return t(key, method.confirmLabel)
+  }, [customLabel, selected, t])
 
   const rawNumber = digitsOnly(cardNumber)
   const canSave =
@@ -133,7 +145,10 @@ export function ResumeSheet({
   const saveCard = () => {
     if (!canSave) return
     const last4 = rawNumber.slice(-4)
-    const label = `${brandFromNumber(rawNumber)} ending ${last4}`
+    const label = t('common.payment.cardLabel', `${brandFromNumber(rawNumber)} ending ${last4}`, {
+      brand: brandFromNumber(rawNumber),
+      last4,
+    })
     setCustomLabel(label)
     setSelected('visa')
     goView('confirm')
@@ -159,7 +174,7 @@ export function ResumeSheet({
       <button
         type="button"
         className="soul-home__sheet-dim"
-        aria-label="Close resume sheet"
+        aria-label={t('home.resume.closeAria', 'Close resume sheet')}
         onClick={onClose}
       />
       <div
@@ -179,17 +194,17 @@ export function ResumeSheet({
               <button
                 type="button"
                 className="soul-home__sheet-back"
-                aria-label="Back"
+                aria-label={t('home.resume.backAria', 'Back')}
                 onClick={() => goView('methods')}
               >
                 <img src={iconBack} alt="" width={20} height={20} />
               </button>
               <h2 id="soul-resume-title" className="soul-home__sheet-title">
-                Add a card
+                {t('home.resume.addCard', 'Add a card')}
               </h2>
             </div>
             <label className="soul-home__sheet-field">
-              <span className="soul-home__sheet-field-label">Card number</span>
+              <span className="soul-home__sheet-field-label">{t('home.resume.cardNumber', 'Card number')}</span>
               <input
                 className="soul-home__sheet-input"
                 inputMode="numeric"
@@ -201,7 +216,7 @@ export function ResumeSheet({
             </label>
             <div className="soul-home__sheet-field-row">
               <label className="soul-home__sheet-field">
-                <span className="soul-home__sheet-field-label">Expiry</span>
+                <span className="soul-home__sheet-field-label">{t('home.resume.expiry', 'Expiry')}</span>
                 <input
                   className="soul-home__sheet-input"
                   inputMode="numeric"
@@ -212,7 +227,7 @@ export function ResumeSheet({
                 />
               </label>
               <label className="soul-home__sheet-field">
-                <span className="soul-home__sheet-field-label">CVC</span>
+                <span className="soul-home__sheet-field-label">{t('home.resume.cvc', 'CVC')}</span>
                 <input
                   className="soul-home__sheet-input"
                   inputMode="numeric"
@@ -224,18 +239,18 @@ export function ResumeSheet({
               </label>
             </div>
             <label className="soul-home__sheet-field">
-              <span className="soul-home__sheet-field-label">Name on card</span>
+              <span className="soul-home__sheet-field-label">{t('home.resume.nameOnCard', 'Name on card')}</span>
               <input
                 className="soul-home__sheet-input"
                 autoComplete="cc-name"
-                placeholder="Full name"
+                placeholder={t('home.resume.fullName', 'Full name')}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
             </label>
             <div className="soul-home__sheet-actions">
               <SoulButton block disabled={!canSave} onClick={saveCard}>
-                Use this card
+                {t('home.resume.useThisCard', 'Use this card')}
               </SoulButton>
             </div>
           </>
@@ -245,18 +260,32 @@ export function ResumeSheet({
               <button
                 type="button"
                 className="soul-home__sheet-back"
-                aria-label="Back"
+                aria-label={t('home.resume.backAria', 'Back')}
                 onClick={() => goView('confirm')}
               >
                 <img src={iconBack} alt="" width={20} height={20} />
               </button>
               <h2 id="soul-resume-title" className="soul-home__sheet-title">
-                Payment method
+                {t('home.resume.paymentMethod', 'Payment method')}
               </h2>
             </div>
             <div className="soul-home__method-list">
               {METHODS.map((method) => {
                 const active = method.id !== 'add' && method.id === selected
+                const titleKey =
+                  method.id === 'visa'
+                    ? 'home.resume.visa4242'
+                    : method.id === 'mc'
+                      ? 'home.resume.mc8811'
+                      : method.id === 'apple'
+                        ? 'home.resume.applePay'
+                        : 'home.resume.addCard'
+                const detailKey =
+                  method.id === 'visa'
+                    ? 'home.resume.visaExpires'
+                    : method.id === 'mc'
+                      ? 'home.resume.mcExpires'
+                      : null
                 return (
                   <button
                     key={method.id}
@@ -272,9 +301,9 @@ export function ResumeSheet({
                       height={22}
                     />
                     <span className="soul-home__method-text">
-                      <span className="soul-home__method-title">{method.title}</span>
-                      {method.detail ? (
-                        <span className="soul-home__method-detail">{method.detail}</span>
+                      <span className="soul-home__method-title">{t(titleKey, method.title)}</span>
+                      {method.detail && detailKey ? (
+                        <span className="soul-home__method-detail">{t(detailKey, method.detail)}</span>
                       ) : null}
                     </span>
                     {active ? (
@@ -292,7 +321,7 @@ export function ResumeSheet({
             </div>
             <div className="soul-home__sheet-actions">
               <SoulButton block onClick={() => goView('confirm')}>
-                Use this card
+                {t('home.resume.useThisCard', 'Use this card')}
               </SoulButton>
             </div>
           </>
@@ -300,18 +329,20 @@ export function ResumeSheet({
           <>
             <div className="soul-home__sheet-heading">
               <h2 id="soul-resume-title" className="soul-home__sheet-title">
-                Pick up where you left off
+                {t('home.resume.title', 'Pick up where you left off')}
               </h2>
               <p className="soul-home__sheet-sub">
-                Everything you built stays exactly as you left it.
+                {t('home.resume.sub', 'Everything you built stays exactly as you left it.')}
               </p>
             </div>
             <div className="soul-home__sheet-row">
-              <span className="soul-home__sheet-row-label">Price</span>
-              <span className="soul-home__sheet-row-value">{price} · renews monthly</span>
+              <span className="soul-home__sheet-row-label">{t('home.resume.price', 'Price')}</span>
+              <span className="soul-home__sheet-row-value">
+                {t('home.resume.priceValue', `${price} · renews monthly`, { price })}
+              </span>
             </div>
             <div className="soul-home__sheet-row">
-              <span className="soul-home__sheet-row-label">Payment method</span>
+              <span className="soul-home__sheet-row-label">{t('home.resume.paymentMethod', 'Payment method')}</span>
               <div className="soul-home__sheet-row-right">
                 <span className="soul-home__sheet-row-value">{confirmLabel}</span>
                 <button
@@ -319,19 +350,21 @@ export function ResumeSheet({
                   className="soul-home__sheet-change"
                   onClick={() => goView('methods')}
                 >
-                  Change
+                  {t('home.resume.change', 'Change')}
                 </button>
               </div>
             </div>
             <p className="soul-home__sheet-note">
-              Cancel anytime. Charged today, then monthly on this date.
+              {t('home.resume.note', 'Cancel anytime. Charged today, then monthly on this date.')}
             </p>
             <div className="soul-home__sheet-actions">
               <SoulButton block disabled={paying} onClick={resume}>
-                {paying ? 'Resuming…' : `Resume · ${price}/mo`}
+                {paying
+                  ? t('home.resume.resuming', 'Resuming…')
+                  : t('home.resume.resume', `Resume · ${price}/mo`, { price })}
               </SoulButton>
               <button type="button" className="soul-home__sheet-ghost" onClick={onClose}>
-                Cancel
+                {t('home.resume.cancel', 'Cancel')}
               </button>
             </div>
           </>

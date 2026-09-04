@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { SoulBrand, SoulNav, SoulRippleBg } from '@/components/soul'
+import { useCopy } from '@/i18n'
 import { AddToHomeSheet } from '@/pages/home/AddToHomeSheet'
 import { useSoulSheetParams } from '@/pages/home/useSoulSheetParams'
 import './soul-account.css'
@@ -32,6 +33,7 @@ const FREQUENCY: {
  */
 export function SoulAccountNotificationsScreen() {
   const navigate = useNavigate()
+  const t = useCopy()
   const [params] = useSearchParams()
   const blocked = params.get('blocked') === '1' || params.get('blocked') === 'true'
 
@@ -44,8 +46,14 @@ export function SoulAccountNotificationsScreen() {
 
   const frequencyLabel = useMemo(() => {
     const row = FREQUENCY.find((f) => f.id === frequency)
-    return row ? `${row.title} · ${row.meta.toLowerCase()}` : 'Balanced · most mornings'
-  }, [frequency])
+    if (!row) return t('account.notifications.balancedLine', 'Balanced · most mornings')
+    const title = t(`account.notifications.${row.id}`, row.title)
+    const meta = t(`account.notifications.${row.id}Meta`, row.meta)
+    return t('account.notifications.frequencyLine', `${title} · ${meta.toLowerCase()}`, {
+      title,
+      meta: meta.toLowerCase(),
+    })
+  }, [frequency, t])
 
   // Keep Full card copy in sync when returning (session only)
   useEffect(() => {
@@ -74,24 +82,26 @@ export function SoulAccountNotificationsScreen() {
               type="button"
               className="soul-account__back"
               onClick={() => navigate('/account')}
-              aria-label="Back to account"
+              aria-label={t('account.backAria', 'Back to account')}
             >
               <img src={iconBack} alt="" width={22} height={22} />
             </button>
             <SoulBrand />
           </div>
-          <div className="soul-account__header-nav" aria-label="Desktop navigation">
+          <div className="soul-account__header-nav" aria-label={t('account.desktopNavAria', 'Desktop navigation')}>
             <SoulNav variant="desktop" />
           </div>
         </header>
 
         <section className="soul-account__intro" aria-labelledby="soul-account-notif-title">
           <h1 id="soul-account-notif-title" className="soul-account__title">
-            Notifications
+            {t('account.notifications.title', 'Notifications')}
           </h1>
           <p className="soul-account__subtitle">
-            You decide how often I show up. I would rather be useful once a week than ignored every
-            day.
+            {t(
+              'account.notifications.subtitle',
+              'You decide how often I show up. I would rather be useful once a week than ignored every day.',
+            )}
           </p>
         </section>
 
@@ -102,17 +112,21 @@ export function SoulAccountNotificationsScreen() {
                 <img src={markHero} alt="" width={28} height={28} />
               </div>
               <div className="soul-account__install-body">
-                <p className="soul-account__install-title">Notifications are off</p>
+                <p className="soul-account__install-title">
+                  {t('account.notifications.blockedTitle', 'Notifications are off')}
+                </p>
                 <p className="soul-account__install-copy">
-                  On iPhone I can only reach you once SOUL+AI is on your home screen. It takes two
-                  taps.
+                  {t(
+                    'account.notifications.blockedCopy',
+                    'On iPhone I can only reach you once SOUL+AI is on your home screen. It takes two taps.',
+                  )}
                 </p>
                 <button
                   type="button"
                   className="soul-account__install-link"
                   onClick={openInstall}
                 >
-                  Show me how
+                  {t('account.notifications.how', 'Show me how')}
                   <img src={iconArrowLight} alt="" width={14} height={14} />
                 </button>
               </div>
@@ -122,8 +136,8 @@ export function SoulAccountNotificationsScreen() {
           <div
             className={`soul-account__section${settingsDisabled ? ' soul-account__section--dim' : ''}`}
           >
-            <p className="soul-account__section-label">How often</p>
-            <div className="soul-account__freq" role="radiogroup" aria-label="How often">
+            <p className="soul-account__section-label">{t('account.notifications.howOften', 'How often')}</p>
+            <div className="soul-account__freq" role="radiogroup" aria-label={t('account.notifications.howOften', 'How often')}>
               {FREQUENCY.map((opt) => {
                 const selected = frequency === opt.id
                 return (
@@ -138,8 +152,12 @@ export function SoulAccountNotificationsScreen() {
                     }`}
                     onClick={() => setFrequency(opt.id)}
                   >
-                    <span className="soul-account__freq-title">{opt.title}</span>
-                    <span className="soul-account__freq-meta">{opt.meta}</span>
+                    <span className="soul-account__freq-title">
+                      {t(`account.notifications.${opt.id}`, opt.title)}
+                    </span>
+                    <span className="soul-account__freq-meta">
+                      {t(`account.notifications.${opt.id}Meta`, opt.meta)}
+                    </span>
                   </button>
                 )
               })}
@@ -149,12 +167,14 @@ export function SoulAccountNotificationsScreen() {
           <div
             className={`soul-account__section${settingsDisabled ? ' soul-account__section--dim' : ''}`}
           >
-            <p className="soul-account__section-label">What I send</p>
+            <p className="soul-account__section-label">{t('account.notifications.whatISend', 'What I send')}</p>
             <div className="soul-account__card soul-account__card--rows">
               <div className="soul-account__toggle-row">
                 <span className="soul-account__row-text">
-                  <span className="soul-account__row-label">Your morning note</span>
-                  <span className="soul-account__row-hint">The one thing I noticed for today</span>
+                  <span className="soul-account__row-label">{t('account.notifications.morningNote', 'Your morning note')}</span>
+                  <span className="soul-account__row-hint">
+                    {t('account.notifications.morningHint', 'The one thing I noticed for today')}
+                  </span>
                 </span>
                 <button
                   type="button"
@@ -163,7 +183,7 @@ export function SoulAccountNotificationsScreen() {
                   disabled={settingsDisabled}
                   className={`soul-account__switch${morningNote ? ' soul-account__switch--on' : ''}`}
                   onClick={() => setMorningNote((v) => !v)}
-                  aria-label="Your morning note"
+                  aria-label={t('account.notifications.morningNote', 'Your morning note')}
                 >
                   <span className="soul-account__switch-knob" />
                 </button>
@@ -171,8 +191,10 @@ export function SoulAccountNotificationsScreen() {
               <hr className="soul-account__hairline" />
               <div className="soul-account__toggle-row">
                 <span className="soul-account__row-text">
-                  <span className="soul-account__row-label">Nudges</span>
-                  <span className="soul-account__row-hint">When a conversation is left open</span>
+                  <span className="soul-account__row-label">{t('account.notifications.nudges', 'Nudges')}</span>
+                  <span className="soul-account__row-hint">
+                    {t('account.notifications.nudgesHint', 'When a conversation is left open')}
+                  </span>
                 </span>
                 <button
                   type="button"
@@ -181,7 +203,7 @@ export function SoulAccountNotificationsScreen() {
                   disabled={settingsDisabled}
                   className={`soul-account__switch${nudges ? ' soul-account__switch--on' : ''}`}
                   onClick={() => setNudges((v) => !v)}
-                  aria-label="Nudges"
+                  aria-label={t('account.notifications.nudges', 'Nudges')}
                 >
                   <span className="soul-account__switch-knob" />
                 </button>
@@ -194,16 +216,16 @@ export function SoulAccountNotificationsScreen() {
               settingsDisabled ? ' soul-account__section--dim' : ''
             }`}
           >
-            <p className="soul-account__section-label">When</p>
+            <p className="soul-account__section-label">{t('account.notifications.when', 'When')}</p>
             <div className="soul-account__card soul-account__card--rows">
               <button
                 type="button"
                 className="soul-account__row soul-account__row--billing"
                 disabled={settingsDisabled}
-                onClick={() => toast.message('Time picker coming soon')}
+                onClick={() => toast.message(t('account.notifications.timeSoon', 'Time picker coming soon'))}
               >
                 <span className="soul-account__row-label soul-account__row-label--grow">
-                  Morning note
+                  {t('account.notifications.morningTime', 'Morning note')}
                 </span>
                 <span className="soul-account__row-amount">{morningTime}</span>
                 <img
@@ -219,10 +241,10 @@ export function SoulAccountNotificationsScreen() {
                 type="button"
                 className="soul-account__row soul-account__row--billing"
                 disabled={settingsDisabled}
-                onClick={() => toast.message('Quiet hours coming soon')}
+                onClick={() => toast.message(t('account.notifications.quietSoon', 'Quiet hours coming soon'))}
               >
                 <span className="soul-account__row-label soul-account__row-label--grow">
-                  Quiet hours
+                  {t('account.notifications.quietHours', 'Quiet hours')}
                 </span>
                 <span className="soul-account__row-amount">{quietHours}</span>
                 <img
@@ -239,7 +261,10 @@ export function SoulAccountNotificationsScreen() {
               className="soul-account__footnote soul-account__footnote--btn"
               onClick={openInstall}
             >
-              On iPhone, notifications only work once SOUL+AI is added to your home screen.
+              {t(
+                'account.notifications.iphoneFoot',
+                'On iPhone, notifications only work once SOUL+AI is added to your home screen.',
+              )}
             </button>
           </div>
         </div>

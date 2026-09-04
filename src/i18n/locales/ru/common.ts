@@ -1,0 +1,58 @@
+export const common = {
+  nav: {
+    home: 'Главная',
+    readings: 'Чтения',
+    people: 'Люди',
+    profile: 'Профиль',
+    ariaMain: 'Основная навигация',
+  },
+  footer: {
+    tagline: 'Помогаем раскрыть ваш потенциал через древнюю мудрость и современные технологии.',
+    support: 'Поддержка',
+    about: 'О нас',
+    manageSubscription: 'Управление подпиской',
+    terms: 'Условия использования',
+    privacy: 'Политика конфиденциальности',
+    refund: 'Политика возврата',
+    copyright: '© 2026 Soul+AI. Все права защищены.',
+    social: {
+      instagram: 'Instagram',
+      facebook: 'Facebook',
+      twitter: 'Twitter',
+      youtube: 'Youtube',
+    },
+  },
+  pending: {
+    loading: 'Загрузка',
+  },
+  you: 'Вы',
+  language: {
+    name: {
+      en: 'English',
+      ru: 'Русский',
+    },
+    label: 'Язык',
+    hint: 'Язык приложения. Чтения и наставник следуют за ним.',
+    toggleAria: 'Сменить язык',
+    title: 'Язык',
+    subtitle: 'Выберите, на каком языке с вами говорить.',
+    save: 'Сохранить',
+  },
+  months: {
+    january: 'Январь',
+    february: 'Февраль',
+    march: 'Март',
+    april: 'Апрель',
+    may: 'Май',
+    june: 'Июнь',
+    july: 'Июль',
+    august: 'Август',
+    september: 'Сентябрь',
+    october: 'Октябрь',
+    november: 'Ноябрь',
+    december: 'Декабрь',
+  },
+  payment: {
+    cardLabel: '{{brand}}, оканчивается на {{last4}}',
+  },
+}

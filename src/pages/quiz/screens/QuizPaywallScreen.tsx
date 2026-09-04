@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { SoulBrand, SoulButton } from '@/components/soul'
+import { SoulLangSwitch, useCopy } from '@/i18n'
 import {
   PAYWALL_INTRO_PRICE,
   PAYWALL_RENEWAL_PRICE,
@@ -13,6 +14,9 @@ import iconCheckFilled from '../assets/onboarding/icon-check-filled.svg'
 import iconShield from '../assets/onboarding/icon-shield-check.svg'
 import iconStar from '../assets/onboarding/icon-star-gold.svg'
 import iconChevron from '../assets/onboarding/icon-chevron-down.svg'
+
+const FEATURE_IDS = ['profile', 'mentor', 'compat', 'daily', 'steps'] as const
+const STAT_IDS = ['profiles', 'accurate', 'rating'] as const
 
 const FEATURES = [
   {
@@ -104,6 +108,7 @@ export default function QuizPaywallScreen({
   onFaqOpened,
   onGetPlanClicked,
 }: QuizPaywallScreenProps) {
+  const t = useCopy()
   const [openFaq, setOpenFaq] = useState(0)
   const [reviewIdx, setReviewIdx] = useState(0)
   const plan = PAYWALL_SINGLE_PLAN
@@ -142,43 +147,55 @@ export default function QuizPaywallScreen({
         <div className="soul-pw__content">
           <header className="soul-pw__header">
             <SoulBrand />
+            <SoulLangSwitch />
           </header>
 
           <div className="soul-pw__offer">
             <section className="soul-pw__hero">
-              <h1 className="soul-pw__title">Everything opens right now!</h1>
+              <h1 className="soul-pw__title">{t('quiz.paywall.title', 'Everything opens right now!')}</h1>
               <p className="soul-pw__body">
-                Your full profile. Everything about you and your patterns, your
-                behavior models and recommendations, your personal mentor, your
-                notes every morning.
+                {t(
+                  'quiz.paywall.body1',
+                  'Your full profile. Everything about you and your patterns, your behavior models and recommendations, your personal mentor, your notes every morning.',
+                )}
               </p>
-              <p className="soul-pw__body">All of it opens the moment you tap.</p>
               <p className="soul-pw__body">
-                Nobody&apos;s forcing you. But honestly. You should try this!
+                {t('quiz.paywall.body2', 'All of it opens the moment you tap.')}
+              </p>
+              <p className="soul-pw__body">
+                {t('quiz.paywall.body3', "Nobody's forcing you. But honestly. You should try this!")}
               </p>
             </section>
 
             <article className="soul-pw__card">
               <div className="soul-pw__price-head">
-                <h2 className="soul-pw__card-title">7-Day Full Access</h2>
-                <p className="soul-pw__card-sub">Everything I have to say about you</p>
+                <h2 className="soul-pw__card-title">{t('quiz.paywall.planTitle', '7-Day Full Access')}</h2>
+                <p className="soul-pw__card-sub">
+                  {t('quiz.paywall.planSub', 'Everything I have to say about you')}
+                </p>
               </div>
               <div className="soul-pw__price-row">
                 <span className="soul-pw__price">{priceLabel}</span>
-                <span className="soul-pw__price-then">then {renewalLabel}/mo</span>
+                <span className="soul-pw__price-then">
+                  {t('quiz.paywall.thenMo', `then ${renewalLabel}/mo`, { price: renewalLabel })}
+                </span>
               </div>
               <hr className="soul-pw__rule" />
-              <p className="soul-pw__gets">What you get today:</p>
+              <p className="soul-pw__gets">{t('quiz.paywall.gets', 'What you get today:')}</p>
               <ul className="soul-pw__features">
-                {FEATURES.map((item) => (
+                {FEATURES.map((item, i) => (
                   <li key={item.title} className="soul-pw__feature">
                     <div className="soul-pw__feature-head">
                       <span className="soul-pw__feature-icon" aria-hidden="true">
                         <img src={iconCheckFilled} alt="" width={16} height={16} />
                       </span>
-                      <p className="soul-pw__feature-title">{item.title}</p>
+                      <p className="soul-pw__feature-title">
+                        {t(`quiz.paywall.features.${FEATURE_IDS[i]}.title`, item.title)}
+                      </p>
                     </div>
-                    <p className="soul-pw__feature-body">{item.body}</p>
+                    <p className="soul-pw__feature-body">
+                      {t(`quiz.paywall.features.${FEATURE_IDS[i]}.body`, item.body)}
+                    </p>
                   </li>
                 ))}
               </ul>
@@ -187,8 +204,10 @@ export default function QuizPaywallScreen({
             <div className="soul-pw__guarantee">
               <img className="soul-pw__shield" src={iconShield} alt="" aria-hidden="true" />
               <p>
-                30-day money-back guarantee. If your profile doesn&apos;t feel like
-                you, email us in the first 30 days for a full refund.
+                {t(
+                  'quiz.paywall.guarantee',
+                  "30-day money-back guarantee. If your profile doesn't feel like you, email us in the first 30 days for a full refund.",
+                )}
               </p>
             </div>
 
@@ -197,18 +216,28 @@ export default function QuizPaywallScreen({
                 block
                 disabled={isProcessing}
                 onClick={handleCheckout}
-                aria-label={`Start my 7 days for ${priceLabel}`}
+                aria-label={t('quiz.paywall.cta', `Start my 7 days for ${priceLabel}`, {
+                  price: priceLabel,
+                })}
               >
-                {isProcessing ? 'Starting checkout…' : `Start my 7 days for ${priceLabel}`}
+                {isProcessing
+                  ? t('quiz.paywall.starting', 'Starting checkout…')
+                  : t('quiz.paywall.cta', `Start my 7 days for ${priceLabel}`, {
+                      price: priceLabel,
+                    })}
               </SoulButton>
               <p className="soul-pw__cta-sub">
-                {priceLabel} today · Then {renewalLabel}/month · Cancel anytime
+                {t(
+                  'quiz.paywall.ctaSub',
+                  `${priceLabel} today · Then ${renewalLabel}/month · Cancel anytime`,
+                  { intro: priceLabel, renewal: renewalLabel },
+                )}
               </p>
             </div>
           </div>
 
           <div className="soul-pw__aside">
-            <section className="soul-pw__social" aria-label="Reviews" aria-roledescription="carousel">
+            <section className="soul-pw__social" aria-label={t('quiz.paywall.reviewsAria', 'Reviews')} aria-roledescription="carousel">
               <div className="soul-pw__carousel">
                 <article
                   key={activeReview.author}
@@ -217,7 +246,11 @@ export default function QuizPaywallScreen({
                 >
                   <div
                     className="soul-pw__stars"
-                    aria-label={`${activeReview.stars} out of 5 stars`}
+                    aria-label={t(
+                      'quiz.paywall.starsAria',
+                      `${activeReview.stars} out of 5 stars`,
+                      { stars: activeReview.stars },
+                    )}
                   >
                     {Array.from({ length: 5 }).map((_, s) => (
                       <img
@@ -230,8 +263,12 @@ export default function QuizPaywallScreen({
                       />
                     ))}
                   </div>
-                  <p className="soul-pw__quote-text">{activeReview.quote}</p>
-                  <p className="soul-pw__quote-author">{activeReview.author}</p>
+                  <p className="soul-pw__quote-text">
+                    {t(`quiz.paywall.testimonials.${reviewIdx + 1}.quote`, activeReview.quote)}
+                  </p>
+                  <p className="soul-pw__quote-author">
+                    {t(`quiz.paywall.testimonials.${reviewIdx + 1}.author`, activeReview.author)}
+                  </p>
                 </article>
                 <article className="soul-pw__quote soul-pw__quote--peek" aria-hidden="true">
                   <div className="soul-pw__stars">
@@ -246,18 +283,28 @@ export default function QuizPaywallScreen({
                       />
                     ))}
                   </div>
-                  <p className="soul-pw__quote-text">{nextReview.quote}</p>
-                  <p className="soul-pw__quote-author">{nextReview.author}</p>
+                  <p className="soul-pw__quote-text">
+                    {t(
+                      `quiz.paywall.testimonials.${((reviewIdx + 1) % TESTIMONIALS.length) + 1}.quote`,
+                      nextReview.quote,
+                    )}
+                  </p>
+                  <p className="soul-pw__quote-author">
+                    {t(
+                      `quiz.paywall.testimonials.${((reviewIdx + 1) % TESTIMONIALS.length) + 1}.author`,
+                      nextReview.author,
+                    )}
+                  </p>
                 </article>
               </div>
-              <div className="soul-pw__dots" role="tablist" aria-label="Review pages">
+              <div className="soul-pw__dots" role="tablist" aria-label={t('quiz.paywall.reviewPagesAria', 'Review pages')}>
                 {TESTIMONIALS.map((item, i) => (
                   <button
                     key={item.author}
                     type="button"
                     role="tab"
                     aria-selected={i === reviewIdx}
-                    aria-label={`Review ${i + 1}`}
+                    aria-label={t('quiz.paywall.reviewN', `Review ${i + 1}`, { n: i + 1 })}
                     className={`soul-pw__dot${i === reviewIdx ? ' is-active' : ''}`}
                     onClick={() => setReviewIdx(i)}
                   />
@@ -265,17 +312,19 @@ export default function QuizPaywallScreen({
               </div>
             </section>
 
-            <section className="soul-pw__stats" aria-label="Social proof stats">
-              {STATS.map((stat) => (
+            <section className="soul-pw__stats" aria-label={t('quiz.paywall.statsAria', 'Social proof stats')}>
+              {STATS.map((stat, i) => (
                 <div key={stat.label} className="soul-pw__stat">
                   <p className="soul-pw__stat-value">{stat.value}</p>
-                  <p className="soul-pw__stat-label">{stat.label}</p>
+                  <p className="soul-pw__stat-label">
+                    {t(`quiz.paywall.stats.${STAT_IDS[i]}`, stat.label)}
+                  </p>
                 </div>
               ))}
             </section>
 
             <section className="soul-pw__faq">
-              <h2 className="soul-pw__faq-title">Common Questions</h2>
+              <h2 className="soul-pw__faq-title">{t('quiz.paywall.faqTitle', 'Common Questions')}</h2>
               <div className="soul-pw__faq-list">
                 {FAQ_ITEMS.map((item, i) => {
                   const open = openFaq === i
@@ -291,7 +340,7 @@ export default function QuizPaywallScreen({
                           if (!open) onFaqOpened?.(item.id)
                         }}
                       >
-                        <span>{item.q}</span>
+                        <span>{t(`quiz.paywall.faq.${i}.q`, item.q)}</span>
                         <img
                           className="soul-pw__faq-chevron"
                           src={iconChevron}
@@ -299,7 +348,9 @@ export default function QuizPaywallScreen({
                           aria-hidden="true"
                         />
                       </button>
-                      {open ? <p className="soul-pw__faq-a">{item.a}</p> : null}
+                      {open ? (
+                        <p className="soul-pw__faq-a">{t(`quiz.paywall.faq.${i}.a`, item.a)}</p>
+                      ) : null}
                       <hr className="soul-pw__faq-rule" />
                     </div>
                   )
@@ -309,15 +360,17 @@ export default function QuizPaywallScreen({
 
             <footer className="soul-pw__footer">
               <p>
-                You&apos;ll be charged {priceLabel} today for 7 days of full access.
-                After 7 days it renews at {renewalLabel} per month until cancelled.
-                Cancel any time in your profile. By continuing you agree to our{' '}
+                {t(
+                  'quiz.paywall.legal',
+                  `You'll be charged ${priceLabel} today for 7 days of full access. After 7 days it renews at ${renewalLabel} per month until cancelled. Cancel any time in your profile. By continuing you agree to our`,
+                  { intro: priceLabel, renewal: renewalLabel },
+                )}{' '}
                 <Link to="/terms" target="_blank" rel="noopener noreferrer">
-                  Terms
+                  {t('quiz.paywall.terms', 'Terms')}
                 </Link>{' '}
-                and{' '}
+                {t('quiz.paywall.and', 'and')}{' '}
                 <Link to="/privacy" target="_blank" rel="noopener noreferrer">
-                  Privacy Policy
+                  {t('quiz.paywall.privacy', 'Privacy Policy')}
                 </Link>
                 .
               </p>

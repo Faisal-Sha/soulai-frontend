@@ -1,6 +1,7 @@
 import { useEffect, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { SoulBrand, SoulFooter } from "@/components/soul";
+import { useCopy } from "@/i18n";
 import bgRipple from "@/pages/home/assets/bg-ripple.png";
 import "@/pages/legal/soul-legal.css";
 
@@ -30,6 +31,7 @@ export function LegalDocumentLayout({
   intro,
   sections,
 }: LegalDocumentLayoutProps) {
+  const t = useCopy();
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -45,7 +47,7 @@ export function LegalDocumentLayout({
       <div className="soul-legal__scroll">
         <div className="soul-legal__column">
           <header className="soul-legal__header">
-            <Link to="/" className="soul-legal__brand-link" aria-label="Soul+AI home">
+            <Link to="/" className="soul-legal__brand-link" aria-label={t("legal.chrome.homeAria", "Soul+AI home")}>
               <SoulBrand />
             </Link>
           </header>
@@ -54,7 +56,7 @@ export function LegalDocumentLayout({
 
             <div className="soul-legal__hero">
               <div className="soul-legal__hero-head">
-                <p className="soul-legal__meta">Last Updated:&nbsp;{lastUpdated}</p>
+                <p className="soul-legal__meta">{t("legal.chrome.lastUpdated", "Last Updated:")}&nbsp;{lastUpdated}</p>
                 <h1 className="soul-legal__title">{title}</h1>
               </div>
               <div className="soul-legal__intro">{intro}</div>

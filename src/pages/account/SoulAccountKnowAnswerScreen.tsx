@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { SoulBrand, SoulButton, SoulNav, SoulRippleBg, SoulTextarea } from '@/components/soul'
+import { useCopy } from '@/i18n'
 import { useKnowAnswers } from './useKnowAnswers'
 import './soul-account.css'
 import iconArrowLight from '../readings/assets/icon-arrow-light.svg'
@@ -13,6 +14,7 @@ import iconBack from '../people/assets/icon-chevron.svg'
  */
 export function SoulAccountKnowAnswerScreen() {
   const navigate = useNavigate()
+  const t = useCopy()
   const { questionId = '' } = useParams()
   const { lookup, progress, saveAnswer } = useKnowAnswers()
   const hit = useMemo(() => lookup(questionId), [lookup, questionId])
@@ -52,7 +54,7 @@ export function SoulAccountKnowAnswerScreen() {
       await saveAnswer(question.id, value)
       return true
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Could not save'
+      const message = err instanceof Error ? err.message : t('errors.account.save', 'Could not save')
       toast.error(message)
       return false
     } finally {
@@ -83,37 +85,45 @@ export function SoulAccountKnowAnswerScreen() {
               type="button"
               className="soul-account__back"
               onClick={() => navigate('/account/know')}
-              aria-label="Back to What I know"
+              aria-label={t('account.know.backKnowAria', 'Back to What I know')}
             >
               <img src={iconBack} alt="" width={22} height={22} />
             </button>
             <SoulBrand />
           </div>
-          <div className="soul-account__header-nav" aria-label="Desktop navigation">
+          <div className="soul-account__header-nav" aria-label={t('account.desktopNavAria', 'Desktop navigation')}>
             <SoulNav variant="desktop" />
           </div>
         </header>
 
         <section className="soul-account__intro" aria-labelledby="soul-account-know-answer-title">
           <h1 id="soul-account-know-answer-title" className="soul-account__title">
-            What I know about you
+            {t('account.know.title', 'What I know about you')}
           </h1>
           <p className="soul-account__subtitle">
-            Your birth data gives me the shape. What you tell me here gives me the detail. And every
-            answer changes what I say next.
+            {t(
+              'account.know.subtitle',
+              'Your birth data gives me the shape. What you tell me here gives me the detail. And every answer changes what I say next.',
+            )}
           </p>
         </section>
 
         <div className="soul-account__know soul-account__know--answer">
           <p className="soul-account__know-progress soul-account__sr-only" aria-live="polite">
-            {progress.answered} of {progress.total} answered
+            {t('account.know.answeredOf', `${progress.answered} of ${progress.total} answered`, {
+              answered: progress.answered,
+              total: progress.total,
+            })}
           </p>
 
           <header className="soul-account__know-head">
             <div className="soul-account__know-head-row">
               <h2 className="soul-account__know-section-title">{section.title}</h2>
               <span className="soul-account__know-count">
-                {doneInSection} of {totalInSection}
+                {t('account.know.of', `${doneInSection} of ${totalInSection}`, {
+                  done: doneInSection,
+                  total: totalInSection,
+                })}
               </span>
             </div>
             {doneInSection === totalInSection && section.completeNote ? (
@@ -130,7 +140,7 @@ export function SoulAccountKnowAnswerScreen() {
                 className="soul-account__answer-textarea"
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
-                placeholder="Write in your own words…"
+                placeholder={t('account.know.placeholder', 'Write in your own words…')}
                 aria-label={question.prompt}
               />
               <SoulButton
@@ -140,7 +150,7 @@ export function SoulAccountKnowAnswerScreen() {
                 disabled={!canSave}
                 onClick={() => void onSave()}
               >
-                {saving ? 'Saving…' : 'Save'}
+                {saving ? t('account.know.saving', 'Saving…') : t('account.know.save', 'Save')}
               </SoulButton>
             </article>
 
@@ -154,7 +164,7 @@ export function SoulAccountKnowAnswerScreen() {
                     className="soul-account__know-link soul-account__know-link--on-dark"
                     onClick={() => void onOpenRemaining(q.id)}
                   >
-                    {answered ? 'Update' : 'Answer'}
+                    {answered ? t('account.know.update', 'Update') : t('account.know.answer', 'Answer')}
                     <img src={iconArrowLight} alt="" width={14} height={14} />
                   </button>
                 </article>

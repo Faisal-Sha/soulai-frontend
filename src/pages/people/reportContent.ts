@@ -1,3 +1,5 @@
+import { getLocale, isEnglish, translate } from '@/i18n'
+
 export type PeopleReportSection = {
   n: number
   title: string
@@ -31,6 +33,46 @@ function swapNames(text: string, selfName: string, partnerName: string) {
 export function buildReportContent(selfName: string, partnerName: string): StoredPeopleReport {
   const self = selfName.trim() || PEOPLE_REPORT_META.selfName
   const partner = partnerName.trim() || PEOPLE_REPORT_META.partnerName
+  if (getLocale() !== 'en') {
+    const locale = getLocale()
+    return {
+      subtitle: swapNames(
+        translate(locale, 'people.report.meta.subtitle', PEOPLE_REPORT_META.subtitle),
+        self,
+        partner,
+      ),
+      closingTitle: swapNames(
+        translate(locale, 'people.report.meta.closingTitle', PEOPLE_REPORT_META.closingTitle),
+        self,
+        partner,
+      ),
+      closingBody: swapNames(
+        translate(locale, 'people.report.meta.closingBody', PEOPLE_REPORT_META.closingBody),
+        self,
+        partner,
+      ),
+      shareQuote: swapNames(
+        translate(locale, 'people.report.meta.shareQuote', PEOPLE_REPORT_META.shareQuote),
+        self,
+        partner,
+      ),
+      sections: PEOPLE_REPORT_SECTIONS.map((section) => ({
+        n: section.n,
+        title: swapNames(
+          translate(locale, `people.report.sections.${section.n}.title`, section.title),
+          self,
+          partner,
+        ),
+        paragraphs: section.paragraphs.map((p, i) =>
+          swapNames(
+            translate(locale, `people.report.sections.${section.n}.p${i + 1}`, p),
+            self,
+            partner,
+          ),
+        ),
+      })),
+    }
+  }
   return {
     subtitle: PEOPLE_REPORT_META.subtitle,
     closingTitle: PEOPLE_REPORT_META.closingTitle,
@@ -40,6 +82,56 @@ export function buildReportContent(selfName: string, partnerName: string): Store
       n: section.n,
       title: section.title,
       paragraphs: section.paragraphs.map((p) => swapNames(p, self, partner)),
+    })),
+  }
+}
+
+/** Display-time overlay. Stored English placeholder bodies stay in the DB; RU reads keys by section number. */
+export function localizeReportForDisplay(
+  report: StoredPeopleReport,
+  selfName: string,
+  partnerName: string,
+): StoredPeopleReport {
+  const self = selfName.trim() || PEOPLE_REPORT_META.selfName
+  const partner = partnerName.trim() || PEOPLE_REPORT_META.partnerName
+  const locale = getLocale()
+  const vars = { partner, name: partner }
+
+  if (isEnglish(locale)) {
+    return {
+      ...report,
+      shareQuote: swapNames(report.shareQuote, self, partner),
+      sections: report.sections.map((section) => ({
+        ...section,
+        title: swapNames(section.title, self, partner),
+        paragraphs: section.paragraphs.map((p) => swapNames(p, self, partner)),
+      })),
+    }
+  }
+
+  return {
+    subtitle: translate(locale, 'people.report.meta.subtitle', report.subtitle, vars),
+    closingTitle: translate(locale, 'people.report.meta.closingTitle', report.closingTitle, vars),
+    closingBody: translate(locale, 'people.report.meta.closingBody', report.closingBody, vars),
+    shareQuote: swapNames(
+      translate(locale, 'people.report.meta.shareQuote', report.shareQuote, vars),
+      self,
+      partner,
+    ),
+    sections: report.sections.map((section) => ({
+      n: section.n,
+      title: swapNames(
+        translate(locale, `people.report.sections.${section.n}.title`, section.title, vars),
+        self,
+        partner,
+      ),
+      paragraphs: section.paragraphs.map((p, i) =>
+        swapNames(
+          translate(locale, `people.report.sections.${section.n}.p${i + 1}`, p, vars),
+          self,
+          partner,
+        ),
+      ),
     })),
   }
 }

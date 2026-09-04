@@ -1,5 +1,6 @@
 import { createPortal } from 'react-dom'
 import { SoulButton } from '@/components/soul'
+import { useCopy } from '@/i18n'
 import './soul-home.css'
 import markApp from '../../components/soul/assets/mark-hero.svg'
 import iconShare from './assets/icon-share.svg'
@@ -36,6 +37,7 @@ type AddToHomeSheetProps = {
  * Figma Popups · Add to home screen · Instructions (955:9162 / sheet 955:9253)
  */
 export function AddToHomeSheet({ open, onClose }: AddToHomeSheetProps) {
+  const t = useCopy()
   if (!open) return null
 
   return createPortal(
@@ -43,7 +45,7 @@ export function AddToHomeSheet({ open, onClose }: AddToHomeSheetProps) {
       <button
         type="button"
         className="soul-home__sheet-dim"
-        aria-label="Close add to home screen"
+        aria-label={t('home.addToHome.closeAria', 'Close add to home screen')}
         onClick={onClose}
       />
       <div
@@ -62,9 +64,11 @@ export function AddToHomeSheet({ open, onClose }: AddToHomeSheetProps) {
           </span>
           <span>
             <p className="soul-home__install-sheet-title" id="soul-install-title">
-              Add SOUL+AI to your home screen
+              {t('home.addToHome.title', 'Add SOUL+AI to your home screen')}
             </p>
-            <p className="soul-home__install-sheet-sub">Two taps. It opens like any other app.</p>
+            <p className="soul-home__install-sheet-sub">
+              {t('home.addToHome.sub', 'Two taps. It opens like any other app.')}
+            </p>
           </span>
         </div>
         <ol className="soul-home__install-steps">
@@ -72,8 +76,12 @@ export function AddToHomeSheet({ open, onClose }: AddToHomeSheetProps) {
             <li key={step.n} className="soul-home__install-step">
               <span className="soul-home__install-step-n">{step.n}</span>
               <span className="soul-home__install-step-copy">
-                <p className="soul-home__install-step-title">{step.title}</p>
-                <p className="soul-home__install-step-detail">{step.detail}</p>
+                <p className="soul-home__install-step-title">
+                  {t(`home.addToHome.step${step.n}Title`, step.title)}
+                </p>
+                <p className="soul-home__install-step-detail">
+                  {t(`home.addToHome.step${step.n}Detail`, step.detail)}
+                </p>
               </span>
               <span className="soul-home__install-step-icon">
                 <img src={step.icon} alt="" width={22} height={22} />
@@ -82,11 +90,13 @@ export function AddToHomeSheet({ open, onClose }: AddToHomeSheetProps) {
           ))}
         </ol>
         <p className="soul-home__sheet-note">
-          On iPhone this is also what lets me send your morning note. Notifications do not work in
-          the browser.
+          {t(
+            'home.addToHome.note',
+            'On iPhone this is also what lets me send your morning note. Notifications do not work in the browser.',
+          )}
         </p>
         <SoulButton block onClick={onClose}>
-          Got it
+          {t('home.addToHome.gotIt', 'Got it')}
         </SoulButton>
       </div>
     </div>,

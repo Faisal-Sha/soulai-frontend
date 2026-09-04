@@ -1,5 +1,6 @@
 import { useRef, type TouchEvent } from 'react'
 import { SoulBrand, SoulButton } from '@/components/soul'
+import { SoulLangSwitch, useCopy } from '@/i18n'
 import '../onboarding-reading.css'
 import bgChat from '../assets/onboarding/bg-chat.png'
 
@@ -13,6 +14,7 @@ interface OnboardingChatScreenProps {
  * Mobile 390×844. 1:1 from design.
  */
 export default function OnboardingChatScreen({ onStart, onBack }: OnboardingChatScreenProps) {
+  const t = useCopy()
   const touchX = useRef<number | null>(null)
 
   const onTouchStart = (e: TouchEvent) => {
@@ -44,16 +46,19 @@ export default function OnboardingChatScreen({ onStart, onBack }: OnboardingChat
         <div className="soul-ob__content">
           <header className="soul-ob__header soul-ob-chat__enter soul-ob-chat__enter--header">
             <SoulBrand />
+            <SoulLangSwitch />
           </header>
 
           <div className="soul-ob__main">
             <section className="soul-ob__hero">
               <h1 className="soul-ob__title soul-ob-chat__enter soul-ob-chat__enter--title">
-                Looking for the right move for you? Ask me!
+                {t('quiz.onboarding.chat.title', 'Looking for the right move for you? Ask me!')}
               </h1>
               <p className="soul-ob__subtitle soul-ob-chat__enter soul-ob-chat__enter--subtitle">
-                My advice comes only from your patterns and your profile. Nothing generic.
-                I&apos;ll show you the options; the choice is always yours.
+                {t(
+                  'quiz.onboarding.chat.subtitle',
+                  "My advice comes only from your patterns and your profile. Nothing generic. I'll show you the options; the choice is always yours.",
+                )}
               </p>
             </section>
 
@@ -61,29 +66,33 @@ export default function OnboardingChatScreen({ onStart, onBack }: OnboardingChat
               <div className="soul-ob-chat__thread">
                 <div className="soul-ob-chat__row soul-ob-chat__row--user">
                   <div className="soul-ob-chat__bubble soul-ob-chat__bubble--user soul-ob-chat__enter soul-ob-chat__enter--user1">
-                    Why do I always fall for the wrong people?
+                    {t('quiz.onboarding.chat.user1', 'Why do I always fall for the wrong people?')}
                   </div>
                 </div>
 
                 <div className="soul-ob-chat__row soul-ob-chat__row--mentor">
                   <div className="soul-ob-chat__bubble soul-ob-chat__bubble--mentor soul-ob-chat__enter soul-ob-chat__enter--mentor">
                     <p>
-                      Because being needed feels safer to you than being chosen. So you pick
-                      people you can rescue, and call it love, Jane.
+                      {t(
+                        'quiz.onboarding.chat.mentor1',
+                        'Because being needed feels safer to you than being chosen. So you pick people you can rescue, and call it love, Jane.',
+                      )}
                     </p>
                     <p>
-                      Notice it: the same pattern shows up in every relationship you&apos;ve had.
-                      Want to see where it starts?
+                      {t(
+                        'quiz.onboarding.chat.mentor2',
+                        "Notice it: the same pattern shows up in every relationship you've had. Want to see where it starts?",
+                      )}
                     </p>
                   </div>
                   <p className="soul-ob-chat__mentor-label soul-ob-chat__enter soul-ob-chat__enter--label">
-                    Your mentor
+                    {t('quiz.onboarding.chat.mentorLabel', 'Your mentor')}
                   </p>
                 </div>
 
                 <div className="soul-ob-chat__row soul-ob-chat__row--user">
                   <div className="soul-ob-chat__bubble soul-ob-chat__bubble--user soul-ob-chat__enter soul-ob-chat__enter--user2">
-                    Wait. You actually caught that? Okay, let&apos;s get into it.
+                    {t('quiz.onboarding.chat.user2', "Wait. You actually caught that? Okay, let's get into it.")}
                   </div>
                 </div>
               </div>
@@ -93,13 +102,13 @@ export default function OnboardingChatScreen({ onStart, onBack }: OnboardingChat
               <div
                 className="soul-ob__dots-wrap soul-ob-chat__enter soul-ob-chat__enter--dots"
                 role="tablist"
-                aria-label="Onboarding slides"
+                aria-label={t('quiz.onboarding.chat.slidesAria', 'Onboarding slides')}
               >
                 <button
                   type="button"
                   role="tab"
                   aria-selected={false}
-                  aria-label="Reading"
+                  aria-label={t('quiz.onboarding.chat.readingDot', 'Reading')}
                   className="soul-ob__dot"
                   onClick={onBack}
                 />
@@ -107,14 +116,18 @@ export default function OnboardingChatScreen({ onStart, onBack }: OnboardingChat
                   type="button"
                   role="tab"
                   aria-selected={true}
-                  aria-label="Chat"
+                  aria-label={t('quiz.onboarding.chat.chatDot', 'Chat')}
                   className="soul-ob__dot soul-ob__dot--active"
                 />
               </div>
 
               <div className="soul-ob__cta soul-ob-chat__enter soul-ob-chat__enter--cta">
-                <SoulButton block onClick={onStart} aria-label="Start my reading">
-                  Start my reading
+                <SoulButton
+                  block
+                  onClick={onStart}
+                  aria-label={t('quiz.onboarding.chat.cta', 'Start my reading')}
+                >
+                  {t('quiz.onboarding.chat.cta', 'Start my reading')}
                 </SoulButton>
               </div>
             </div>

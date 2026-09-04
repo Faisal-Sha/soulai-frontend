@@ -1,3 +1,5 @@
+import { useCopy } from '@/i18n'
+
 interface PrimaryButtonProps {
   children: React.ReactNode
   onClick: () => void
@@ -15,6 +17,7 @@ export default function PrimaryButton({
   variant = 'lavender',
   'aria-label': ariaLabel,
 }: PrimaryButtonProps) {
+  const t = useCopy()
   const isDisabled = disabled || loading
 
   return (
@@ -32,7 +35,7 @@ export default function PrimaryButton({
         opacity: 0.5,
       } : undefined}
     >
-      {loading ? 'Loading…' : children}
+      {loading ? t('common.pending.loading', 'Loading…') : children}
     </button>
   )
 }

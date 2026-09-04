@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
+import { useCopy } from '@/i18n'
 import './soul-ui.css'
 import navHome from './assets/nav-home.svg'
 import navHomeActive from './assets/nav-home-active.svg'
@@ -64,12 +65,13 @@ type SoulNavProps = {
  */
 export function SoulNav({ active, variant = 'dock', className = '' }: SoulNavProps) {
   const { pathname } = useLocation()
+  const t = useCopy()
   const current = active !== undefined ? active : soulNavTabFromPath(pathname)
 
   return (
     <nav
       className={`soul-nav${variant === 'desktop' ? ' soul-nav--desktop' : ''} ${className}`.trim()}
-      aria-label="Main"
+      aria-label={t('common.nav.ariaMain', 'Main')}
     >
       {TABS.map((tab) => {
         const isActive = current === tab.id
@@ -86,7 +88,7 @@ export function SoulNav({ active, variant = 'dock', className = '' }: SoulNavPro
               width={variant === 'desktop' ? 18 : 20}
               height={variant === 'desktop' ? 18 : 20}
             />
-            {tab.label}
+            {t(`common.nav.${tab.id}`, tab.label)}
           </Link>
         )
       })}

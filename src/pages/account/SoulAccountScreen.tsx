@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { SoulBrand, SoulNav, SoulRippleBg } from '@/components/soul'
+import { useCopy, useI18n } from '@/i18n'
 import { useUser } from '@/hooks/useUser'
 import { supabase } from '@/integrations/supabase/client'
 import { ResumeSheet } from '@/pages/home/ResumeSheet'
@@ -33,14 +34,14 @@ const ENDED_STATUSES = new Set([
   'unpaid',
 ])
 
-function readNotificationsLine(signedIn: boolean) {
+function readNotificationsLine(signedIn: boolean, fallback: string) {
   try {
     const stored = sessionStorage.getItem('soul-account-notifications-line')
     if (stored) return stored
   } catch {
     /* ignore */
   }
-  return signedIn ? 'Choose how we write to you' : DEMO.notificationsLine
+  return signedIn ? fallback : DEMO.notificationsLine
 }
 
 function initialFromName(name: string) {
@@ -48,13 +49,16 @@ function initialFromName(name: string) {
   return t ? t.charAt(0).toUpperCase() : '?'
 }
 
-function formatPlanLine(opts: {
-  isPremium: boolean
-  expiresAt?: string | null
-  status?: string | null
-  cancelAtPeriodEnd?: boolean
-}) {
-  if (!opts.isPremium) return 'Free · upgrade anytime'
+function formatPlanLine(
+  opts: {
+    isPremium: boolean
+    expiresAt?: string | null
+    status?: string | null
+    cancelAtPeriodEnd?: boolean
+  },
+  t: (key: string, english: string, vars?: Record<string, string | number>) => string,
+) {
+  if (!opts.isPremium) return t('account.plan.free', 'Free · upgrade anytime')
   const date = opts.expiresAt
     ? new Date(opts.expiresAt).toLocaleDateString(undefined, {
         day: 'numeric',
@@ -63,15 +67,23 @@ function formatPlanLine(opts: {
     : null
   const trialing = opts.status?.toLowerCase() === 'trialing'
   if (trialing && opts.cancelAtPeriodEnd) {
-    return date ? `Ends ${date} · no monthly charge` : 'Cancelled · ends at trial'
+    return date
+      ? t('account.plan.endsDate', `Ends ${date} · no monthly charge`, { date })
+      : t('account.plan.cancelledTrial', 'Cancelled · ends at trial')
   }
   if (trialing) {
-    return date ? `$6.99 a month · starts ${date}` : '$6.99 a month after trial'
+    return date
+      ? t('account.plan.startsDate', `$6.99 a month · starts ${date}`, { date })
+      : t('account.plan.afterTrial', '$6.99 a month after trial')
   }
   if (opts.cancelAtPeriodEnd) {
-    return date ? `$6.99 a month · ends ${date}` : '$6.99 a month'
+    return date
+      ? t('account.plan.endsMonthly', `$6.99 a month · ends ${date}`, { date })
+      : t('account.plan.monthly', '$6.99 a month')
   }
-  return date ? `$6.99 a month · renews ${date}` : '$6.99 a month'
+  return date
+    ? t('account.plan.renewsDate', `$6.99 a month · renews ${date}`, { date })
+    : t('account.plan.monthly', '$6.99 a month')
 }
 
 function formatEndedOn(raw?: string | null) {
@@ -94,6 +106,8 @@ function formatEndedOn(raw?: string | null) {
 export function SoulAccountScreen() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+  const t = useCopy()
+  const { locale } = useI18n()
   const { user, profile, isPremium, subscription } = useUser()
   const [signingOut, setSigningOut] = useState(false)
   const { progress: know } = useKnowAnswers()
@@ -126,20 +140,27 @@ export function SoulAccountScreen() {
         birthPlace: profile?.birth_place,
         dob: profile?.dob,
         birthTime: profile?.birth_time,
-      }) || 'Add your birth details'
+      }) || t('account.addBirth', 'Add your birth details')
     )
-  }, [signedIn, profile?.birth_place, profile?.birth_time, profile?.dob])
+  }, [signedIn, profile?.birth_place, profile?.birth_time, profile?.dob, t])
 
-  const notificationsLine = readNotificationsLine(signedIn)
+  const notificationsLine = readNotificationsLine(
+    signedIn,
+    t('account.notifications.choose', 'Choose how we write to you'),
+  )
 
+  const endedDay = formatEndedOn(subscription?.expires_at ?? subscription?.current_period_end)
   const planLine = subscriptionEnded
-    ? `Ended on ${formatEndedOn(subscription?.expires_at ?? subscription?.current_period_end)}`
-    : formatPlanLine({
-        isPremium,
-        expiresAt: subscription?.expires_at ?? subscription?.current_period_end,
-        status: subscription?.status,
-        cancelAtPeriodEnd: subscription?.cancel_at_period_end,
-      })
+    ? t('account.plan.endedOn', `Ended on ${endedDay}`, { date: endedDay })
+    : formatPlanLine(
+        {
+          isPremium,
+          expiresAt: subscription?.expires_at ?? subscription?.current_period_end,
+          status: subscription?.status,
+          cancelAtPeriodEnd: subscription?.cancel_at_period_end,
+        },
+        t,
+      )
 
   const knowPct = Math.round((know.answered / Math.max(1, know.total)) * 100)
 
@@ -175,11 +196,11 @@ export function SoulAccountScreen() {
             type="button"
             className="soul-account__brand"
             onClick={() => navigate('/')}
-            aria-label="SOUL+AI home"
+            aria-label={t('account.homeAria', 'SOUL+AI home')}
           >
             <SoulBrand />
           </button>
-          <div className="soul-account__header-nav" aria-label="Desktop navigation">
+          <div className="soul-account__header-nav" aria-label={t('account.desktopNavAria', 'Desktop navigation')}>
             <SoulNav variant="desktop" />
           </div>
         </header>
@@ -189,10 +210,10 @@ export function SoulAccountScreen() {
           aria-labelledby="soul-account-title"
         >
           <h1 id="soul-account-title" className="soul-account__title">
-            Your account
+            {t('account.title', 'Your account')}
           </h1>
           {!subscriptionEnded ? (
-            <p className="soul-account__subtitle">{DEMO.subtitle}</p>
+            <p className="soul-account__subtitle">{t('account.subtitle', DEMO.subtitle)}</p>
           ) : null}
         </section>
 
@@ -213,9 +234,14 @@ export function SoulAccountScreen() {
           {/* What I know */}
           <article className="soul-account__card">
             <div className="soul-account__card-heading">
-              <h2 className="soul-account__card-title">What I know about you</h2>
+              <h2 className="soul-account__card-title">
+                {t('account.know.title', 'What I know about you')}
+              </h2>
               <p className="soul-account__card-meta">
-                {know.answered} of {know.total} answered
+                {t('account.know.answeredOf', `${know.answered} of ${know.total} answered`, {
+                  answered: know.answered,
+                  total: know.total,
+                })}
               </p>
             </div>
             <div
@@ -224,7 +250,7 @@ export function SoulAccountScreen() {
               aria-valuenow={know.answered}
               aria-valuemin={0}
               aria-valuemax={know.total}
-              aria-label="Profile questions answered"
+              aria-label={t('account.know.answeredAria', 'Profile questions answered')}
             >
               <span className="soul-account__progress-fill" style={{ width: `${knowPct}%` }} />
             </div>
@@ -233,7 +259,7 @@ export function SoulAccountScreen() {
               className="soul-account__text-link"
               onClick={() => navigate('/account/know')}
             >
-              Add more
+              {t('account.know.addMore', 'Add more')}
               <img src={iconArrow} alt="" width={14} height={14} />
             </button>
           </article>
@@ -242,13 +268,17 @@ export function SoulAccountScreen() {
           <article className="soul-account__card">
             <div className="soul-account__card-heading">
               <h2 className="soul-account__card-title">
-                {subscriptionEnded ? 'Your plan · ended' : 'Your plan'}
+                {subscriptionEnded
+                  ? t('account.plan.titleEnded', 'Your plan · ended')
+                  : t('account.plan.title', 'Your plan')}
               </h2>
               <p className="soul-account__card-meta">{planLine}</p>
             </div>
             {subscriptionEnded ? (
               <button type="button" className="soul-account__text-link" onClick={onResume}>
-                Resume · {DEMO.resumePrice}/mo
+                {t('account.plan.resume', `Resume · ${DEMO.resumePrice}/mo`, {
+                  price: DEMO.resumePrice,
+                })}
                 <img src={iconArrow} alt="" width={14} height={14} />
               </button>
             ) : (
@@ -257,7 +287,7 @@ export function SoulAccountScreen() {
                 className="soul-account__text-link"
                 onClick={() => navigate('/account/plan')}
               >
-                Manage plan
+                {t('account.plan.manage', 'Manage plan')}
                 <img src={iconArrow} alt="" width={14} height={14} />
               </button>
             )}
@@ -266,7 +296,9 @@ export function SoulAccountScreen() {
           {/* Notifications */}
           <article className="soul-account__card">
             <div className="soul-account__card-heading">
-              <h2 className="soul-account__card-title">Notifications</h2>
+              <h2 className="soul-account__card-title">
+                {t('account.notifications.title', 'Notifications')}
+              </h2>
               <p className="soul-account__card-meta">{notificationsLine}</p>
             </div>
             <button
@@ -274,7 +306,7 @@ export function SoulAccountScreen() {
               className="soul-account__text-link"
               onClick={() => navigate('/account/notifications')}
             >
-              Change
+              {t('account.notifications.change', 'Change')}
               <img src={iconArrow} alt="" width={14} height={14} />
             </button>
           </article>
@@ -287,9 +319,36 @@ export function SoulAccountScreen() {
               onClick={() => navigate('/account/birth')}
             >
               <span className="soul-account__row-text">
-                <span className="soul-account__row-label">Birth details</span>
+                <span className="soul-account__row-label">
+                  {t('account.birth.rowLabel', 'Birth details')}
+                </span>
                 <span className="soul-account__row-hint">
-                  Changing these rewrites your reading
+                  {t('account.birth.rowHint', 'Changing these rewrites your reading')}
+                </span>
+              </span>
+              <img
+                className="soul-account__row-chevron"
+                src={iconChevron}
+                alt=""
+                width={16}
+                height={16}
+              />
+            </button>
+            <hr className="soul-account__hairline" />
+            <button
+              type="button"
+              className="soul-account__row"
+              onClick={() => navigate('/account/language')}
+            >
+              <span className="soul-account__row-text">
+                <span className="soul-account__row-label">
+                  {t('account.language.rowLabel', 'Language')}
+                </span>
+                <span className="soul-account__row-hint">
+                  {t(
+                    `common.language.name.${locale}`,
+                    locale === 'ru' ? 'Русский' : 'English',
+                  )}
                 </span>
               </span>
               <img
@@ -307,13 +366,18 @@ export function SoulAccountScreen() {
                   type="button"
                   className="soul-account__row"
                   onClick={() =>
-                    toast.message('Download everything', {
-                      description: 'Export comes next. Not wired yet.',
+                    toast.message(t('account.plan.download', 'Download everything'), {
+                      description: t(
+                        'account.plan.downloadSoon',
+                        'Export comes next. Not wired yet.',
+                      ),
                     })
                   }
                 >
                   <span className="soul-account__row-text">
-                    <span className="soul-account__row-label">Download everything</span>
+                    <span className="soul-account__row-label">
+                      {t('account.plan.download', 'Download everything')}
+                    </span>
                   </span>
                   <img
                     className="soul-account__row-chevron"
@@ -328,7 +392,9 @@ export function SoulAccountScreen() {
             ) : null}
             <Link to="/contact" className="soul-account__row">
               <span className="soul-account__row-text">
-                <span className="soul-account__row-label">Contact support</span>
+                <span className="soul-account__row-label">
+                  {t('account.rows.contact', 'Contact support')}
+                </span>
               </span>
               <img
                 className="soul-account__row-chevron"
@@ -341,7 +407,9 @@ export function SoulAccountScreen() {
             <hr className="soul-account__hairline" />
             <Link to="/terms" className="soul-account__row">
               <span className="soul-account__row-text">
-                <span className="soul-account__row-label">Terms and Privacy</span>
+                <span className="soul-account__row-label">
+                  {t('account.rows.legal', 'Terms and Privacy')}
+                </span>
               </span>
               <img
                 className="soul-account__row-chevron"
@@ -361,7 +429,9 @@ export function SoulAccountScreen() {
             onClick={onSignOut}
             disabled={signingOut}
           >
-            {signingOut ? 'Signing out…' : 'Sign out'}
+            {signingOut
+              ? t('account.plan.signingOut', 'Signing out…')
+              : t('account.plan.signOut', 'Sign out')}
           </button>
         </div>
       </div>

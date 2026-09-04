@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { SoulBrand, SoulNav, SoulRippleBg, SoulTextLink } from '@/components/soul'
+import { useCopy } from '@/i18n'
 import { type KnowQuestion } from './knowData'
 import { useKnowAnswers } from './useKnowAnswers'
 import './soul-account.css'
@@ -12,6 +13,7 @@ import iconBack from '../people/assets/icon-chevron.svg'
  */
 export function SoulAccountKnowScreen() {
   const navigate = useNavigate()
+  const t = useCopy()
   const { sections, progress } = useKnowAnswers()
 
   const onOpenQuestion = (q: KnowQuestion) => {
@@ -31,30 +33,35 @@ export function SoulAccountKnowScreen() {
               type="button"
               className="soul-account__back"
               onClick={() => navigate('/account')}
-              aria-label="Back to account"
+              aria-label={t('account.backAria', 'Back to account')}
             >
               <img src={iconBack} alt="" width={22} height={22} />
             </button>
             <SoulBrand />
           </div>
-          <div className="soul-account__header-nav" aria-label="Desktop navigation">
+          <div className="soul-account__header-nav" aria-label={t('account.desktopNavAria', 'Desktop navigation')}>
             <SoulNav variant="desktop" />
           </div>
         </header>
 
         <section className="soul-account__intro" aria-labelledby="soul-account-know-title">
           <h1 id="soul-account-know-title" className="soul-account__title">
-            What I know about you
+            {t('account.know.title', 'What I know about you')}
           </h1>
           <p className="soul-account__subtitle">
-            Your birth data gives me the shape. What you tell me here gives me the detail. And every
-            answer changes what I say next.
+            {t(
+              'account.know.subtitle',
+              'Your birth data gives me the shape. What you tell me here gives me the detail. And every answer changes what I say next.',
+            )}
           </p>
         </section>
 
         <div className="soul-account__know">
           <p className="soul-account__know-progress" aria-live="polite">
-            {progress.answered} of {progress.total} answered
+            {t('account.know.answeredOf', `${progress.answered} of ${progress.total} answered`, {
+              answered: progress.answered,
+              total: progress.total,
+            })}
           </p>
 
           {sections.map((section) => {
@@ -68,7 +75,7 @@ export function SoulAccountKnowScreen() {
                   <div className="soul-account__know-head-row">
                     <h2 className="soul-account__know-section-title">{section.title}</h2>
                     <span className="soul-account__know-count">
-                      {done} of {total}
+                      {t('account.know.of', `${done} of ${total}`, { done, total })}
                     </span>
                   </div>
                   {complete && section.completeNote ? (
@@ -92,7 +99,9 @@ export function SoulAccountKnowScreen() {
                               <p className="soul-account__know-prompt">{q.prompt}</p>
                               <p className="soul-account__know-answer">“{q.answer}”</p>
                             </div>
-                            <SoulTextLink onClick={() => onOpenQuestion(q)}>Update</SoulTextLink>
+                            <SoulTextLink onClick={() => onOpenQuestion(q)}>
+                              {t('account.know.update', 'Update')}
+                            </SoulTextLink>
                           </>
                         ) : (
                           <>
@@ -102,7 +111,7 @@ export function SoulAccountKnowScreen() {
                               className="soul-account__know-link soul-account__know-link--on-dark"
                               onClick={() => onOpenQuestion(q)}
                             >
-                              Answer
+                              {t('account.know.answer', 'Answer')}
                               <img src={iconArrowLight} alt="" width={14} height={14} />
                             </button>
                           </>

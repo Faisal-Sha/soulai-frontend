@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from '@/integrations/supabase/client'
 import { AuthLayout } from './AuthLayout'
+import { useCopy } from '@/i18n'
 import bgSignInEmail from './assets/bg-signin-email.png'
 import {
   getPostAuthPath,
@@ -18,8 +19,9 @@ import {
  */
 export function AuthCallbackScreen() {
   const navigate = useNavigate()
+  const t = useCopy()
   const [params] = useSearchParams()
-  const [status, setStatus] = useState('Signing you in…')
+  const [status, setStatus] = useState(() => t('auth.callback.signingIn', 'Signing you in…'))
   const done = useRef(false)
 
   useEffect(() => {
@@ -30,7 +32,7 @@ export function AuthCallbackScreen() {
     const succeed = async (session: Session) => {
       if (done.current) return
       done.current = true
-      setStatus('Opening your space…')
+      setStatus(t('auth.callback.opening', 'Opening your space…'))
       try {
         const path = await resolveSignedInPath(session.user.id, requested)
         navigate(path, { replace: true })
@@ -64,7 +66,7 @@ export function AuthCallbackScreen() {
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) void succeed(session)
-      else setStatus('Waiting for your session…')
+      else setStatus(t('auth.callback.waiting', 'Waiting for your session…'))
     })
 
     const t = window.setTimeout(() => fail(true), 12000)
@@ -78,7 +80,7 @@ export function AuthCallbackScreen() {
   return (
     <AuthLayout bg={bgSignInEmail} name="Sign in · Callback" centered>
       <section className="soul-auth__hero soul-auth__hero--center">
-        <h1 className="soul-auth__title">One moment</h1>
+        <h1 className="soul-auth__title">{t('auth.callback.title', 'One moment')}</h1>
         <p className="soul-auth__subtitle">{status}</p>
       </section>
     </AuthLayout>

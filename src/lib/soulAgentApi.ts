@@ -1,3 +1,5 @@
+import { getLocale, translate } from "@/i18n";
+
 const API_BASE =
   import.meta.env.VITE_SOULAI_AGENT_API_URL ||
   "https://soulai-agents-production.up.railway.app";
@@ -25,12 +27,17 @@ export function formatApiError(err: unknown): string {
   const raw = err instanceof Error ? err.message : String(err ?? "");
   const text = raw.trim();
 
-  if (!text) return "Something went wrong. Please try again.";
+  if (!text) {
+    const en = "Something went wrong. Please try again.";
+    return getLocale() !== "en" ? translate(getLocale(), "errors.agent.generic", en) : en;
+  }
   if (/failed to fetch|networkerror|load failed/i.test(text)) {
-    return "Could not reach the agent. Check your connection and try again.";
+    const en = "Could not reach the agent. Check your connection and try again.";
+    return getLocale() !== "en" ? translate(getLocale(), "errors.agent.unreachable", en) : en;
   }
   if (/string_type|validation error|pydantic/i.test(text)) {
-    return "The agent returned an unexpected response. Please try again.";
+    const en = "The agent returned an unexpected response. Please try again.";
+    return getLocale() !== "en" ? translate(getLocale(), "errors.agent.unexpected", en) : en;
   }
   if (text.length > 160) {
     return text.slice(0, 157).trimEnd() + "…";
@@ -60,10 +67,12 @@ function formatDetail(detail: unknown): string {
     try {
       return JSON.stringify(detail);
     } catch {
-      return "Request failed";
+      const en = "Request failed";
+      return getLocale() !== "en" ? translate(getLocale(), "errors.agent.requestFailed", en) : en;
     }
   }
-  return "Request failed";
+  const en = "Request failed";
+  return getLocale() !== "en" ? translate(getLocale(), "errors.agent.requestFailed", en) : en;
 }
 
 async function parseError(res: Response, data: unknown): Promise<never> {
@@ -71,7 +80,15 @@ async function parseError(res: Response, data: unknown): Promise<never> {
     data && typeof data === "object" && "detail" in data
       ? (data as { detail: unknown }).detail
       : data;
-  throw new Error(formatDetail(detail) || `Request failed (${res.status})`);
+  const fallback = `Request failed (${res.status})`;
+  throw new Error(
+    formatDetail(detail) ||
+      (getLocale() !== "en"
+        ? translate(getLocale(), "errors.agent.requestFailedStatus", fallback, {
+            status: res.status,
+          })
+        : fallback),
+  );
 }
 
 /** Normalize agent answer whether backend sends a string or content blocks. */
@@ -140,7 +157,10 @@ export async function sendChat(
 
   const answer = normalizeAnswer((data as ChatResponse).answer);
   if (!answer) {
-    throw new Error("The agent returned an empty or invalid answer. Please try again.");
+    const en = "The agent returned an empty or invalid answer. Please try again.";
+    throw new Error(
+      getLocale() !== "en" ? translate(getLocale(), "errors.agent.unexpected", en) : en,
+    );
   }
 
   return {

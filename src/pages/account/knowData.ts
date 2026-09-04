@@ -1,3 +1,5 @@
+import { getLocale, translate } from '@/i18n'
+
 export type KnowQuestion = {
   id: string
   prompt: string
@@ -230,17 +232,40 @@ export function getKnowSections(
   opts?: { preview?: boolean },
 ): KnowSection[] {
   const preview = opts?.preview ?? false
-  return KNOW_SECTIONS.map((section) => ({
-    ...section,
-    questions: section.questions.map((q) => {
-      if (Object.prototype.hasOwnProperty.call(stored, q.id)) {
-        const value = stored[q.id]
-        return value ? { ...q, answer: value } : { ...q, answer: undefined }
-      }
-      if (preview) return { ...q, answer: q.demoAnswer }
-      return { ...q, answer: undefined }
-    }),
-  }))
+  const locale = getLocale()
+  return KNOW_SECTIONS.map((section) => {
+    const localizedSection =
+      locale !== 'en'
+        ? {
+            ...section,
+            title: translate(locale, `account.know.sections.${section.id}`, section.title),
+            completeNote: section.completeNote
+              ? translate(locale, 'account.know.completeNote', section.completeNote)
+              : section.completeNote,
+          }
+        : section
+    return {
+      ...localizedSection,
+      questions: section.questions.map((q) => {
+        const localizedQ =
+          locale !== 'en'
+            ? {
+                ...q,
+                prompt: translate(locale, `account.know.prompts.${q.id}`, q.prompt),
+                demoAnswer: q.demoAnswer
+                  ? translate(locale, `account.know.demo.${q.id}`, q.demoAnswer)
+                  : q.demoAnswer,
+              }
+            : q
+        if (Object.prototype.hasOwnProperty.call(stored, q.id)) {
+          const value = stored[q.id]
+          return value ? { ...localizedQ, answer: value } : { ...localizedQ, answer: undefined }
+        }
+        if (preview) return { ...localizedQ, answer: localizedQ.demoAnswer }
+        return { ...localizedQ, answer: undefined }
+      }),
+    }
+  })
 }
 
 export function findKnowQuestion(

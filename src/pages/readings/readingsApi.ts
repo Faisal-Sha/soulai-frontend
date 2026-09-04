@@ -1,9 +1,11 @@
+import { getLocale, translate } from '@/i18n'
 import { supabase } from '@/integrations/supabase/client'
 import type { ReadingChapter, ReadingChapterId } from './chapters'
 import {
   READING_PACK,
   STATIC_DAILY_NOTE,
   countWords,
+  localizeStaticPack,
   packById,
   type ChapterPack,
 } from './readingCatalog'
@@ -116,9 +118,11 @@ export function summarizeProgress(rows: ChapterProgressRow[]): ReadingProgress {
 }
 
 export function toListChapter(row: ChapterProgressRow): ReadingChapter {
-  const sectionTotal = Math.max(1, row.content.sections.length)
+  const content = localizeStaticPack(row.content)
+  const sectionTotal = Math.max(1, content.sections.length)
   const read = Boolean(row.completed_at)
   const viewPct = chapterViewPct(row)
+  const locale = getLocale()
   let meta: string | undefined
   if (!read) {
     const fromScroll = Math.max(1, Math.round((viewPct / 100) * sectionTotal))
@@ -129,15 +133,21 @@ export function toListChapter(row: ChapterProgressRow): ReadingChapter {
         ? fromScroll
         : 0
     if (started) {
-      meta = `${sectionN} of ${sectionTotal} · ${row.read_time_min} min`
+      const en = `${sectionN} of ${sectionTotal} · ${row.read_time_min} min`
+      meta = translate(locale, 'readings.chapter.ofMeta', en, {
+        done: sectionN,
+        total: sectionTotal,
+        mins: row.read_time_min,
+      })
     } else {
-      meta = `${row.read_time_min} min`
+      const en = `${row.read_time_min} min`
+      meta = translate(locale, 'readings.chapter.minOnly', en, { mins: row.read_time_min })
     }
   }
   return {
     id: row.chapter_id,
-    title: row.content.title,
-    blurb: row.content.blurb,
+    title: content.title,
+    blurb: content.blurb,
     read,
     meta,
   }

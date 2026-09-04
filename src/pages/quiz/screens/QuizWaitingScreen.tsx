@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { SoulBrand } from '@/components/soul'
+import { SoulLangSwitch, useCopy } from '@/i18n'
 import '../quiz-waiting.css'
 import bgWaiting from '../assets/onboarding/bg-waiting.png'
 import markHero from '../assets/onboarding/mark-waiting.svg'
@@ -29,6 +30,8 @@ const WAIT_CARDS = [
   },
 ] as const
 
+const WAIT_CARD_IDS = ['daily', 'weekly', 'mindful'] as const
+
 /** Figma 1017:4418 cohort. 12s play-once, then a short settle */
 const SEQUENCE_MS = 12000
 const DONE_MS = 900
@@ -43,7 +46,8 @@ interface QuizWaitingScreenProps {
  * Mark/hero steps 180° per checklist item; glass orb video loops in place.
  */
 export default function QuizWaitingScreen({ name, onDone }: QuizWaitingScreenProps) {
-  const displayName = name?.trim() || 'friend'
+  const t = useCopy()
+  const displayName = name?.trim() || t('quiz.waiting.friend', 'friend')
 
   useEffect(() => {
     const t = window.setTimeout(onDone, SEQUENCE_MS + DONE_MS)
@@ -63,11 +67,12 @@ export default function QuizWaitingScreen({ name, onDone }: QuizWaitingScreenPro
         <div className="soul-wt__content">
           <header className="soul-wt__header soul-wt-enter soul-wt-enter--header">
             <SoulBrand />
+            <SoulLangSwitch />
           </header>
 
           <section className="soul-wt__hero">
             <h1 className="soul-wt__title soul-wt-enter soul-wt-enter--title">
-              Building your profile, {displayName}…
+              {t('quiz.waiting.title', `Building your profile, ${displayName}…`, { name: displayName })}
             </h1>
           </section>
 
@@ -92,12 +97,14 @@ export default function QuizWaitingScreen({ name, onDone }: QuizWaitingScreenPro
                 <span className="soul-wt__tick" aria-hidden="true">
                   ✓
                 </span>
-                <span>{label}</span>
+                <span>{t(`quiz.waiting.checks.${i + 1}`, label)}</span>
               </li>
             ))}
           </ul>
 
-          <p className="soul-wt__wait-label soul-wt-enter soul-wt-enter--label">While you wait</p>
+          <p className="soul-wt__wait-label soul-wt-enter soul-wt-enter--label">
+            {t('quiz.waiting.waitLabel', 'While you wait')}
+          </p>
 
           <div className="soul-wt__cards">
             {WAIT_CARDS.map((card, i) => (
@@ -105,8 +112,12 @@ export default function QuizWaitingScreen({ name, onDone }: QuizWaitingScreenPro
                 key={card.title}
                 className={`soul-wt__card soul-wt__card--${i + 1}`}
               >
-                <h2 className="soul-wt__card-title">{card.title}</h2>
-                <p className="soul-wt__card-body">{card.body}</p>
+                <h2 className="soul-wt__card-title">
+                  {t(`quiz.waiting.cards.${WAIT_CARD_IDS[i]}.title`, card.title)}
+                </h2>
+                <p className="soul-wt__card-body">
+                  {t(`quiz.waiting.cards.${WAIT_CARD_IDS[i]}.body`, card.body)}
+                </p>
               </article>
             ))}
           </div>
@@ -114,13 +125,13 @@ export default function QuizWaitingScreen({ name, onDone }: QuizWaitingScreenPro
           <div
             className="soul-wt__dots soul-wt-enter soul-wt-enter--dots"
             role="tablist"
-            aria-label="While you wait"
+            aria-label={t('quiz.waiting.waitAria', 'While you wait')}
           >
             {WAIT_CARDS.map((card, i) => (
               <span
                 key={card.title}
                 role="tab"
-                aria-label={card.title}
+                aria-label={t(`quiz.waiting.cards.${WAIT_CARD_IDS[i]}.title`, card.title)}
                 className={`soul-wt__dot soul-wt__dot--${i + 1}`}
               />
             ))}

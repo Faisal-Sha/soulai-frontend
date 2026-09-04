@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import iconCheck from './assets/icon-check.svg'
 import iconError from './assets/icon-error.svg'
+import { useCopy } from '@/i18n'
 
 export type TopUpSheetMode = 'pay' | 'declined' | 'change'
 
@@ -55,6 +56,7 @@ export function TopUpSheet({
   onBackFromChange,
   onSaveCard,
 }: TopUpSheetProps) {
+  const t = useCopy()
   const [cardNumber, setCardNumber] = useState('')
   const [expiry, setExpiry] = useState('')
   const [cvc, setCvc] = useState('')
@@ -81,7 +83,12 @@ export function TopUpSheet({
   const saveCard = () => {
     if (!canSave) return
     const last4 = rawNumber.slice(-4)
-    onSaveCard(`${brandFromNumber(rawNumber)} ending ${last4}`)
+    onSaveCard(
+      t('common.payment.cardLabel', `${brandFromNumber(rawNumber)} ending ${last4}`, {
+        brand: brandFromNumber(rawNumber),
+        last4,
+      }),
+    )
   }
 
   return (
@@ -89,7 +96,7 @@ export function TopUpSheet({
       <button
         type="button"
         className="soul-chat__sheet-dim"
-        aria-label="Close payment sheet"
+        aria-label={t('agent.topup.closeAria', 'Close payment sheet')}
         onClick={onClose}
       />
       <div
@@ -106,15 +113,15 @@ export function TopUpSheet({
           <>
             <div className="soul-chat__sheet-heading">
               <h2 id="soul-topup-title" className="soul-chat__sheet-title">
-                Change card
+                {t('agent.topup.changeTitle', 'Change card')}
               </h2>
               <p className="soul-chat__sheet-sub">
-                We&apos;ll use this for your next top-up. Nothing is charged yet.
+                {t('agent.topup.changeSub', "We'll use this for your next top-up. Nothing is charged yet.")}
               </p>
             </div>
 
             <label className="soul-chat__sheet-field">
-              <span className="soul-chat__sheet-field-label">Card number</span>
+              <span className="soul-chat__sheet-field-label">{t('agent.topup.cardNumber', 'Card number')}</span>
               <input
                 className="soul-chat__sheet-input"
                 inputMode="numeric"
@@ -127,7 +134,7 @@ export function TopUpSheet({
 
             <div className="soul-chat__sheet-field-row">
               <label className="soul-chat__sheet-field">
-                <span className="soul-chat__sheet-field-label">Expiry</span>
+                <span className="soul-chat__sheet-field-label">{t('agent.topup.expiry', 'Expiry')}</span>
                 <input
                   className="soul-chat__sheet-input"
                   inputMode="numeric"
@@ -138,7 +145,7 @@ export function TopUpSheet({
                 />
               </label>
               <label className="soul-chat__sheet-field">
-                <span className="soul-chat__sheet-field-label">CVC</span>
+                <span className="soul-chat__sheet-field-label">{t('agent.topup.cvc', 'CVC')}</span>
                 <input
                   className="soul-chat__sheet-input"
                   inputMode="numeric"
@@ -151,18 +158,18 @@ export function TopUpSheet({
             </div>
 
             <label className="soul-chat__sheet-field">
-              <span className="soul-chat__sheet-field-label">Name on card</span>
+              <span className="soul-chat__sheet-field-label">{t('agent.topup.nameOnCard', 'Name on card')}</span>
               <input
                 className="soul-chat__sheet-input"
                 autoComplete="cc-name"
-                placeholder="Full name"
+                placeholder={t('agent.topup.fullName', 'Full name')}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
             </label>
 
             <p className="soul-chat__sheet-note">
-              Encrypted entry. Nothing is charged until you confirm Pay.
+              {t('agent.topup.encryptNote', 'Encrypted entry. Nothing is charged until you confirm Pay.')}
             </p>
 
             <div className="soul-chat__sheet-actions">
@@ -172,10 +179,10 @@ export function TopUpSheet({
                 disabled={!canSave}
                 onClick={saveCard}
               >
-                Save card
+                {t('agent.topup.saveCard', 'Save card')}
               </button>
               <button type="button" className="soul-chat__sheet-cancel" onClick={onBackFromChange}>
-                Back
+                {t('agent.topup.back', 'Back')}
               </button>
             </div>
           </>
@@ -183,23 +190,25 @@ export function TopUpSheet({
           <>
             <div className="soul-chat__sheet-heading">
               <h2 id="soul-topup-title" className="soul-chat__sheet-title">
-                10 more messages
+                {t('agent.topup.title', '10 more messages')}
               </h2>
-              <p className="soul-chat__sheet-sub">Your conversation stays exactly where it is.</p>
+              <p className="soul-chat__sheet-sub">
+                {t('agent.topup.sub', 'Your conversation stays exactly where it is.')}
+              </p>
             </div>
 
             <div className="soul-chat__sheet-row">
-              <span className="soul-chat__sheet-row-label">Price</span>
-              <span className="soul-chat__sheet-row-value">$7.00 · one-time</span>
+              <span className="soul-chat__sheet-row-label">{t('agent.topup.price', 'Price')}</span>
+              <span className="soul-chat__sheet-row-value">{t('agent.topup.priceValue', '$7.00 · one-time')}</span>
             </div>
 
             <div className="soul-chat__sheet-row">
-              <span className="soul-chat__sheet-row-label">Payment method</span>
+              <span className="soul-chat__sheet-row-label">{t('agent.topup.paymentMethod', 'Payment method')}</span>
               <div className="soul-chat__sheet-row-right">
                 <span className="soul-chat__sheet-row-value">{cardLabel}</span>
                 {mode === 'pay' ? (
                   <button type="button" className="soul-chat__sheet-change" onClick={onChangeCard}>
-                    Change
+                    {t('agent.topup.change', 'Change')}
                   </button>
                 ) : null}
               </div>
@@ -208,11 +217,11 @@ export function TopUpSheet({
             {mode === 'declined' ? (
               <div className="soul-chat__sheet-error" role="alert">
                 <img src={iconError} alt="" width={16} height={16} />
-                <p>Your card was declined.</p>
+                <p>{t('agent.topup.declined', 'Your card was declined.')}</p>
               </div>
             ) : (
               <p className="soul-chat__sheet-note">
-                One-time charge. Unused messages stay on your account.
+                {t('agent.topup.oneTime', 'One-time charge. Unused messages stay on your account.')}
               </p>
             )}
 
@@ -225,19 +234,19 @@ export function TopUpSheet({
                     disabled={paying}
                     onClick={onPay}
                   >
-                    {paying ? 'Paying…' : 'Pay $7.00'}
+                    {paying ? t('agent.topup.paying', 'Paying…') : t('agent.topup.pay', 'Pay $7.00')}
                   </button>
                   <button type="button" className="soul-chat__sheet-cancel" onClick={onClose}>
-                    Cancel
+                    {t('agent.topup.cancel', 'Cancel')}
                   </button>
                 </>
               ) : (
                 <>
                   <button type="button" className="soul-chat__sheet-pay" onClick={onChangeCard}>
-                    Use another card
+                    {t('agent.topup.otherCard', 'Use another card')}
                   </button>
                   <button type="button" className="soul-chat__sheet-cancel" onClick={onTryAgain}>
-                    Try again
+                    {t('agent.topup.tryAgain', 'Try again')}
                   </button>
                 </>
               )}
@@ -250,10 +259,11 @@ export function TopUpSheet({
 }
 
 export function TopUpSuccessPill() {
+  const t = useCopy()
   return (
     <div className="soul-chat__topup-pill" role="status">
       <img src={iconCheck} alt="" width={13} height={13} />
-      <span>10 messages added · $7.00</span>
+      <span>{t('agent.topup.success', '10 messages added · $7.00')}</span>
     </div>
   )
 }

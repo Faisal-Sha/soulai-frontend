@@ -1,3 +1,5 @@
+import { getLocale, translate } from '@/i18n'
+
 export type ReadingChapterId =
   | 'core-self'
   | 'your-pattern'
@@ -75,3 +77,17 @@ export const READING_CHAPTERS: ReadingChapter[] = [
     meta: '6 min',
   },
 ]
+
+export function localizeReadingChapter(chapter: ReadingChapter): ReadingChapter {
+  if (getLocale() === 'en') return chapter
+  const locale = getLocale()
+  return {
+    ...chapter,
+    title: translate(locale, `readings.chapters.${chapter.id}.title`, chapter.title),
+    blurb: translate(locale, `readings.chapters.${chapter.id}.blurb`, chapter.blurb),
+  }
+}
+
+export function getReadingChapters(): ReadingChapter[] {
+  return READING_CHAPTERS.map(localizeReadingChapter)
+}

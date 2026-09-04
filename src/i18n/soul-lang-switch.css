@@ -1,0 +1,38 @@
+/* Compact EN/RU control. Sits in existing flex headers without moving the brand. */
+.soul-lang-switch {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: rgba(255, 253, 250, 0.72);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.soul-lang-switch__item {
+  opacity: 0.45;
+}
+
+.soul-lang-switch__item--on {
+  opacity: 1;
+  color: #fffdf8;
+}
+
+.soul-lang-switch__rule {
+  opacity: 0.35;
+}
+
+.soul-lang-switch--on-light {
+  color: rgba(40, 32, 24, 0.62);
+}
+
+.soul-lang-switch--on-light .soul-lang-switch__item--on {
+  color: #281e16;
+}

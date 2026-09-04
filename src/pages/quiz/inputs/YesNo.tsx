@@ -1,3 +1,5 @@
+import { useCopy } from '@/i18n'
+
 interface YesNoProps {
   value: boolean | undefined
   onChange: (v: boolean) => void
@@ -10,6 +12,7 @@ const OPTIONS = [
 ] as const
 
 export default function YesNo({ value, onChange, onConfirm }: YesNoProps) {
+  const t = useCopy()
   const handlePick = (v: boolean) => {
     onChange(v)
     if (onConfirm) setTimeout(onConfirm, 280)
@@ -38,7 +41,7 @@ export default function YesNo({ value, onChange, onConfirm }: YesNoProps) {
               borderRadius: 'var(--radius-lg)',
             }}
           >
-            {opt.label}
+            {t(opt.v ? 'quiz.yesno.yes' : 'quiz.yesno.notYet', opt.label)}
           </button>
         )
       })}

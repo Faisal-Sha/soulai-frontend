@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type TouchEvent } from 'react'
 import { SoulBrand, SoulButton } from '@/components/soul'
+import { SoulLangSwitch, useCopy } from '@/i18n'
 import '../onboarding-reading.css'
 import bgReading from '../assets/onboarding/bg-reading.png'
 import glassBead from '../assets/onboarding/glass-bead.svg'
@@ -37,6 +38,7 @@ const CARDS = [
  * Dots / swipe flip Money ↔ Relationships insight cards.
  */
 export default function OnboardingReadingScreen({ onStart }: OnboardingReadingScreenProps) {
+  const t = useCopy()
   const [active, setActive] = useState(0)
   const [phase, setPhase] = useState<CardPhase>('enter-first')
   const touchX = useRef<number | null>(null)
@@ -48,6 +50,9 @@ export default function OnboardingReadingScreen({ onStart }: OnboardingReadingSc
       window.matchMedia('(prefers-reduced-motion: reduce)').matches,
   )
   const front = CARDS[active]
+  const frontLabel = t(`quiz.onboarding.cards.${front.id}.label`, front.label)
+  const frontBody = t(`quiz.onboarding.cards.${front.id}.body`, front.body)
+  const frontMeta = t(`quiz.onboarding.cards.${front.id}.meta`, front.meta)
 
   useEffect(() => {
     if (reduceMotion.current) {
@@ -123,17 +128,19 @@ export default function OnboardingReadingScreen({ onStart }: OnboardingReadingSc
         <div className="soul-ob__content">
           <header className="soul-ob__header soul-ob__enter soul-ob__enter--header">
             <SoulBrand />
+            <SoulLangSwitch />
           </header>
 
           <div className="soul-ob__main">
             <section className="soul-ob__hero">
               <h1 className="soul-ob__title soul-ob__enter soul-ob__enter--title">
-                The better you know yourself, the further you go
+                {t('quiz.onboarding.reading.title', 'The better you know yourself, the further you go')}
               </h1>
               <p className="soul-ob__subtitle soul-ob__enter soul-ob__enter--subtitle">
-                I&apos;m your AI Mentor. Together we&apos;ll find what makes you you: your
-                strengths, your blocks, and turn it into real steps for your life, your
-                relationships, your goals.
+                {t(
+                  'quiz.onboarding.reading.subtitle',
+                  "I'm your AI Mentor. Together we'll find what makes you you: your strengths, your blocks, and turn it into real steps for your life, your relationships, your goals.",
+                )}
               </p>
             </section>
 
@@ -145,7 +152,11 @@ export default function OnboardingReadingScreen({ onStart }: OnboardingReadingSc
                   onClick={() => goTo(active + 1)}
                   role="button"
                   tabIndex={0}
-                  aria-label={`${front.label} insight. Tap or swipe for next.`}
+                  aria-label={t(
+                    'quiz.onboarding.reading.cardAria',
+                    `${frontLabel} insight. Tap or swipe for next.`,
+                    { label: frontLabel },
+                  )}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault()
@@ -155,11 +166,11 @@ export default function OnboardingReadingScreen({ onStart }: OnboardingReadingSc
                 >
                   <div className="soul-ob__card-head">
                     <SphereBullet />
-                    <p className="soul-ob__card-label">{front.label}</p>
+                    <p className="soul-ob__card-label">{frontLabel}</p>
                   </div>
                   <hr className="soul-ob__card-rule" />
-                  <p className="soul-ob__card-body">{front.body}</p>
-                  <p className="soul-ob__card-meta">{front.meta}</p>
+                  <p className="soul-ob__card-body">{frontBody}</p>
+                  <p className="soul-ob__card-meta">{frontMeta}</p>
                 </article>
               </div>
             </div>
@@ -168,7 +179,7 @@ export default function OnboardingReadingScreen({ onStart }: OnboardingReadingSc
               <div
                 className="soul-ob__dots-wrap soul-ob__enter soul-ob__enter--dots"
                 role="tablist"
-                aria-label="Insight cards"
+                aria-label={t('quiz.onboarding.reading.cardsAria', 'Insight cards')}
               >
                 {CARDS.map((card, i) => (
                   <button
@@ -176,7 +187,7 @@ export default function OnboardingReadingScreen({ onStart }: OnboardingReadingSc
                     type="button"
                     role="tab"
                     aria-selected={i === active}
-                    aria-label={card.label}
+                    aria-label={t(`quiz.onboarding.cards.${card.id}.label`, card.label)}
                     className={`soul-ob__dot${i === active ? ' soul-ob__dot--active' : ''}`}
                     onClick={() => goTo(i)}
                   />
@@ -184,8 +195,8 @@ export default function OnboardingReadingScreen({ onStart }: OnboardingReadingSc
               </div>
 
               <div className="soul-ob__cta soul-ob__enter soul-ob__enter--cta">
-                <SoulButton block onClick={onStart} aria-label="Let's go">
-                  Let&apos;s go
+                <SoulButton block onClick={onStart} aria-label={t('quiz.onboarding.reading.cta', "Let's go")}>
+                  {t('quiz.onboarding.reading.cta', "Let's go")}
                 </SoulButton>
               </div>
             </div>

@@ -3,10 +3,11 @@
  */
 import { Link } from "react-router-dom";
 import { LegalDocumentLayout, type LegalSection } from "@/components/LegalDocumentLayout";
+import { ruTermsIntro, ruTermsLastUpdated, ruTermsSections, ruTermsTitle, useI18n } from "@/i18n";
 
 const LAST_UPDATED = "July 29, 2026";
 
-const sections: LegalSection[] = [
+const EN_SECTIONS: LegalSection[] = [
   {
     title: "1. Introduction",
     paragraphs: [
@@ -175,11 +176,21 @@ const sections: LegalSection[] = [
   },
 ];
 
-const Terms = () => (
+const Terms = () => {
+  const { locale } = useI18n();
+  const sections = locale === "ru" ? ruTermsSections : EN_SECTIONS;
+  return (
   <LegalDocumentLayout
-    title="Terms & Conditions"
-    lastUpdated={LAST_UPDATED}
+    title={locale === "ru" ? ruTermsTitle : "Terms & Conditions"}
+    lastUpdated={locale === "ru" ? ruTermsLastUpdated : LAST_UPDATED}
     intro={
+      locale === "ru" ? (
+        <>
+          {ruTermsIntro.map((paragraph) => (
+            <p key={paragraph.slice(0, 48)}>{paragraph}</p>
+          ))}
+        </>
+      ) : (
       <>
         <p>
           These Terms &amp; Conditions govern your access to and use of SoulPlus, including the website at{" "}
@@ -201,9 +212,11 @@ const Terms = () => (
           . Please read these Terms carefully. If you do not agree, you must not use the Services.
         </p>
       </>
+      )
     }
     sections={sections}
   />
-);
+  );
+};
 
 export default Terms;

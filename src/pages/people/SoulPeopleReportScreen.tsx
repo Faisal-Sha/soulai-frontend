@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { SoulBrand, SoulButton, SoulNav, SoulRippleBg } from '@/components/soul'
+import { useCopy, useI18n } from '@/i18n'
 import {
+  buildReportContent,
+  localizeReportForDisplay,
   PEOPLE_REPORT_META,
-  PEOPLE_REPORT_SECTIONS,
   type PeopleReportSection,
   type StoredPeopleReport,
 } from './reportContent'
@@ -12,24 +14,21 @@ import './soul-people.css'
 import iconChevron from './assets/icon-chevron.svg'
 import iconArrow from '../readings/assets/icon-arrow-light.svg'
 
-const FALLBACK: StoredPeopleReport = {
-  subtitle: PEOPLE_REPORT_META.subtitle,
-  closingTitle: PEOPLE_REPORT_META.closingTitle,
-  closingBody: PEOPLE_REPORT_META.closingBody,
-  shareQuote: PEOPLE_REPORT_META.shareQuote,
-  sections: PEOPLE_REPORT_SECTIONS,
-}
+const fallbackReport = () =>
+  buildReportContent(PEOPLE_REPORT_META.selfName, PEOPLE_REPORT_META.partnerName)
 
 /**
  * Figma WIP · People · Report (805:1970 / 803:1643)
  */
 export function SoulPeopleReportScreen() {
   const navigate = useNavigate()
+  const t = useCopy()
+  const { locale } = useI18n()
   const { personId = 'anna' } = useParams()
   const [partnerName, setPartnerName] = useState(
     demoPerson(personId)?.name || PEOPLE_REPORT_META.partnerName,
   )
-  const [report, setReport] = useState<StoredPeopleReport>(FALLBACK)
+  const [report, setReport] = useState<StoredPeopleReport>(fallbackReport)
 
   useEffect(() => {
     let cancelled = false
@@ -54,10 +53,19 @@ export function SoulPeopleReportScreen() {
     }
   }, [navigate, personId])
 
+  const reportView = useMemo(
+    () => localizeReportForDisplay(report, PEOPLE_REPORT_META.selfName, partnerName),
+    [report, partnerName, locale],
+  )
+
   const talkSection = (title: string, body: string) => {
     navigate('/agent', {
       state: {
-        starter: `Talk through this with me. You and ${partnerName}, “${title}”:\n\n${body}`,
+        starter: t(
+          'people.report.talkStarter',
+          `Talk through this with me. You and ${partnerName}, “${title}”:\n\n${body}`,
+          { partner: partnerName, title, body },
+        ),
         quotedNote: title,
         newChat: true,
       },
@@ -67,8 +75,10 @@ export function SoulPeopleReportScreen() {
   const askAboutPair = () => {
     navigate('/agent', {
       state: {
-        starter: `Ask about you two. Me and ${partnerName}.`,
-        quotedNote: `You and ${partnerName}`,
+        starter: t('people.report.askStarter', `Ask about you two. Me and ${partnerName}.`, {
+          partner: partnerName,
+        }),
+        quotedNote: t('people.report.quotedPair', `You and ${partnerName}`, { partner: partnerName }),
         newChat: true,
       },
     })
@@ -87,13 +97,13 @@ export function SoulPeopleReportScreen() {
               type="button"
               className="soul-people__back"
               onClick={() => navigate('/people')}
-              aria-label="Back to People"
+              aria-label={t('people.backAria', 'Back to People')}
             >
               <img src={iconChevron} alt="" width={22} height={22} />
             </button>
             <SoulBrand />
           </div>
-          <div className="soul-people__header-nav" aria-label="Desktop navigation">
+          <div className="soul-people__header-nav" aria-label={t('people.desktopNavAria', 'Desktop navigation')}>
             <SoulNav variant="desktop" />
           </div>
         </header>
@@ -104,15 +114,15 @@ export function SoulPeopleReportScreen() {
             aria-labelledby="soul-people-report-title"
           >
             <h1 id="soul-people-report-title" className="soul-people__title">
-              You and {partnerName}
+              {t('people.report.title', `You and ${partnerName}`, { name: partnerName })}
             </h1>
             <p className="soul-people__subtitle soul-people__subtitle--report">
-              {report.subtitle}
+              {reportView.subtitle}
             </p>
           </section>
 
           <div className="soul-people__cards">
-            {report.sections.map((section: PeopleReportSection) => {
+            {reportView.sections.map((section: PeopleReportSection) => {
               const body = section.paragraphs.join('\n\n')
               return (
                 <article key={section.n} className="soul-people__card">
@@ -131,13 +141,13 @@ export function SoulPeopleReportScreen() {
                       className="soul-people__talk"
                       onClick={() => talkSection(section.title, body)}
                     >
-                      Talk this through
+                      {t('people.report.talkThrough', 'Talk this through')}
                       <img src={iconArrow} alt="" width={15} height={15} />
                     </button>
                     <button
                       type="button"
                       className="soul-people__share-btn"
-                      aria-label="Share this section"
+                      aria-label={t('people.report.shareAria', 'Share this section')}
                       onClick={() => navigate(`/people/${personId}/share`)}
                     >
                       <span className="soul-people__share-icon" aria-hidden="true" />
@@ -149,18 +159,18 @@ export function SoulPeopleReportScreen() {
           </div>
 
           <section className="soul-people__closing">
-            <h2 className="soul-people__closing-title">{report.closingTitle}</h2>
-            <p className="soul-people__closing-body">{report.closingBody}</p>
+            <h2 className="soul-people__closing-title">{reportView.closingTitle}</h2>
+            <p className="soul-people__closing-body">{reportView.closingBody}</p>
             <SoulButton block onClick={askAboutPair}>
-              Ask about you two
+              {t('people.report.askPair', 'Ask about you two')}
             </SoulButton>
             <button type="button" className="soul-people__text-link" onClick={() => navigate('/people/add')}>
-              Add someone else
+              {t('people.report.addSomeoneElse', 'Add someone else')}
             </button>
             <p className="soul-people__legal">
-              <Link to="/terms">Terms</Link>
+              <Link to="/terms">{t('people.report.terms', 'Terms')}</Link>
               {' & '}
-              <Link to="/privacy">Privacy Policy</Link>
+              <Link to="/privacy">{t('people.report.privacy', 'Privacy Policy')}</Link>
             </p>
           </section>
         </div>

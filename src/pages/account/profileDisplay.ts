@@ -1,3 +1,5 @@
+import { getLocale, translate } from '@/i18n'
+
 /** Calendar date from Postgres `date` / ISO, without UTC day-shift. */
 export function formatBirthDate(iso: string | null | undefined): string | null {
   if (!iso) return null
@@ -33,6 +35,7 @@ export function displayName(
   if (name) return name
   const local = email?.split('@')[0]?.trim()
   if (local) return local
+  if (getLocale() !== 'en') return translate(getLocale(), 'common.you', 'You')
   return 'You'
 }
 

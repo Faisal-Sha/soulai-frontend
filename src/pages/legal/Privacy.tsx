@@ -1,9 +1,16 @@
 import { Link } from "react-router-dom";
 import { LegalDocumentLayout, type LegalSection } from "@/components/LegalDocumentLayout";
+import {
+  ruPrivacyIntro,
+  ruPrivacyLastUpdated,
+  ruPrivacySections,
+  ruPrivacyTitle,
+  useI18n,
+} from "@/i18n";
 
 const LAST_UPDATED = "August 27, 2026";
 
-const sections: LegalSection[] = [
+const EN_SECTIONS: LegalSection[] = [
   {
     title: "1. Introduction",
     paragraphs: [
@@ -469,12 +476,22 @@ const sections: LegalSection[] = [
   },
 ];
 
-const Privacy = () => (
+const Privacy = () => {
+  const { locale } = useI18n();
+  const sections = locale === "ru" ? ruPrivacySections : EN_SECTIONS;
+  return (
   <LegalDocumentLayout
-    title="Privacy Policy"
-    lastUpdated={LAST_UPDATED}
+    title={locale === "ru" ? ruPrivacyTitle : "Privacy Policy"}
+    lastUpdated={locale === "ru" ? ruPrivacyLastUpdated : LAST_UPDATED}
     relatedLink={{ label: "Terms & Conditions", path: "/terms" }}
     intro={
+      locale === "ru" ? (
+        <>
+          {ruPrivacyIntro.map((paragraph) => (
+            <p key={paragraph.slice(0, 48)}>{paragraph}</p>
+          ))}
+        </>
+      ) : (
       <>
         <p>
           Thank you for using SoulPlus (the &ldquo;App&rdquo;) and visiting{" "}
@@ -525,9 +542,11 @@ const Privacy = () => (
           Privacy Policy.
         </p>
       </>
+      )
     }
     sections={sections}
   />
-);
+  );
+};
 
 export default Privacy;

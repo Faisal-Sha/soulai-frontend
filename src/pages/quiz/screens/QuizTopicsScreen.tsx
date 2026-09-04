@@ -1,4 +1,5 @@
 import { SoulBrand, SoulButton, SoulChip, SoulProgress } from '@/components/soul'
+import { SoulLangSwitch, useCopy } from '@/i18n'
 import '../quiz-topics.css'
 import bgTopics from '../assets/onboarding/bg-topics.png'
 
@@ -29,6 +30,7 @@ export default function QuizTopicsScreen({
   onContinue,
   canProceed,
 }: QuizTopicsScreenProps) {
+  const t = useCopy()
   const toggle = (v: string) => {
     const set = new Set(value)
     if (set.has(v)) set.delete(v)
@@ -49,6 +51,7 @@ export default function QuizTopicsScreen({
         <div className="soul-qt__content">
           <header className="soul-qt__header">
             <SoulBrand />
+            <SoulLangSwitch />
           </header>
 
           <div className="soul-qt__progress-wrap">
@@ -56,17 +59,22 @@ export default function QuizTopicsScreen({
           </div>
 
           <section className="soul-qt__hero">
-            <h1 className="soul-qt__title">Where do you want things to change?</h1>
+            <h1 className="soul-qt__title">
+              {t('quiz.topics.title', 'Where do you want things to change?')}
+            </h1>
             <p className="soul-qt__subtitle">
-              Pick as many as you want. It tells me where to focus for you first.
+              {t(
+                'quiz.topics.sub',
+                'Pick as many as you want. It tells me where to focus for you first.',
+              )}
             </p>
           </section>
 
-          <div className="soul-qt__chips" role="group" aria-label="Focus topics">
+          <div className="soul-qt__chips" role="group" aria-label={t('quiz.topics.aria', 'Focus topics')}>
             {TOPICS.map((topic) => (
               <SoulChip
                 key={topic.v}
-                label={topic.label}
+                label={t(`quiz.topics.options.${topic.v}`, topic.label)}
                 selected={value.includes(topic.v)}
                 onClick={() => toggle(topic.v)}
                 className="soul-qt__chip"
@@ -81,9 +89,9 @@ export default function QuizTopicsScreen({
               block
               onClick={onContinue}
               disabled={!canProceed}
-              aria-label="Continue"
+              aria-label={t('quiz.topics.continue', 'Continue')}
             >
-              Continue
+              {t('quiz.topics.continue', 'Continue')}
             </SoulButton>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import { SoulBrand, SoulButton, SoulProgress } from '@/components/soul'
+import { SoulLangSwitch, useCopy } from '@/i18n'
 import '../quiz-reinforce.css'
 import bgReinforce from '../assets/onboarding/bg-reinforce.png'
 import starFill from '../assets/onboarding/icon-star-reinforce.svg'
@@ -15,6 +16,7 @@ interface QuizReinforceScreenProps {
  * Mobile: stacked. Desktop: split. Orb between copy paras, card up on the right.
  */
 export default function QuizReinforceScreen({ onNext }: QuizReinforceScreenProps) {
+  const t = useCopy()
   return (
     <div className="soul-rf" data-name="02.1.1 · Quiz · Reinforcement">
       <div className="soul-rf__bg" aria-hidden="true">
@@ -28,6 +30,7 @@ export default function QuizReinforceScreen({ onNext }: QuizReinforceScreenProps
         <div className="soul-rf__content">
           <header className="soul-rf__header">
             <SoulBrand />
+            <SoulLangSwitch />
           </header>
 
           <div className="soul-rf__progress-wrap">
@@ -36,10 +39,12 @@ export default function QuizReinforceScreen({ onNext }: QuizReinforceScreenProps
 
           <div className="soul-rf__left">
             <section className="soul-rf__hero">
-              <h1 className="soul-rf__title">Awesome!</h1>
+              <h1 className="soul-rf__title">{t('quiz.reinforce.title', 'Awesome!')}</h1>
               <p className="soul-rf__subtitle">
-                Those who seek Ambition in their soulmate are drawn to partners who match their
-                fire. Building something real, side by side.
+                {t(
+                  'quiz.reinforce.subtitle',
+                  'Those who seek Ambition in their soulmate are drawn to partners who match their fire. Building something real, side by side.',
+                )}
               </p>
             </section>
 
@@ -48,35 +53,39 @@ export default function QuizReinforceScreen({ onNext }: QuizReinforceScreenProps
             </div>
 
             <p className="soul-rf__proof-copy">
-              14,248 people came in with the same things on their mind. Love &amp; relationships,
-              Purpose. Here&apos;s what they say after.
+              {t(
+                'quiz.reinforce.proof',
+                "14,248 people came in with the same things on their mind. Love & relationships, Purpose. Here's what they say after.",
+              )}
             </p>
 
             <div className="soul-rf__cta soul-rf__cta--desktop">
-              <SoulButton block onClick={onNext} aria-label="Continue">
-                Continue
+              <SoulButton block onClick={onNext} aria-label={t('quiz.reinforce.continue', 'Continue')}>
+                {t('quiz.reinforce.continue', 'Continue')}
               </SoulButton>
             </div>
           </div>
 
           <div className="soul-rf__stage">
             <article className="soul-rf__card">
-              <div className="soul-rf__stars" aria-label="5 out of 5 stars">
+              <div className="soul-rf__stars" aria-label={t('quiz.reinforce.starsAria', '5 out of 5 stars')}>
                 {Array.from({ length: 5 }, (_, i) => (
                   <img key={i} className="soul-rf__star" src={starFill} alt="" width={14} height={14} />
                 ))}
               </div>
               <p className="soul-rf__quote">
-                SoulPlus didn&apos;t just help me understand who I am - it gave me a real plan
-                and helped me finally reach a goal I&apos;d been putting off for years.
+                {t(
+                  'quiz.reinforce.quote',
+                  "SoulPlus didn't just help me understand who I am - it gave me a real plan and helped me finally reach a goal I'd been putting off for years.",
+                )}
               </p>
-              <p className="soul-rf__author">Alena R. · October 2025</p>
+              <p className="soul-rf__author">{t('quiz.reinforce.author', 'Alena R. · October 2025')}</p>
             </article>
           </div>
 
           <div className="soul-rf__cta soul-rf__cta--mobile">
-            <SoulButton block onClick={onNext} aria-label="Continue">
-              Continue
+            <SoulButton block onClick={onNext} aria-label={t('quiz.reinforce.continue', 'Continue')}>
+              {t('quiz.reinforce.continue', 'Continue')}
             </SoulButton>
           </div>
         </div>

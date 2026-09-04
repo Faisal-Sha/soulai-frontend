@@ -2,12 +2,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { SoulBrand, SoulNav, SoulPending, SoulRippleBg } from '@/components/soul'
+import { useCopy, useI18n } from '@/i18n'
 import { useUser } from '@/hooks/useUser'
 import { ResumeSheet } from '@/pages/home/ResumeSheet'
 import { useSoulSheetParams } from '@/pages/home/useSoulSheetParams'
 import { saveInsight } from '@/pages/insights/insightsApi'
-import { READING_CHAPTERS, type ReadingChapterId } from './chapters'
-import { countWords, nextPack, packById } from './readingCatalog'
+import { localizeReadingChapter, READING_CHAPTERS, type ReadingChapterId } from './chapters'
+import { countWords, localizeStaticPack, nextPack, packById } from './readingCatalog'
 import {
   ensureReading,
   getChapterRow,
@@ -46,6 +47,8 @@ function isChapterId(raw: string | undefined): raw is ReadingChapterId {
  */
 export function SoulPatternChapterScreen() {
   const navigate = useNavigate()
+  const t = useCopy()
+  const { locale } = useI18n()
   const [searchParams] = useSearchParams()
   const { chapterId: chapterParam } = useParams()
   const chapterId: ReadingChapterId = isChapterId(chapterParam) ? chapterParam : 'your-pattern'
@@ -63,7 +66,10 @@ export function SoulPatternChapterScreen() {
   const toastTimer = useRef<number | null>(null)
 
   const catalog = packById(chapterId)
-  const pack = row?.content ?? catalog
+  const pack = useMemo(() => {
+    const source = row?.content ?? catalog
+    return source ? localizeStaticPack(source) : undefined
+  }, [row?.content, catalog, locale])
   const demo = READING_CHAPTERS.find((c) => c.id === chapterId)
 
   const subscriptionEnded = useMemo(() => {
@@ -81,10 +87,16 @@ export function SoulPatternChapterScreen() {
   const { resumeOpen, resumeMode, openResume, closeResume } = useSoulSheetParams(resumeExtra)
   const canAskAboutSelection = !subscriptionEnded
 
-  const next = pack ? nextPack(pack.id) : null
+  const nextRaw = pack ? nextPack(pack.id) : null
+  const next = nextRaw ? localizeReadingChapter({
+    id: nextRaw.id as ReadingChapterId,
+    title: nextRaw.title,
+    blurb: nextRaw.blurb,
+  }) : null
   const words = pack ? countWords(pack) : 0
   const mins = row?.read_time_min ?? pack?.readTimeMin ?? 6
-  const title = pack?.title ?? demo?.title ?? 'Chapter'
+  const rawTitle = pack?.title ?? demo?.title ?? 'Chapter'
+  const title = t(`readings.chapters.${chapterId}.title`, rawTitle)
   const endedQuery = subscriptionEnded ? '?ended=1' : ''
 
   useEffect(() => {
@@ -333,9 +345,9 @@ export function SoulPatternChapterScreen() {
     const text = menu?.text ?? ''
     try {
       await navigator.clipboard.writeText(text)
-      toast.message('Copied')
+      toast.message(t('readings.chapter.copied', 'Copied'))
     } catch {
-      toast.message('Could not copy')
+      toast.message(t('readings.chapter.copyFail', 'Could not copy'))
     }
     setMenu(null)
   }
@@ -347,7 +359,9 @@ export function SoulPatternChapterScreen() {
     }
     navigate('/agent', {
       state: {
-        starter: `Talk through my ${title} chapter with me.`,
+        starter: t('readings.chapter.talkStarter', `Talk through my ${title} chapter with me.`, {
+          title,
+        }),
         quotedNote: title,
         newChat: true,
       },
@@ -385,7 +399,7 @@ export function SoulPatternChapterScreen() {
           <button type="button" className="soul-pattern__brand" onClick={() => navigate('/')}>
             <SoulBrand />
           </button>
-          <div className="soul-pattern__header-nav" aria-label="Desktop navigation">
+          <div className="soul-pattern__header-nav" aria-label={t('readings.desktopNavAria', 'Desktop navigation')}>
             <SoulNav variant="desktop" />
           </div>
         </header>
@@ -395,21 +409,21 @@ export function SoulPatternChapterScreen() {
             className="soul-pattern__chrome-back"
             onClick={() => navigate('/readings')}
           >
-            ‹ Back to readings
+            {t('readings.chapter.back', '‹ Back to readings')}
           </button>
         </div>
       </div>
 
       {hydrating ? (
         <div className="soul-pattern__hydrate">
-          <SoulPending variant="center" label="Opening chapter" />
+          <SoulPending variant="center" label={t('readings.chapter.opening', 'Opening chapter')} />
         </div>
       ) : null}
       <div
         className="soul-pattern__sheet"
         ref={sheetRef}
         role="document"
-        aria-label={`${title} chapter`}
+        aria-label={t('readings.chapter.chapterAria', `${title} chapter`, { title })}
       >
         <div className="soul-pattern__layout">
           <div className="soul-pattern__main">
@@ -417,7 +431,7 @@ export function SoulPatternChapterScreen() {
               <button
                 type="button"
                 className="soul-pattern__grabber"
-                aria-label="Close chapter"
+                aria-label={t('readings.chapter.closeAria', 'Close chapter')}
                 onClick={() => navigate('/readings')}
               >
                 <span />
@@ -425,7 +439,9 @@ export function SoulPatternChapterScreen() {
               <div className="soul-pattern__head-row">
                 <div className="soul-pattern__head-copy">
                   <h1 className="soul-pattern__title">{title}</h1>
-                  <p className="soul-pattern__read-time">{mins} min read</p>
+                  <p className="soul-pattern__read-time">
+                    {t('readings.chapter.minRead', `${mins} min read`, { mins })}
+                  </p>
                 </div>
                 <p className="soul-pattern__progress-label" aria-hidden="true">
                   {progressPct}%
@@ -466,14 +482,20 @@ export function SoulPatternChapterScreen() {
             <div className="soul-pattern__end">
               <hr className="soul-pattern__end-rule" />
               <div className="soul-pattern__end-copy">
-                <p className="soul-pattern__end-title">You’ve finished {title}</p>
+                <p className="soul-pattern__end-title">
+                  {t('readings.chapter.finished', `You’ve finished ${title}`, { title })}
+                </p>
                 <p className="soul-pattern__end-meta">
-                  {sectionCount} sections · {words.toLocaleString()} words
+                  {t(
+                    'readings.chapter.sectionsWords',
+                    `${sectionCount} sections · ${words.toLocaleString()} words`,
+                    { count: sectionCount, words: words.toLocaleString() },
+                  )}
                 </p>
               </div>
               {!subscriptionEnded ? (
                 <button type="button" className="soul-pattern__cta" onClick={talkThrough}>
-                  Talk this chapter through
+                  {t('readings.chapter.talkChapter', 'Talk this chapter through')}
                   <img src={iconArrowLight} alt="" width={15} height={15} />
                 </button>
               ) : null}
@@ -481,7 +503,9 @@ export function SoulPatternChapterScreen() {
               {next ? (
                 <button type="button" className="soul-pattern__next soul-pattern__next--mobile" onClick={goNext}>
                   <span className="soul-pattern__next-body">
-                    <span className="soul-pattern__next-label">Next · {next.title}</span>
+                    <span className="soul-pattern__next-label">
+                      {t('readings.chapter.next', `Next · ${next.title}`, { title: next.title })}
+                    </span>
                     <span className="soul-pattern__next-blurb">{next.blurb}</span>
                   </span>
                   <img src={iconArrowDark} alt="" width={18} height={18} />
@@ -493,17 +517,20 @@ export function SoulPatternChapterScreen() {
                 className="soul-pattern__back"
                 onClick={() => navigate('/readings')}
               >
-                ‹ Back to your readings
+                {t('readings.chapter.backYours', '‹ Back to your readings')}
               </button>
             </div>
           </div>
 
-          <aside className="soul-pattern__rail" aria-label="Chapter guide">
+          <aside className="soul-pattern__rail" aria-label={t('readings.chapter.guideAria', 'Chapter guide')}>
             <div className="soul-pattern__rail-card">
-              <p className="soul-pattern__rail-kicker">Chapter</p>
+              <p className="soul-pattern__rail-kicker">{t('readings.chapter.kicker', 'Chapter')}</p>
               <p className="soul-pattern__rail-title">{title}</p>
               <p className="soul-pattern__rail-meta">
-                {mins} min read · {sectionCount} sections
+                {t('readings.chapter.railMeta', `${mins} min read · ${sectionCount} sections`, {
+                  mins,
+                  count: sectionCount,
+                })}
               </p>
               <div className="soul-pattern__rail-progress" aria-hidden="true">
                 <span style={{ width: `${progressPct}%` }} />
@@ -531,14 +558,16 @@ export function SoulPatternChapterScreen() {
                   className="soul-pattern__cta soul-pattern__cta--rail"
                   onClick={talkThrough}
                 >
-                  Talk this through
+                  {t('readings.chapter.talkThrough', 'Talk this through')}
                   <img src={iconArrowLight} alt="" width={15} height={15} />
                 </button>
               ) : null}
               {next ? (
                 <button type="button" className="soul-pattern__next" onClick={goNext}>
                   <span className="soul-pattern__next-body">
-                    <span className="soul-pattern__next-label">Next · {next.title}</span>
+                    <span className="soul-pattern__next-label">
+                      {t('readings.chapter.next', `Next · ${next.title}`, { title: next.title })}
+                    </span>
                     <span className="soul-pattern__next-blurb">{next.blurb}</span>
                   </span>
                   <img src={iconArrowDark} alt="" width={18} height={18} />
@@ -554,32 +583,32 @@ export function SoulPatternChapterScreen() {
           className={`soul-pattern__menu${canAskAboutSelection ? '' : ' soul-pattern__menu--compact'}`}
           style={{ top: menu.top, left: menu.left }}
           role="toolbar"
-          aria-label="Selection actions"
+          aria-label={t('readings.chapter.selectionAria', 'Selection actions')}
         >
           <button type="button" onClick={onSave}>
             <img src={iconSave} alt="" width={14} height={14} />
-            Save
+            {t('readings.chapter.save', 'Save')}
           </button>
           <span className="soul-pattern__menu-div" aria-hidden="true" />
           {canAskAboutSelection ? (
             <>
               <button type="button" onClick={onAsk}>
                 <img src={iconAsk} alt="" width={14} height={14} />
-                Ask about this
+                {t('readings.chapter.ask', 'Ask about this')}
               </button>
               <span className="soul-pattern__menu-div" aria-hidden="true" />
             </>
           ) : null}
           <button type="button" onClick={() => void onCopy()}>
             <img src={iconCopy} alt="" width={14} height={14} />
-            Copy
+            {t('readings.chapter.copy', 'Copy')}
           </button>
         </div>
       ) : null}
 
       {savedToast ? (
         <div className="soul-pattern__toast" role="status">
-          <span>Saved to your insights</span>
+          <span>{t('readings.chapter.savedToast', 'Saved to your insights')}</span>
           <button
             type="button"
             onClick={() => {
@@ -587,7 +616,7 @@ export function SoulPatternChapterScreen() {
               navigate('/insights')
             }}
           >
-            View
+            {t('readings.chapter.view', 'View')}
           </button>
         </div>
       ) : null}

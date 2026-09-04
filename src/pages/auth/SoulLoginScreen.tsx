@@ -5,6 +5,7 @@ import iconArrowLink from '@/components/soul/assets/icon-arrow-link.svg'
 import iconGoogle from './assets/icon-google.svg'
 import iconApple from './assets/icon-apple.svg'
 import { AuthLayout } from './AuthLayout'
+import { useCopy } from '@/i18n'
 import bgSignIn from './assets/bg-signin.png'
 import { authErrorMessage, getPostAuthPath, signInWithOAuth } from './authActions'
 import { useLeaveIfSignedIn } from './useLeaveIfSignedIn'
@@ -14,6 +15,7 @@ import { useLeaveIfSignedIn } from './useLeaveIfSignedIn'
  */
 export function SoulLoginScreen() {
   const navigate = useNavigate()
+  const t = useCopy()
   const location = useLocation()
   const [busy, setBusy] = useState<'google' | 'apple' | null>(null)
   useLeaveIfSignedIn()
@@ -34,9 +36,9 @@ export function SoulLoginScreen() {
   return (
     <AuthLayout bg={bgSignIn} name="Sign in">
       <section className="soul-auth__hero">
-        <h1 className="soul-auth__title">Welcome back</h1>
+        <h1 className="soul-auth__title">{t('auth.login.title', 'Welcome back')}</h1>
         <p className="soul-auth__subtitle">
-          Use the email you gave me when I wrote your reading.
+          {t('auth.login.subtitle', 'Use the email you gave me when I wrote your reading.')}
         </p>
       </section>
 
@@ -48,7 +50,7 @@ export function SoulLoginScreen() {
           onClick={() => void onOAuth('google')}
         >
           <img src={iconGoogle} alt="" width={20} height={20} />
-          Continue with Google
+          {t('auth.login.google', 'Continue with Google')}
         </button>
 
         <button
@@ -58,12 +60,12 @@ export function SoulLoginScreen() {
           onClick={() => void onOAuth('apple')}
         >
           <img src={iconApple} alt="" width={20} height={20} />
-          Continue with Apple
+          {t('auth.login.apple', 'Continue with Apple')}
         </button>
 
         <div className="soul-auth__divider" role="separator">
           <span />
-          <em>or</em>
+          <em>{t('auth.login.or', 'or')}</em>
           <span />
         </div>
 
@@ -74,12 +76,12 @@ export function SoulLoginScreen() {
             navigate({ pathname: '/login/email', search: location.search })
           }
         >
-          Use email instead
+          {t('auth.login.emailInstead', 'Use email instead')}
         </button>
 
         <Link to="/quiz/welcome" className="soul-auth__quiz">
           <span>
-            New here? <u>Take the quiz</u>
+            {t('auth.login.newHere', 'New here?')} <u>{t('auth.login.takeQuiz', 'Take the quiz')}</u>
           </span>
           <img src={iconArrowLink} alt="" width={15} height={15} />
         </Link>

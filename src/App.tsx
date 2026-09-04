@@ -5,7 +5,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
+import { I18nProvider } from "./i18n";
 import { UserProvider } from "./hooks/useUser";
+import { SoulAccountLanguageScreen } from "./pages/account/SoulAccountLanguageScreen";
 import { SoulHomeRoute } from "./pages/home/SoulHomeRoute";
 import QuizShell from "./pages/quiz/QuizShell";
 import { SoulPaidScreen } from "./pages/quiz/SoulPaidScreen";
@@ -82,6 +84,7 @@ function AppRoutes() {
       <Route path="/account/know" element={<SoulAccountKnowScreen />} />
       <Route path="/account/know/:questionId" element={<SoulAccountKnowAnswerScreen />} />
       <Route path="/account/birth" element={<SoulAccountBirthScreen />} />
+      <Route path="/account/language" element={<SoulAccountLanguageScreen />} />
       <Route path="/about" element={<SoulAboutScreen />} />
 
       <Route path="/contact" element={<Contact />} />
@@ -101,11 +104,13 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <UserProvider>
-            <QuizGate>
-              <AppRoutes />
-            </QuizGate>
-          </UserProvider>
+          <I18nProvider>
+            <UserProvider>
+              <QuizGate>
+                <AppRoutes />
+              </QuizGate>
+            </UserProvider>
+          </I18nProvider>
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>

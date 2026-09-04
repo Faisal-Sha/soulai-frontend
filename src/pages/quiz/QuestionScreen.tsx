@@ -1,4 +1,5 @@
 import PrimaryButton from './atoms/PrimaryButton'
+import { useCopy } from '@/i18n'
 import { GoMoon } from 'react-icons/go'
 import SingleSelect from './inputs/SingleSelect'
 import MultiSelect from './inputs/MultiSelect'
@@ -42,6 +43,17 @@ export default function QuestionScreen({
   theme,
   onToggleTheme,
 }: QuestionScreenProps) {
+  const t = useCopy()
+  const flowId = screen.id ?? ''
+  const title = t(`quiz.flow.${flowId}.title`, screen.q ?? screen.title ?? '')
+  const sub = screen.sub ? t(`quiz.flow.${flowId}.sub`, screen.sub) : screen.sub
+  const placeholder = t(`quiz.flow.${flowId}.placeholder`, screen.placeholder ?? '')
+  const cta = t(`quiz.flow.${flowId}.cta`, screen.ctaLabel ?? 'Continue')
+  const options = screen.options?.map((opt) => ({
+    ...opt,
+    label: t(`quiz.flow.${flowId}.options.${opt.v}`, opt.label),
+    detail: opt.detail ? t(`quiz.flow.${flowId}.options.${opt.v}.detail`, opt.detail) : opt.detail,
+  }))
 
   return (
     <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
@@ -64,7 +76,7 @@ export default function QuestionScreen({
           {/* Back. Outer left edge = left bound */}
           <button
             onClick={onBack}
-            aria-label="Go back"
+            aria-label={t('quiz.question.backAria', 'Go back')}
             className="quiz-header-btn"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -89,7 +101,11 @@ export default function QuestionScreen({
           {onToggleTheme ? (
             <button
               onClick={onToggleTheme}
-              aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+              aria-label={
+                theme === 'light'
+                  ? t('quiz.question.darkMode', 'Switch to dark mode')
+                  : t('quiz.question.lightMode', 'Switch to light mode')
+              }
               className="quiz-header-btn"
             >
               {theme === 'light' ? <GoMoon /> : '☀'}
@@ -105,7 +121,10 @@ export default function QuestionScreen({
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
             <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-muted)' }}>
-              Question {questionIndex} of {totalQuestions}
+              {t('quiz.question.of', `Question ${questionIndex} of ${totalQuestions}`, {
+                index: questionIndex,
+                total: totalQuestions,
+              })}
             </span>
             <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--accent)' }}>
               {Math.round((questionIndex / totalQuestions) * 100)}%
@@ -116,7 +135,10 @@ export default function QuestionScreen({
             aria-valuenow={questionIndex}
             aria-valuemin={1}
             aria-valuemax={totalQuestions}
-            aria-label={`Question ${questionIndex} of ${totalQuestions}`}
+            aria-label={t('quiz.question.ofAria', `Question ${questionIndex} of ${totalQuestions}`, {
+              index: questionIndex,
+              total: totalQuestions,
+            })}
             className="quiz-progress-track"
           >
             <div
@@ -150,7 +172,7 @@ export default function QuestionScreen({
               textAlign: 'center',
             }}
           >
-            {screen.kicker}
+            {screen.kicker ? t(`quiz.flow.${flowId}.kicker`, screen.kicker) : screen.kicker}
           </div>
         )}
 
@@ -167,7 +189,7 @@ export default function QuestionScreen({
             textAlign: 'center',
           }}
         >
-          {screen.q ?? screen.title}
+          {title}
         </h2>
 
         {/* Subtitle */}
@@ -182,7 +204,7 @@ export default function QuestionScreen({
               textAlign: 'center',
             }}
           >
-            {screen.sub}
+            {sub}
           </p>
         )}
 
@@ -190,7 +212,7 @@ export default function QuestionScreen({
         <div style={{ flex: 1, marginTop: screen.sub ? 0 : 20 }}>
           {screen.type === 'single' && screen.options && (
             <SingleSelect
-              options={screen.options}
+              options={options!}
               value={value as string | undefined}
               onChange={v => onChange(v)}
               onConfirm={onContinue}
@@ -198,7 +220,7 @@ export default function QuestionScreen({
           )}
           {screen.type === 'multi' && screen.options && (
             <MultiSelect
-              options={screen.options}
+              options={options!}
               value={value as string[] | undefined}
               onChange={v => onChange(v)}
               max={screen.max}
@@ -225,7 +247,7 @@ export default function QuestionScreen({
           )}
           {screen.type === 'visual' && screen.options && (
             <VisualSelect
-              options={screen.options}
+              options={options!}
               value={value as string | undefined}
               onChange={v => onChange(v)}
               onConfirm={onContinue}
@@ -256,9 +278,9 @@ export default function QuestionScreen({
                       : 'off'
                 }
                 inputMode={screen.id === 'birth-time' ? 'numeric' : undefined}
-                placeholder={screen.placeholder ?? ''}
+                placeholder={placeholder}
                 value={(value as string) ?? ''}
-                aria-label={screen.title ?? screen.q ?? 'Text input'}
+                aria-label={title || t('quiz.question.textAria', 'Text input')}
                 onChange={e => onChange(e.target.value)}
                 onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
                 onBlur={e => (e.target.style.borderColor = 'var(--glass-border)')}
@@ -313,7 +335,7 @@ export default function QuestionScreen({
               aria-hidden="true"
               style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--accent)', flexShrink: 0 }}
             />
-            82% of members selected more than one
+            {t('quiz.question.multiHint', '82% of members selected more than one')}
           </div>
         )}
       </div>
@@ -334,7 +356,7 @@ export default function QuestionScreen({
             }}
           >
             <span style={{ fontSize: 13, color: 'var(--danger)', lineHeight: 1.4 }}>
-              Couldn't save your reading. Your answers are safe.
+              {t('quiz.question.saveError', "Couldn't save your reading. Your answers are safe.")}
             </span>
             <button
               onClick={onRetry}
@@ -351,7 +373,7 @@ export default function QuestionScreen({
                 fontFamily: 'var(--ui)',
               }}
             >
-              Retry
+              {t('quiz.question.retry', 'Retry')}
             </button>
           </div>
         </div>
@@ -360,7 +382,7 @@ export default function QuestionScreen({
       {/* ── CTA ── */}
       <div style={{ padding: '8px 0 28px' }}>
         <PrimaryButton onClick={onContinue} disabled={!canProceed} loading={isLoading}>
-          Continue
+          {cta}
         </PrimaryButton>
       </div>
 

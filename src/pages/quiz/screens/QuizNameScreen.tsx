@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { SoulBrand, SoulButton, SoulProgress } from '@/components/soul'
+import { SoulLangSwitch, useCopy } from '@/i18n'
 import '../quiz-name.css'
 import bgName from '../assets/onboarding/bg-name.png'
 
@@ -20,11 +21,12 @@ export default function QuizNameScreen({
   onContinue,
   canProceed,
 }: QuizNameScreenProps) {
+  const t = useCopy()
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    const t = window.setTimeout(() => inputRef.current?.focus(), 120)
-    return () => window.clearTimeout(t)
+    const focusTimer = window.setTimeout(() => inputRef.current?.focus(), 120)
+    return () => window.clearTimeout(focusTimer)
   }, [])
 
   return (
@@ -40,6 +42,7 @@ export default function QuizNameScreen({
         <div className="soul-qn__content">
           <header className="soul-qn__header">
             <SoulBrand />
+            <SoulLangSwitch />
           </header>
 
           <div className="soul-qn__progress-wrap">
@@ -47,15 +50,18 @@ export default function QuizNameScreen({
           </div>
 
           <section className="soul-qn__hero">
-            <h1 className="soul-qn__title">What can I call you?</h1>
+            <h1 className="soul-qn__title">{t('quiz.name.title', 'What can I call you?')}</h1>
             <p className="soul-qn__subtitle">
-              Just your first name. That&apos;s how I&apos;ll talk to you from here on.
+              {t(
+                'quiz.name.sub',
+                "Just your first name. That's how I'll talk to you from here on.",
+              )}
             </p>
           </section>
 
           <div className="soul-qn__form">
             <label className="soul-qn__field" htmlFor="soul-qn-name">
-              <span className="soul-qn__label">Your name</span>
+              <span className="soul-qn__label">{t('quiz.name.label', 'Your name')}</span>
               <input
                 ref={inputRef}
                 id="soul-qn-name"
@@ -65,7 +71,7 @@ export default function QuizNameScreen({
                 autoComplete="given-name"
                 autoCapitalize="words"
                 enterKeyHint="done"
-                placeholder="Enter your name"
+                placeholder={t('quiz.name.placeholder', 'Enter your name')}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 onKeyDown={(e) => {
@@ -82,12 +88,12 @@ export default function QuizNameScreen({
                 block
                 onClick={onContinue}
                 disabled={!canProceed}
-                aria-label="Continue"
+                aria-label={t('quiz.name.continue', 'Continue')}
               >
-                Continue
+                {t('quiz.name.continue', 'Continue')}
               </SoulButton>
               <p className="soul-qn__privacy">
-                Your details stay private and are never shared.
+                {t('quiz.name.privacy', 'Your details stay private and are never shared.')}
               </p>
             </div>
           </div>

@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { useCopy, useI18n, destylizeDashes, foldCopy, isCatalogCopy, isEnglish } from '@/i18n'
+import { localizeCatalogQuote } from '@/i18n/catalogSnippets'
+import { STATIC_DAILY_NOTE } from '@/pages/readings/readingCatalog'
 import { useUser } from '@/hooks/useUser'
 import { quoteIsSaved, saveInsight } from '@/pages/insights/insightsApi'
 import {
@@ -58,6 +61,17 @@ const NOTE = {
   unpaidSub: 'Resume to talk it through with your mentor.',
 } as const
 
+const CATALOG_NOTE_HEADLINES = [
+  NOTE.headline,
+  'You move fastest right after you decide — and slowest while you look for permission.',
+  'You move fastest right after you decide — and slowest while you look for permission',
+] as const
+
+const CATALOG_NOTE_SUBS = [
+  NOTE.sub,
+  'Today asks for a small decision made without asking anyone.',
+] as const
+
 const UNPAID_BANNER = {
   title: 'Your subscription ended',
   detail: "Everything you've built stays. Reading, insights, conversations.",
@@ -73,8 +87,11 @@ const WELCOME_BACK = {
   body: "Payment successful. Everything's unlocked. Preparing today's insight. It'll be ready in a moment.",
 } as const
 
-function formatHomeDate(d = new Date()) {
-  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+function formatHomeDate(d = new Date(), locale?: string) {
+  return d.toLocaleDateString(locale === 'ru' ? 'ru-RU' : undefined, {
+    month: 'short',
+    day: 'numeric',
+  })
 }
 
 /**
@@ -101,6 +118,8 @@ export function SoulHomeScreen({
   resumePrice = '$6.99',
 }: SoulHomeScreenProps) {
   const navigate = useNavigate()
+  const t = useCopy()
+  const { locale } = useI18n()
   const { profile } = useUser()
   const [searchParams] = useSearchParams()
   const variant =
@@ -129,9 +148,19 @@ export function SoulHomeScreen({
   const trial = variant === 'trial'
   const unpaid = variant === 'unpaid'
   const unpaidPool = variant === 'unpaid-pool'
-  const noteHeadline = dailyHeadline?.trim() || NOTE.headline
-  const noteSub = dailySub?.trim() || NOTE.sub
-  const noteQuote = unpaidPool ? POOL_NOTE.headline : noteHeadline
+  const catalogHeadline =
+    isCatalogCopy(dailyHeadline, STATIC_DAILY_NOTE.headline, ...CATALOG_NOTE_HEADLINES) ||
+    foldCopy(dailyHeadline ?? '').startsWith('you move fastest right after you decide')
+  const catalogSub = isCatalogCopy(dailySub, STATIC_DAILY_NOTE.sub, ...CATALOG_NOTE_SUBS)
+  const rawHeadline = catalogHeadline
+    ? t('home.note.headline', NOTE.headline)
+    : localizeCatalogQuote((dailyHeadline ?? '').trim())
+  const rawSub = catalogSub
+    ? t('home.note.sub', NOTE.sub)
+    : localizeCatalogQuote((dailySub ?? '').trim())
+  const noteHeadline = isEnglish(locale) ? rawHeadline : destylizeDashes(rawHeadline)
+  const noteSub = isEnglish(locale) ? rawSub : destylizeDashes(rawSub)
+  const noteQuote = unpaidPool ? t('home.pool.headline', POOL_NOTE.headline) : noteHeadline
   const [noteSaved, setNoteSaved] = useState(false)
 
   useEffect(() => {
@@ -170,34 +199,51 @@ export function SoulHomeScreen({
 
   const eyebrow = useMemo(() => {
     const day = day1 ? 1 : dayNumber
-    return `Today · ${formatHomeDate()} · Day ${day}`
-  }, [day1, dayNumber])
+    const dateLabel = formatHomeDate(undefined, locale)
+    return t('home.eyebrow', `Today · ${dateLabel} · Day ${day}`, {
+      date: dateLabel,
+      day,
+    })
+  }, [day1, dayNumber, locale, t])
 
   const readingsMeta = shelfReady
-    ? `${chaptersDone} of ${chaptersTotal} chapters`
-    : 'Checking your chapters…'
+    ? t('home.shelf.chaptersOf', `${chaptersDone} of ${chaptersTotal} chapters`, {
+        done: chaptersDone,
+        total: chaptersTotal,
+      })
+    : t('home.shelf.checkingChapters', 'Checking your chapters…')
   const readingsCta = !shelfReady
-    ? 'Open readings'
+    ? t('home.shelf.openReadings', 'Open readings')
     : chaptersDone === 0 && (readingsProgressPct ?? 0) === 0
-      ? 'Start reading'
-      : 'Continue reading'
+      ? t('home.shelf.startReading', 'Start reading')
+      : t('home.shelf.continueReading', 'Continue reading')
   const insightsMeta = useMemo(() => {
-    if (!shelfReady) return 'Checking notes…'
+    if (!shelfReady) return t('home.shelf.checkingNotes', 'Checking notes…')
     if (day1) {
       return notesKept > 0
-        ? `${notesKept} note${notesKept === 1 ? '' : 's'} you kept`
-        : 'Anything you highlight will live here'
+        ? notesKept === 1
+          ? t('home.shelf.notesKeptOne', `${notesKept} note you kept`, { count: notesKept })
+          : t('home.shelf.notesKept', `${notesKept} notes you kept`, { count: notesKept })
+        : t('home.shelf.highlightHint', 'Anything you highlight will live here')
     }
-    return `${notesKept} notes you kept`
-  }, [day1, notesKept, noteSaved, shelfReady])
+    return t('home.shelf.notesKept', `${notesKept} notes you kept`, { count: notesKept })
+  }, [day1, notesKept, noteSaved, shelfReady, t])
   const insightsCta =
-    day1 && notesKept === 0 ? 'Nothing saved yet' : 'See all'
+    day1 && notesKept === 0
+      ? t('home.shelf.nothingSaved', 'Nothing saved yet')
+      : t('home.shelf.seeAll', 'See all')
+  const compatEmpty =
+    compatSummary.startsWith('Add someone') ||
+    compatSummary === t('people.compatHomeSummary.empty', 'Add someone close to you')
   const compatMeta = !shelfReady
-    ? 'Checking…'
-    : day1 || compatSummary.startsWith('Add someone')
-      ? 'Add someone close to you'
+    ? t('home.shelf.checking', 'Checking…')
+    : day1 || compatEmpty
+      ? t('home.shelf.addSomeoneClose', 'Add someone close to you')
       : compatSummary
-  const compatCta = day1 || compatSummary.startsWith('Add someone') ? 'Add someone' : 'See all'
+  const compatCta =
+    day1 || compatEmpty
+      ? t('home.shelf.addSomeone', 'Add someone')
+      : t('home.shelf.seeAll', 'See all')
   const progressPct = unpaidPool
     ? 100
     : !shelfReady
@@ -212,7 +258,7 @@ export function SoulHomeScreen({
   const showShelfProgress = true
 
   const openAgent = () => {
-    const starter = unpaidPool ? POOL_NOTE.headline : noteHeadline
+    const starter = unpaidPool ? t('home.pool.headline', POOL_NOTE.headline) : noteHeadline
     navigate('/agent', {
       state: {
         starter,
@@ -252,7 +298,7 @@ export function SoulHomeScreen({
     void saveInsight({
       ownerProfileId: profile.id,
       quote: noteQuote,
-      source: "Today's note",
+      source: t('home.note.sourceDaily', "Today's note"),
       sourceKind: 'daily_note',
     })
       .then((row) => {
@@ -285,7 +331,7 @@ export function SoulHomeScreen({
           data-home-enter-delay="0"
         >
           <SoulBrand />
-          <div className="soul-home__header-nav" aria-label="Desktop navigation">
+          <div className="soul-home__header-nav" aria-label={t('home.nav.desktopAria', 'Desktop navigation')}>
             <SoulNav variant="desktop" />
           </div>
         </header>
@@ -293,11 +339,11 @@ export function SoulHomeScreen({
         {unpaidLike ? (
           <div className="soul-home__trial soul-home__trial--notice soul-home__enter soul-home__enter--banner" role="status" data-home-enter data-home-enter-delay="150">
             <div className="soul-home__trial-copy">
-              <p className="soul-home__trial-title">{UNPAID_BANNER.title}</p>
-              <p className="soul-home__trial-detail">{UNPAID_BANNER.detail}</p>
+              <p className="soul-home__trial-title">{t('home.unpaid.title', UNPAID_BANNER.title)}</p>
+              <p className="soul-home__trial-detail">{t('home.unpaid.detail', UNPAID_BANNER.detail)}</p>
             </div>
             <Link className="soul-home__trial-manage" to="/account/plan">
-              Manage
+              {t('home.trialNotice.manage', 'Manage')}
             </Link>
           </div>
         ) : null}
@@ -309,12 +355,12 @@ export function SoulHomeScreen({
               <p className="soul-home__trial-detail">{trialDetail}</p>
             </div>
             <Link className="soul-home__trial-manage" to="/account/plan">
-              Manage
+              {t('home.trialNotice.manage', 'Manage')}
             </Link>
           </div>
         ) : null}
 
-        <section className="soul-home__note" aria-label="Today’s note">
+        <section className="soul-home__note" aria-label={t('home.note.aria', 'Today’s note')}>
           {noteLoading ? (
             <div
               className={`soul-home__skeleton${paymentConfirmation ? ' soul-home__skeleton--offset' : ''} soul-home__enter soul-home__enter--eyebrow`}
@@ -327,7 +373,7 @@ export function SoulHomeScreen({
               <span className="soul-home__skeleton-bar soul-home__skeleton-bar--h1" />
               <span className="soul-home__skeleton-bar soul-home__skeleton-bar--h2" />
               <span className="soul-home__skeleton-bar soul-home__skeleton-bar--h3" />
-              <p className="soul-home__skeleton-label">Writing today’s note…</p>
+              <p className="soul-home__skeleton-label">{t('home.note.writing', 'Writing today’s note…')}</p>
             </div>
           ) : (
             <div className="soul-home__note-copy">
@@ -345,14 +391,18 @@ export function SoulHomeScreen({
                 data-home-enter
                 data-home-enter-delay="400"
               >
-                {unpaidPool ? POOL_NOTE.headline : noteHeadline}
+                {unpaidPool ? t('home.pool.headline', POOL_NOTE.headline) : noteHeadline}
               </h1>
               <p
                 className="soul-home__sub soul-home__enter soul-home__enter--sub"
                 data-home-enter
                 data-home-enter-delay="600"
               >
-                {unpaidPool ? POOL_NOTE.sub : unpaid ? NOTE.unpaidSub : noteSub}
+                {unpaidPool
+                  ? t('home.pool.sub', POOL_NOTE.sub)
+                  : unpaid
+                    ? t('home.note.unpaidSub', NOTE.unpaidSub)
+                    : noteSub}
               </p>
             </div>
           )}
@@ -366,25 +416,29 @@ export function SoulHomeScreen({
               {unpaidLike ? (
                 <div className="soul-home__action-row">
                   <SoulButton showArrow onClick={onResume}>
-                    Resume · {resumePrice}/mo
+                    {t('home.resume.resume', `Resume · ${resumePrice}/mo`, { price: resumePrice })}
                   </SoulButton>
                 </div>
               ) : (
                 <>
                   <div className="soul-home__action-row">
                     <SoulButton showArrow disabled={noteLoading} onClick={openAgent}>
-                      Talk this through
+                      {t('home.note.talkThrough', 'Talk this through')}
                     </SoulButton>
                     <SoulSecondaryButton
-                      aria-label={noteSaved ? 'Note saved' : 'Save today’s note'}
+                      aria-label={
+                        noteSaved
+                          ? t('home.note.savedAria', 'Note saved')
+                          : t('home.note.saveAria', 'Save today’s note')
+                      }
                       disabled={noteLoading}
                       onClick={saveNote}
                     />
                   </div>
                   <p className="soul-home__chapter">
-                    Drawn from{' '}
+                    {t('home.note.drawnFrom', 'Drawn from')}{' '}
                     <button type="button" onClick={openPattern}>
-                      your Pattern chapter
+                      {t('home.note.patternChapter', 'your Pattern chapter')}
                     </button>
                   </p>
                 </>
@@ -393,7 +447,7 @@ export function SoulHomeScreen({
           ) : null}
         </section>
 
-        <section className="soul-home__shelf" aria-label="Your shelf">
+        <section className="soul-home__shelf" aria-label={t('home.shelf.aria', 'Your shelf')}>
           <hr
             className="soul-home__divider soul-home__enter soul-home__enter--fade"
             data-home-enter
@@ -409,7 +463,7 @@ export function SoulHomeScreen({
             >
               <div className="soul-home__card-body">
                 <div>
-                  <h2 className="soul-home__card-title">Your readings</h2>
+                  <h2 className="soul-home__card-title">{t('home.shelf.readings', 'Your readings')}</h2>
                   <p className="soul-home__card-meta">{readingsMeta}</p>
                 </div>
                 {showShelfProgress ? (
@@ -433,7 +487,7 @@ export function SoulHomeScreen({
             >
               <div className="soul-home__card-body">
                 <div>
-                  <h2 className="soul-home__card-title">Saved insights</h2>
+                  <h2 className="soul-home__card-title">{t('home.shelf.insights', 'Saved insights')}</h2>
                   <p className="soul-home__card-meta">{insightsMeta}</p>
                 </div>
                 <SoulTextLink showArrow>{insightsCta}</SoulTextLink>
@@ -452,7 +506,7 @@ export function SoulHomeScreen({
             >
               <div className="soul-home__card-body">
                 <div>
-                  <h2 className="soul-home__card-title">Compatibilities</h2>
+                  <h2 className="soul-home__card-title">{t('home.shelf.compat', 'Compatibilities')}</h2>
                   <p className="soul-home__card-meta">{compatMeta}</p>
                 </div>
                 <SoulTextLink showArrow>{compatCta}</SoulTextLink>
@@ -481,11 +535,15 @@ export function SoulHomeScreen({
           </span>
           <span className="soul-home__install-body">
             <span>
-              <p className="soul-home__install-title">Keep SOUL+AI one tap away</p>
-              <p className="soul-home__install-sub">Your note is waiting each morning.</p>
+              <p className="soul-home__install-title">
+                {t('home.install.title', 'Keep SOUL+AI one tap away')}
+              </p>
+              <p className="soul-home__install-sub">
+                {t('home.install.sub', 'Your note is waiting each morning.')}
+              </p>
             </span>
             <SoulTextLink tone="on-dark" showArrow>
-              Show me how
+              {t('home.install.how', 'Show me how')}
             </SoulTextLink>
           </span>
         </button>
@@ -497,34 +555,39 @@ export function SoulHomeScreen({
         >
           <hr className="soul-home__divider" />
           <p className="soul-home__footer-tag">
-            Helping you unlock your potential through ancient wisdom and modern technology.
+            {t(
+              'common.footer.tagline',
+              'Helping you unlock your potential through ancient wisdom and modern technology.',
+            )}
           </p>
           <div className="soul-home__footer-links">
-            <Link to="/contact">Support</Link>
-            <Link to="/about">About</Link>
-            <Link to="/account">Manage subscription</Link>
-            <Link to="/terms">Terms of Service</Link>
-            <Link to="/privacy">Privacy Policy</Link>
-            <Link to="/faq">Refund Policy</Link>
+            <Link to="/contact">{t('common.footer.support', 'Support')}</Link>
+            <Link to="/about">{t('common.footer.about', 'About')}</Link>
+            <Link to="/account">{t('common.footer.manageSubscription', 'Manage subscription')}</Link>
+            <Link to="/terms">{t('common.footer.terms', 'Terms of Service')}</Link>
+            <Link to="/privacy">{t('common.footer.privacy', 'Privacy Policy')}</Link>
+            <Link to="/faq">{t('common.footer.refund', 'Refund Policy')}</Link>
           </div>
           <a className="soul-home__footer-email" href="mailto:support@soulplusai.com">
             support@soulplusai.com
           </a>
           <div className="soul-home__footer-links">
             <a href="https://instagram.com" target="_blank" rel="noreferrer">
-              Instagram
+              {t('common.footer.social.instagram', 'Instagram')}
             </a>
             <a href="https://facebook.com" target="_blank" rel="noreferrer">
-              Facebook
+              {t('common.footer.social.facebook', 'Facebook')}
             </a>
             <a href="https://twitter.com" target="_blank" rel="noreferrer">
-              Twitter
+              {t('common.footer.social.twitter', 'Twitter')}
             </a>
             <a href="https://youtube.com" target="_blank" rel="noreferrer">
-              Youtube
+              {t('common.footer.social.youtube', 'Youtube')}
             </a>
           </div>
-          <p className="soul-home__footer-copy">© 2026 Soul+AI. All rights reserved.</p>
+          <p className="soul-home__footer-copy">
+            {t('common.footer.copyright', '© 2026 Soul+AI. All rights reserved.')}
+          </p>
         </footer>
       </div>
 
@@ -536,7 +599,7 @@ export function SoulHomeScreen({
         <button
           type="button"
           className="soul-home__agent-fab soul-home__agent-fab--mobile"
-          aria-label="Talk this through with your mentor"
+          aria-label={t('home.fab.talkAria', 'Talk this through with your mentor')}
           onClick={openAgent}
         >
           <img className="soul-home__agent-fab-orb" src={glassOrbFab} alt="" aria-hidden="true" />
@@ -555,7 +618,7 @@ export function SoulHomeScreen({
 
       {savedToast ? (
         <div className="soul-home__toast" role="status">
-          <span>Saved to your insights</span>
+          <span>{t('home.toast.saved', 'Saved to your insights')}</span>
           <button
             type="button"
             onClick={() => {
@@ -563,7 +626,7 @@ export function SoulHomeScreen({
               navigate('/insights')
             }}
           >
-            View
+            {t('home.toast.view', 'View')}
           </button>
         </div>
       ) : null}
@@ -580,14 +643,14 @@ export function SoulHomeScreen({
           >
             <div className="soul-home__welcome-copy">
               <p className="soul-home__welcome-title" id="soul-home-welcome-title">
-                {WELCOME_BACK.title}
+                {t('home.welcome.title', WELCOME_BACK.title)}
               </p>
               <p className="soul-home__welcome-body" id="soul-home-welcome-body">
-                {WELCOME_BACK.body}
+                {t('home.welcome.body', WELCOME_BACK.body)}
               </p>
             </div>
             <SoulButton block onClick={() => setWelcomeDismissed(true)}>
-              Close
+              {t('home.welcome.close', 'Close')}
             </SoulButton>
           </div>
         </div>

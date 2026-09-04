@@ -2,6 +2,7 @@
 // Ported from soul-v6.html renderQuestion() feedback type
 
 import PrimaryButton from '../atoms/PrimaryButton'
+import { useCopy } from '@/i18n'
 import type { QuizAnswers } from '../types'
 
 interface FeedbackScreenProps {
@@ -19,8 +20,10 @@ const FEEDBACK_MAP: Record<string, string> = {
 }
 
 export default function FeedbackScreen({ answers, onNext }: FeedbackScreenProps) {
+  const t = useCopy()
   const strength = answers['soulmate-strength'] ?? 'emotional'
-  const body = FEEDBACK_MAP[strength] ?? FEEDBACK_MAP['emotional']
+  const english = FEEDBACK_MAP[strength] ?? FEEDBACK_MAP['emotional']
+  const body = t(`quiz.feedback.${strength}`, english)
 
   return (
     <div
@@ -93,7 +96,7 @@ export default function FeedbackScreen({ answers, onNext }: FeedbackScreenProps)
             letterSpacing: '-0.02em',
           }}
         >
-          Awesome!
+          {t('quiz.feedback.title', 'Awesome!')}
         </h2>
         <p
           style={{
@@ -109,7 +112,7 @@ export default function FeedbackScreen({ answers, onNext }: FeedbackScreenProps)
 
       {/* CTA */}
       <div style={{ padding: '8px 0 28px' }}>
-        <PrimaryButton onClick={onNext}>Continue</PrimaryButton>
+        <PrimaryButton onClick={onNext}>{t('quiz.feedback.continue', 'Continue')}</PrimaryButton>
       </div>
     </div>
   )

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { SoulBrand, SoulNav, SoulRippleBg } from '@/components/soul'
+import { useCopy } from '@/i18n'
 import { displayName } from '@/pages/account/profileDisplay'
 import { useUser } from '@/hooks/useUser'
 import { PEOPLE_REPORT_META } from './reportContent'
@@ -15,6 +16,7 @@ import iconLink from './assets/icon-link.svg'
  */
 export function SoulPeopleShareScreen() {
   const navigate = useNavigate()
+  const t = useCopy()
   const { personId = 'anna' } = useParams()
   const { profile } = useUser()
   const [partnerName, setPartnerName] = useState(
@@ -55,9 +57,9 @@ export function SoulPeopleShareScreen() {
   const onCopy = async () => {
     try {
       await navigator.clipboard.writeText(shareUrl || `https://${PEOPLE_REPORT_META.shareLink}`)
-      toast.message('Link copied')
+      toast.message(t('people.share.copied', 'Link copied'))
     } catch {
-      toast.message('Could not copy')
+      toast.message(t('people.share.copyFail', 'Could not copy'))
     }
   }
 
@@ -73,11 +75,11 @@ export function SoulPeopleShareScreen() {
             type="button"
             className="soul-people__brand"
             onClick={() => navigate('/')}
-            aria-label="SOUL+AI home"
+            aria-label={t('people.homeAria', 'SOUL+AI home')}
           >
             <SoulBrand />
           </button>
-          <div className="soul-people__header-nav" aria-label="Desktop navigation">
+          <div className="soul-people__header-nav" aria-label={t('people.desktopNavAria', 'Desktop navigation')}>
             <SoulNav variant="desktop" />
           </div>
         </header>
@@ -88,10 +90,10 @@ export function SoulPeopleShareScreen() {
             aria-labelledby="soul-people-share-title"
           >
             <h1 id="soul-people-share-title" className="soul-people__title">
-              Share with {partnerName}
+              {t('people.share.title', `Share with ${partnerName}`, { name: partnerName })}
             </h1>
             <p className="soul-people__subtitle soul-people__subtitle--share">
-              She reads one line. Then her own.
+              {t('people.share.subtitle', 'She reads one line. Then her own.')}
             </p>
           </section>
 
@@ -109,17 +111,24 @@ export function SoulPeopleShareScreen() {
             <hr className="soul-people__invite-rule" />
             <div className="soul-people__invite-body">
               <p className="soul-people__invite-quote">
-                “{quote}”
+                “
+                {t('people.report.meta.shareQuote', quote)}
+                ”
               </p>
               <p className="soul-people__invite-pair">
-                {selfName} and {partnerName}
+                {t('people.share.pair', `${selfName} and ${partnerName}`, {
+                  self: selfName,
+                  partner: partnerName,
+                })}
               </p>
             </div>
           </article>
 
           <p className="soul-people__share-note">
-            Nothing else travels with the link. Birth details and the rest of the reading stay
-            private.
+            {t(
+              'people.share.note',
+              'Nothing else travels with the link. Birth details and the rest of the reading stay private.',
+            )}
           </p>
 
           <div className="soul-people__link-field">
@@ -132,7 +141,7 @@ export function SoulPeopleShareScreen() {
             />
             <span className="soul-people__link-url">{displayLink || PEOPLE_REPORT_META.shareLink}</span>
             <button type="button" className="soul-people__copy" onClick={() => void onCopy()}>
-              Copy link
+              {t('people.share.copy', 'Copy link')}
             </button>
           </div>
         </div>

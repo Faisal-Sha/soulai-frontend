@@ -2,6 +2,7 @@
 // Logic ported verbatim from soul-v6.html buildRecognition()
 
 import PrimaryButton from '../atoms/PrimaryButton'
+import { useCopy } from '@/i18n'
 import { buildRecognition } from '../lib/buildRecognition'
 import type { QuizAnswers } from '../types'
 
@@ -11,6 +12,7 @@ interface RecognitionScreenProps {
 }
 
 export default function RecognitionScreen({ answers, onNext }: RecognitionScreenProps) {
+  const t = useCopy()
   const paragraphs = buildRecognition(answers)
 
   return (
@@ -35,7 +37,7 @@ export default function RecognitionScreen({ answers, onNext }: RecognitionScreen
             textAlign: 'center',
           }}
         >
-          A quick check-in
+          {t('quiz.recognition.eyebrow', 'A quick check-in')}
         </div>
 
         {/* Title */}
@@ -51,7 +53,7 @@ export default function RecognitionScreen({ answers, onNext }: RecognitionScreen
             textAlign: 'center',
           }}
         >
-          Based on what you've told us so far…
+          {t('quiz.recognition.title', "Based on what you've told us so far…")}
         </h2>
 
         {/* Personalized paragraphs */}
@@ -91,7 +93,7 @@ export default function RecognitionScreen({ answers, onNext }: RecognitionScreen
 
       {/* CTA */}
       <div style={{ padding: '8px 0 28px' }}>
-        <PrimaryButton onClick={onNext}>Keep going</PrimaryButton>
+        <PrimaryButton onClick={onNext}>{t('quiz.recognition.cta', 'Keep going')}</PrimaryButton>
         <div
           style={{
             textAlign: 'center',
@@ -100,7 +102,7 @@ export default function RecognitionScreen({ answers, onNext }: RecognitionScreen
             marginTop: 10,
           }}
         >
-          4 quick questions left
+          {t('quiz.recognition.remaining', '4 quick questions left')}
         </div>
       </div>
     </div>

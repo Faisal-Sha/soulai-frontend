@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { SoulButton, SoulField } from '@/components/soul'
 import { AuthLayout } from './AuthLayout'
+import { useCopy } from '@/i18n'
 import { isValidEmail } from './authValidation'
 import bgSignInEmail from './assets/bg-signin-email.png'
 import {
@@ -15,6 +16,7 @@ import { useLeaveIfSignedIn } from './useLeaveIfSignedIn'
 
 export function SoulForgotPasswordScreen() {
   const navigate = useNavigate()
+  const t = useCopy()
   const location = useLocation()
   const stored = readStoredAuth()
   const preset = (location.state as { email?: string } | null)?.email ?? stored.email
@@ -47,18 +49,18 @@ export function SoulForgotPasswordScreen() {
   return (
     <AuthLayout bg={bgSignInEmail} name="Forgot password">
       <section className="soul-auth__hero">
-        <h1 className="soul-auth__title">Forgot your password?</h1>
+        <h1 className="soul-auth__title">{t('auth.forgot.title', 'Forgot your password?')}</h1>
         <p className="soul-auth__subtitle">
-          Enter the email on this account. I’ll send a reset link.
+          {t('auth.forgot.subtitle', 'Enter the email on this account. I’ll send a reset link.')}
         </p>
       </section>
 
       <form className="soul-auth__stack soul-auth__stack--form" onSubmit={onSubmit} noValidate>
         <SoulField
           htmlFor="soul-auth-link-email"
-          label="Your email"
+          label={t('auth.email.label', 'Your email')}
           tone={submitted && !emailOk ? 'error' : 'none'}
-          message={submitted && !emailOk ? 'Enter a valid email.' : undefined}
+          message={submitted && !emailOk ? t('auth.email.invalid', 'Enter a valid email.') : undefined}
           inputProps={{
             id: 'soul-auth-link-email',
             size: 'lg',
@@ -66,18 +68,18 @@ export function SoulForgotPasswordScreen() {
             name: 'email',
             autoComplete: 'email',
             inputMode: 'email',
-            placeholder: 'name@email.com',
+            placeholder: t('auth.email.placeholder', 'name@email.com'),
             value: email,
             onChange: (e) => setEmail(e.target.value),
           }}
         />
 
         <SoulButton type="submit" block disabled={!email.trim()} loading={loading}>
-          Send reset link
+          {t('auth.forgot.sendReset', 'Send reset link')}
         </SoulButton>
 
         <Link to="/login/email" className="soul-auth__alt">
-          Back to sign in
+          {t('auth.forgot.backToSignIn', 'Back to sign in')}
         </Link>
       </form>
     </AuthLayout>

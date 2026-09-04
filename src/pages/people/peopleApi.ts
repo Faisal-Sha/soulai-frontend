@@ -2,9 +2,12 @@ import { supabase } from '@/integrations/supabase/client'
 import { DEMO_PEOPLE, type PeopleEntry, type PeopleEntryStatus } from './peopleData'
 import {
   buildReportContent,
+  localizeReportForDisplay,
   parseReportContent,
+  PEOPLE_REPORT_META,
   type StoredPeopleReport,
 } from './reportContent'
+import { getLocale, translate } from '@/i18n'
 
 export type PersonRecord = {
   id: string
@@ -29,10 +32,19 @@ function asStatus(raw: unknown): PeopleEntryStatus {
   return raw === 'ready' ? 'ready' : 'generating'
 }
 
-function summaryFromContent(content: StoredPeopleReport | null, status: PeopleEntryStatus) {
-  if (status === 'generating') return GENERATING_SUMMARY
-  const line = content?.sections[2]?.paragraphs[1] ?? content?.shareQuote
-  if (!line) return 'Reading you two.'
+function summaryFromContent(
+  content: StoredPeopleReport | null,
+  status: PeopleEntryStatus,
+  partnerName: string,
+) {
+  if (status === 'generating') {
+    return translate(getLocale(), 'people.demo.kate', GENERATING_SUMMARY)
+  }
+  const view = content
+    ? localizeReportForDisplay(content, PEOPLE_REPORT_META.selfName, partnerName)
+    : null
+  const line = view?.sections[2]?.paragraphs[1] ?? view?.shareQuote
+  if (!line) return translate(getLocale(), 'people.generate.note', 'Reading you two.')
   const sentence = line.split(/(?<=\.)\s/)[0]?.trim()
   return sentence || line.slice(0, 80)
 }
@@ -45,7 +57,7 @@ export function toPeopleEntry(
     id: person.id,
     name: person.full_name,
     status: person.status,
-    summary: summaryFromContent(content, person.status),
+    summary: summaryFromContent(content, person.status, person.full_name),
   }
 }
 

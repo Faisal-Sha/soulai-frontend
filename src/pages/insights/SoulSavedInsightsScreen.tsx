@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { SoulBrand, SoulButton, SoulPending, SoulRippleBg } from '@/components/soul'
+import { useCopy, useI18n } from '@/i18n'
 import { useUser } from '@/hooks/useUser'
 import {
   deleteInsight,
   listSavedInsights,
 } from './insightsApi'
-import { SAVED_INSIGHTS, type SavedInsight } from './insightsData'
+import { getSavedInsights, localizeInsight, SAVED_INSIGHTS, type SavedInsight } from './insightsData'
 import './soul-insights.css'
 import iconBack from './assets/icon-back.svg'
 import iconBookmark from './assets/icon-bookmark.svg'
@@ -31,6 +32,8 @@ function variantFromPath(pathname: string): InsightsVariant {
  */
 export function SoulSavedInsightsScreen({ variant: variantProp }: SoulSavedInsightsScreenProps) {
   const navigate = useNavigate()
+  const t = useCopy()
+  const { locale } = useI18n()
   const { pathname } = useLocation()
   const { user, profile, loading } = useUser()
   const variant = variantProp ?? variantFromPath(pathname)
@@ -51,7 +54,7 @@ export function SoulSavedInsightsScreen({ variant: variantProp }: SoulSavedInsig
       return
     }
     if (!profile?.id) {
-      setInsights(includeDemo ? SAVED_INSIGHTS : [])
+      setInsights(includeDemo ? getSavedInsights() : [])
       setReady(true)
       return
     }
@@ -80,6 +83,7 @@ export function SoulSavedInsightsScreen({ variant: variantProp }: SoulSavedInsig
 
   const waiting = !ready
   const empty = ready && insights.length === 0
+  const visibleInsights = useMemo(() => insights.map(localizeInsight), [insights, locale])
 
   const removeInsight = (id: string) => {
     setInsights((items) => items.filter((item) => item.id !== id))
@@ -112,7 +116,7 @@ export function SoulSavedInsightsScreen({ variant: variantProp }: SoulSavedInsig
               type="button"
               className="soul-insights__back"
               onClick={goBack}
-              aria-label="Back"
+              aria-label={t('insights.backAria', 'Back')}
             >
               <img src={iconBack} alt="" width={22} height={22} />
             </button>
@@ -127,41 +131,44 @@ export function SoulSavedInsightsScreen({ variant: variantProp }: SoulSavedInsig
           {waiting ? (
             <>
               <h1 id="soul-insights-title" className="soul-insights__title">
-                Saved insights
+                {t('insights.title', 'Saved insights')}
               </h1>
-              <SoulPending rows={3} variant="cards" label="Loading insights" />
+              <SoulPending rows={3} variant="cards" label={t('insights.loading', 'Loading insights')} />
             </>
           ) : empty ? (
             <>
               <div className="soul-insights__empty-head">
                 <h1 id="soul-insights-title" className="soul-insights__title">
-                  Saved insights
+                  {t('insights.title', 'Saved insights')}
                 </h1>
                 <div className="soul-insights__empty-copy-block">
-                  <p className="soul-insights__empty-lead">Nothing saved yet.</p>
+                  <p className="soul-insights__empty-lead">{t('insights.emptyLead', 'Nothing saved yet.')}</p>
                   <p className="soul-insights__empty-copy">
-                    Hold any line in your reading, or tap the bookmark under something the mentor
-                    said. It will wait for you here.
+                    {t(
+                      'insights.emptyCopy',
+                      'Hold any line in your reading, or tap the bookmark under something the mentor said. It will wait for you here.',
+                    )}
                   </p>
                 </div>
               </div>
               <SoulButton showArrow onClick={() => navigate('/readings')}>
-                Open your reading
+                {t('insights.openReading', 'Open your reading')}
               </SoulButton>
             </>
           ) : (
             <>
               <h1 id="soul-insights-title" className="soul-insights__title">
-                Saved insights
+                {t('insights.title', 'Saved insights')}
               </h1>
               <ul className="soul-insights__list">
-                {insights.map((insight) => (
+                {visibleInsights.map((insight) => (
                   <InsightCard
                     key={insight.id}
                     insight={insight}
                     open={openId === insight.id}
                     onToggle={() => toggleOpen(insight.id)}
                     onRemove={() => removeInsight(insight.id)}
+                    removeLabel={t('insights.removeAria', 'Remove saved insight')}
                   />
                 ))}
               </ul>
@@ -178,9 +185,10 @@ type InsightCardProps = {
   open: boolean
   onToggle: () => void
   onRemove: () => void
+  removeLabel: string
 }
 
-function InsightCard({ insight, open, onToggle, onRemove }: InsightCardProps) {
+function InsightCard({ insight, open, onToggle, onRemove, removeLabel }: InsightCardProps) {
   const clamp = !open && Boolean(insight.clampLines)
   const clampClass = clamp ? 'soul-insights__quote--clamp-3' : ''
 
@@ -203,7 +211,7 @@ function InsightCard({ insight, open, onToggle, onRemove }: InsightCardProps) {
         <button
           type="button"
           className="soul-insights__bookmark"
-          aria-label="Remove saved insight"
+          aria-label={removeLabel}
           onClick={onRemove}
         >
           <img src={iconBookmark} alt="" width={20} height={20} />

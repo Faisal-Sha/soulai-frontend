@@ -1,7 +1,14 @@
 // buildRecognition. Ported verbatim from soul-v6.html buildRecognition()
 // Generates 2–3 personalized paragraphs from the user's prior answers.
 
+import { getLocale, translate } from '@/i18n'
 import type { QuizAnswers } from '../types'
+
+function loc(key: string, english: string): string {
+  const locale = getLocale()
+  if (locale === 'en') return english
+  return translate(locale, key, english)
+}
 
 export function buildRecognition(answers: QuizAnswers): string[] {
   const paragraphs: string[] = []
@@ -32,11 +39,11 @@ export function buildRecognition(answers: QuizAnswers): string[] {
   }
 
   if (answers.block && blockLines[answers.block]) {
-    paragraphs.push(blockLines[answers.block])
+    paragraphs.push(loc(`quiz.recognition.block.${answers.block}`, blockLines[answers.block]))
   } else if (answers.attachment && attachmentLines[answers.attachment]) {
-    paragraphs.push(attachmentLines[answers.attachment])
+    paragraphs.push(loc(`quiz.recognition.attachment.${answers.attachment}`, attachmentLines[answers.attachment]))
   } else if (answers.status && statusLines[answers.status]) {
-    paragraphs.push(statusLines[answers.status])
+    paragraphs.push(loc(`quiz.recognition.status.${answers.status}`, statusLines[answers.status]))
   }
 
   // ── Para 2: what you actually want ──
@@ -57,9 +64,9 @@ export function buildRecognition(answers: QuizAnswers): string[] {
   }
 
   if (answers.hope && hopeLines[answers.hope]) {
-    paragraphs.push(hopeLines[answers.hope])
+    paragraphs.push(loc(`quiz.recognition.hope.${answers.hope}`, hopeLines[answers.hope]))
   } else if (answers['soulmate-vibe'] && vibeLines[answers['soulmate-vibe']]) {
-    paragraphs.push(vibeLines[answers['soulmate-vibe']])
+    paragraphs.push(loc(`quiz.recognition.vibe.${answers['soulmate-vibe']}`, vibeLines[answers['soulmate-vibe']]))
   }
 
   // ── Para 3: the closer. What you need / how you love ──
@@ -79,14 +86,14 @@ export function buildRecognition(answers: QuizAnswers): string[] {
   }
 
   if (answers['love-receive'] && loveLines[answers['love-receive']]) {
-    paragraphs.push(loveLines[answers['love-receive']])
+    paragraphs.push(loc(`quiz.recognition.love.${answers['love-receive']}`, loveLines[answers['love-receive']]))
   } else if (answers.energy && energyLines[answers.energy]) {
-    paragraphs.push(energyLines[answers.energy])
+    paragraphs.push(loc(`quiz.recognition.energy.${answers.energy}`, energyLines[answers.energy]))
   }
 
   // Fallback
   if (paragraphs.length < 2) {
-    paragraphs.push("We have enough to start seeing your person.")
+    paragraphs.push(loc('quiz.recognition.fallback', 'We have enough to start seeing your person.'))
   }
 
   return paragraphs.slice(0, 3)

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useCopy } from '@/i18n'
 import './soul-ui.css'
 import { SoulIconButton } from './SoulIconButton'
 
@@ -20,13 +21,15 @@ type SoulComposerProps = {
 export function SoulComposer({
   value,
   defaultValue = '',
-  placeholder = 'Chat with mentor…',
+  placeholder,
   disabled = false,
   autoFocus = false,
   className = '',
   onChange,
   onSubmit,
 }: SoulComposerProps) {
+  const t = useCopy()
+  const resolvedPlaceholder = placeholder ?? t('agent.composer.defaultPlaceholder', 'Chat with mentor…')
   const [internal, setInternal] = useState(defaultValue)
   const inputRef = useRef<HTMLInputElement>(null)
   const text = value !== undefined ? value : internal
@@ -70,10 +73,10 @@ export function SoulComposer({
         className="soul-composer__input"
         type="text"
         value={text}
-        placeholder={placeholder}
+        placeholder={resolvedPlaceholder}
         disabled={disabled}
         onChange={(e) => setText(e.target.value)}
-        aria-label={placeholder}
+        aria-label={resolvedPlaceholder}
       />
       <SoulIconButton
         type="submit"
