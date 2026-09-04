@@ -1,9 +1,10 @@
 <svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="16.2" height="16.2" viewBox="0 0 16.2 16.2" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="check" clip-path="url(#clip0_0_7)">
+<g id="check" clip-path="url(#clip0_0_4)">
 <circle id="Ellipse 10" cx="8.10156" cy="8.09961" r="8" fill="#3A362E"/>
+<path id="&#226;&#156;&#147;" d="M4.10015 8.20211L4.75158 7.53354L7.01444 9.76211L11.6944 5.09925L12.363 5.76783L7.01444 11.0993L4.10015 8.20211Z" fill="white"/>
 </g>
 <defs>
-<clipPath id="clip0_0_7">
+<clipPath id="clip0_0_4">
 <rect width="16.2" height="16.2" fill="white"/>
 </clipPath>
 </defs>

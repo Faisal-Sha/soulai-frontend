@@ -10,31 +10,30 @@ import type { PaywallPlanId } from '../types'
 import '../quiz-paywall.css'
 import bgPaywall from '../assets/onboarding/bg-paywall.png'
 import iconCheckFilled from '../assets/onboarding/icon-check-filled.svg'
-import iconCheckOutline from '../assets/onboarding/icon-check-outline.svg'
 import iconShield from '../assets/onboarding/icon-shield-check.svg'
 import iconStar from '../assets/onboarding/icon-star-gold.svg'
 import iconChevron from '../assets/onboarding/icon-chevron-down.svg'
 
-const TIMELINE = [
+const FEATURES = [
   {
-    title: 'Today',
-    body: 'Your full profile, the chat, daily notes, all open.',
-    active: true,
+    title: 'Your full profile',
+    body: 'A deep, honest read on who you really are',
   },
   {
-    title: 'Day 5',
-    body: 'I email you before the trial ends. No surprises.',
-    active: false,
+    title: 'Your AI mentor',
+    body: 'Ask me anything about your life, and I answer based on you, to help you actually move forward',
   },
   {
-    title: 'Day 7',
-    body: "Your subscription begins, unless you've cancelled. One tap in your profile.",
-    active: false,
+    title: 'Compatibility',
+    body: 'See how you truly match with any partner, friend, or family member',
   },
   {
-    title: 'After that',
-    body: 'I keep writing. A short note each morning, a new deep section each month, and the chat stays open.',
-    active: false,
+    title: 'Daily insight',
+    body: 'Every morning, a short note on what today asks of you',
+  },
+  {
+    title: 'Action steps',
+    body: 'Clear next moves made for your nature, not generic advice',
   },
 ] as const
 
@@ -169,25 +168,20 @@ export default function QuizPaywallScreen({
                 <span className="soul-pw__price-then">then {renewalLabel}/mo</span>
               </div>
               <hr className="soul-pw__rule" />
-              <ol className="soul-pw__timeline">
-                {TIMELINE.map((step) => (
-                  <li
-                    key={step.title}
-                    className={`soul-pw__step${step.active ? ' soul-pw__step--active' : ''}`}
-                  >
-                    <span className="soul-pw__step-icon" aria-hidden="true">
-                      <img
-                        src={step.active ? iconCheckFilled : iconCheckOutline}
-                        alt=""
-                      />
-                    </span>
-                    <div className="soul-pw__step-copy">
-                      <p className="soul-pw__step-title">{step.title}</p>
-                      <p className="soul-pw__step-body">{step.body}</p>
+              <p className="soul-pw__gets">What you get today:</p>
+              <ul className="soul-pw__features">
+                {FEATURES.map((item) => (
+                  <li key={item.title} className="soul-pw__feature">
+                    <div className="soul-pw__feature-head">
+                      <span className="soul-pw__feature-icon" aria-hidden="true">
+                        <img src={iconCheckFilled} alt="" width={16} height={16} />
+                      </span>
+                      <p className="soul-pw__feature-title">{item.title}</p>
                     </div>
+                    <p className="soul-pw__feature-body">{item.body}</p>
                   </li>
                 ))}
-              </ol>
+              </ul>
             </article>
 
             <div className="soul-pw__guarantee">

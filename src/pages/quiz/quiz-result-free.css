@@ -1,4 +1,4 @@
-/* 04.1 · Result · Free — Figma DEV 437:3106 */
+/* 04.1 · Result · Free — Figma DEV 1189:3486 */
 
 @import '../../styles/soul-tokens.css';
 
@@ -256,10 +256,9 @@
   font-family: var(--rs-display);
   font-weight: 400;
   font-size: 18px;
-  line-height: 22px;
+  line-height: 24px;
   color: var(--rs-text-dark);
   font-variation-settings: 'SOFT' 0, 'WONK' 1;
-  white-space: nowrap;
 }
 
 .soul-rs__card-meta {

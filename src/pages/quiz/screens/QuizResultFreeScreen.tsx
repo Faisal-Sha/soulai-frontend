@@ -29,14 +29,14 @@ const LOCKED_ROWS = [
 
 const FREE_CARDS = [
   {
-    id: 'core-self',
-    title: 'Core Self',
+    id: 'who-you-really-are',
+    title: 'Who You Really Are',
     meta: '1 / 42',
     body: "You process the world through feeling first and logic second. That isn't a weakness to manage. It's the instrument you read people with. The trouble only starts when you apologise for the signal before you've even read it.",
   },
   {
-    id: 'your-pattern',
-    title: 'Your Pattern',
+    id: 'strengths-and-talents',
+    title: 'Your strengths and talents',
     meta: '1 / 42',
     body: "You start strong, then quietly retreat the moment things get real. Your profile shows exactly where that exit door sits. And it isn't where you think.",
   },
@@ -44,23 +44,38 @@ const FREE_CARDS = [
 
 const LOCKED_CARDS = [
   {
-    id: 'purpose',
-    title: 'Purpose',
+    id: 'blind-spots',
+    title: 'Your blind spots and blocks',
     body: 'You were never built to pick one thing and stay there. What everyone reads as restlessness is actually the shape of how you learn. And your chart names the exact conditions under which you finally settle, which is not the ones you keep trying to force.',
   },
   {
-    id: 'relationships',
-    title: 'Relationships',
+    id: 'money',
+    title: 'Your money',
     body: "You hand people the version of yourself that's easiest to love. It works. Right up until the moment you need something back, and discover you've trained them not to ask. Your chart shows where that habit began.",
   },
   {
-    id: 'money',
-    title: 'Money',
+    id: 'purpose',
+    title: 'Your purpose and direction',
     body: "You earn in bursts, then cap yourself the moment things feel stable. Your block isn't money. It's what staying in one place would mean about you, and your chart is unusually direct about where that fear was formed.",
   },
   {
-    id: 'year-ahead',
-    title: 'Year Ahead',
+    id: 'relationships',
+    title: 'Your relationships',
+    body: "The next nine months ask you to finish something you abandoned around your late twenties. There's a specific window where it becomes far easier than it has been, and it is closer than you'd expect.",
+  },
+  {
+    id: 'energy',
+    title: 'Your energy and resources',
+    body: "The next nine months ask you to finish something you abandoned around your late twenties. There's a specific window where it becomes far easier than it has been, and it is closer than you'd expect.",
+  },
+  {
+    id: 'family',
+    title: 'Your family and roots',
+    body: "The next nine months ask you to finish something you abandoned around your late twenties. There's a specific window where it becomes far easier than it has been, and it is closer than you'd expect.",
+  },
+  {
+    id: 'next-step',
+    title: 'Your next step',
     body: "The next nine months ask you to finish something you abandoned around your late twenties. There's a specific window where it becomes far easier than it has been, and it is closer than you'd expect.",
   },
 ] as const
@@ -81,7 +96,7 @@ interface QuizResultFreeScreenProps {
 }
 
 /**
- * Figma DEV · 04.1 · Result · Free (node 437:3106)
+ * Figma DEV · 04.1 · Result · Free (node 1189:3486)
  */
 export default function QuizResultFreeScreen({
   answers,
@@ -115,7 +130,7 @@ export default function QuizResultFreeScreen({
               <h1 className="soul-rs__title">{name}, your profile is ready!</h1>
             </div>
             <p className="soul-rs__subtitle">
-              Written for you. And shaped by what&apos;s on your mind.
+              In our main readings we use 9 chapters
             </p>
           </section>
 
@@ -147,9 +162,9 @@ export default function QuizResultFreeScreen({
                   showArrow
                   className="soul-rs__words-cta"
                   onClick={onUnlock}
-                  aria-label="1,240 of 18,000 words unlocked"
+                  aria-label="134 of 1580 words unlocked"
                 >
-                  1,240 of 18,000 words unlocked
+                  134 of 1580 words unlocked
                 </SoulButton>
               </article>
             ))}
@@ -203,12 +218,9 @@ export default function QuizResultFreeScreen({
               ))}
             </ul>
             <div className="soul-rs__paywall-cta">
-              <SoulButton block onClick={onUnlock} aria-label="Unlock everything for $0.99">
-                Unlock everything for $0.99
+              <SoulButton block onClick={onUnlock} aria-label="Unlock everything">
+                Unlock everything
               </SoulButton>
-              <p className="soul-rs__paywall-sub">
-                $0.99 for 7 days, then $6.99/month · Cancel anytime
-              </p>
             </div>
           </section>
 
