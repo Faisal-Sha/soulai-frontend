@@ -1,4 +1,4 @@
-import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from 'react'
+import type { AnchorHTMLAttributes, ButtonHTMLAttributes, HTMLAttributes, ReactNode } from 'react'
 import './soul-ui.css'
 import iconArrowLink from './assets/icon-arrow-link.svg'
 import iconArrowLinkPressed from './assets/icon-arrow-link-pressed.svg'
@@ -10,21 +10,30 @@ type Common = {
   className?: string
 }
 
+type AsSpan = Common &
+  Omit<HTMLAttributes<HTMLSpanElement>, 'children' | 'className'> & {
+    as: 'span'
+    href?: undefined
+  }
+
 type AsButton = Common &
   Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'className'> & {
+    as?: 'button'
     href?: undefined
   }
 
 type AsLink = Common &
   Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'children' | 'className'> & {
+    as?: 'a'
     href: string
   }
 
 /**
  * Figma WIP · Text Link (559:582)
  * States: Default · Pressed
+ * Use `as="span"` when nested inside another button (cards, etc.).
  */
-export function SoulTextLink(props: AsButton | AsLink) {
+export function SoulTextLink(props: AsSpan | AsButton | AsLink) {
   const { children, showArrow = true, tone = 'on-light', className = '' } = props
 
   const classes = [
@@ -59,12 +68,29 @@ export function SoulTextLink(props: AsButton | AsLink) {
     </>
   )
 
+  if ('as' in props && props.as === 'span') {
+    const {
+      children: _c,
+      showArrow: _s,
+      tone: _t,
+      className: _cl,
+      as: _as,
+      ...spanRest
+    } = props
+    return (
+      <span className={classes} {...spanRest}>
+        {content}
+      </span>
+    )
+  }
+
   if ('href' in props && props.href) {
     const {
       children: _c,
       showArrow: _s,
       tone: _t,
       className: _cl,
+      as: _as,
       ...anchorRest
     } = props
     return (
@@ -79,6 +105,7 @@ export function SoulTextLink(props: AsButton | AsLink) {
     showArrow: _s,
     tone: _t,
     className: _cl,
+    as: _as,
     type = 'button',
     ...btnRest
   } = props as AsButton

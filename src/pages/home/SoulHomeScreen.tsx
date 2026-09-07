@@ -18,6 +18,7 @@ import { AddToHomeSheet } from './AddToHomeSheet'
 import { ResumeSheet } from './ResumeSheet'
 import { useSoulSheetParams } from './useSoulSheetParams'
 import { useHomeEnter } from './useHomeEnter'
+import { usePwaInstall } from './usePwaInstall'
 import './soul-home.css'
 import iconReadings from './assets/icon-readings.png'
 import iconInsights from './assets/icon-insights.png'
@@ -196,6 +197,7 @@ export function SoulHomeScreen({
     openInstall,
     closeInstall,
   } = useSoulSheetParams(resumeExtra)
+  const { isInstalled: pwaInstalled } = usePwaInstall()
 
   const eyebrow = useMemo(() => {
     const day = day1 ? 1 : dayNumber
@@ -471,7 +473,9 @@ export function SoulHomeScreen({
                     <span style={{ width: `${progressPct}%` }} />
                   </div>
                 ) : null}
-                <SoulTextLink showArrow>{readingsCta}</SoulTextLink>
+                <SoulTextLink as="span" showArrow>
+                  {readingsCta}
+                </SoulTextLink>
               </div>
               <span className="soul-home__card-icon" aria-hidden="true">
                 <img src={iconReadings} alt="" />
@@ -490,7 +494,9 @@ export function SoulHomeScreen({
                   <h2 className="soul-home__card-title">{t('home.shelf.insights', 'Saved insights')}</h2>
                   <p className="soul-home__card-meta">{insightsMeta}</p>
                 </div>
-                <SoulTextLink showArrow>{insightsCta}</SoulTextLink>
+                <SoulTextLink as="span" showArrow>
+                  {insightsCta}
+                </SoulTextLink>
               </div>
               <span className="soul-home__card-icon" aria-hidden="true">
                 <img src={iconInsights} alt="" />
@@ -509,7 +515,9 @@ export function SoulHomeScreen({
                   <h2 className="soul-home__card-title">{t('home.shelf.compat', 'Compatibilities')}</h2>
                   <p className="soul-home__card-meta">{compatMeta}</p>
                 </div>
-                <SoulTextLink showArrow>{compatCta}</SoulTextLink>
+                <SoulTextLink as="span" showArrow>
+                  {compatCta}
+                </SoulTextLink>
               </div>
               <span className="soul-home__card-icon" aria-hidden="true">
                 <img src={iconCompat} alt="" />
@@ -523,30 +531,32 @@ export function SoulHomeScreen({
           />
         </section>
 
-        <button
-          type="button"
-          className="soul-home__install soul-home__enter soul-home__enter--install"
-          data-home-enter
-          data-home-enter-delay="1900"
-          onClick={openInstall}
-        >
-          <span className="soul-home__install-mark">
-            <img src={markApp} alt="" width={28} height={28} />
-          </span>
-          <span className="soul-home__install-body">
-            <span>
-              <p className="soul-home__install-title">
-                {t('home.install.title', 'Keep SOUL+AI one tap away')}
-              </p>
-              <p className="soul-home__install-sub">
-                {t('home.install.sub', 'Your note is waiting each morning.')}
-              </p>
+        {!pwaInstalled ? (
+          <button
+            type="button"
+            className="soul-home__install soul-home__enter soul-home__enter--install"
+            data-home-enter
+            data-home-enter-delay="1900"
+            onClick={openInstall}
+          >
+            <span className="soul-home__install-mark">
+              <img src={markApp} alt="" width={28} height={28} />
             </span>
-            <SoulTextLink tone="on-dark" showArrow>
-              {t('home.install.how', 'Show me how')}
-            </SoulTextLink>
-          </span>
-        </button>
+            <span className="soul-home__install-body">
+              <span>
+                <p className="soul-home__install-title">
+                  {t('home.install.title', 'Keep SOUL+AI one tap away')}
+                </p>
+                <p className="soul-home__install-sub">
+                  {t('home.install.sub', 'Your note is waiting each morning.')}
+                </p>
+              </span>
+              <SoulTextLink as="span" tone="on-dark" showArrow>
+                {t('home.install.how', 'Show me how')}
+              </SoulTextLink>
+            </span>
+          </button>
+        ) : null}
 
         <footer
           className="soul-home__footer soul-home__enter soul-home__enter--footer"
@@ -572,10 +582,10 @@ export function SoulHomeScreen({
             support@soulplusai.com
           </a>
           <div className="soul-home__footer-links">
-            <a href="https://instagram.com" target="_blank" rel="noreferrer">
+            <a href="https://www.instagram.com/soul.healingcenter/" target="_blank" rel="noreferrer">
               {t('common.footer.social.instagram', 'Instagram')}
             </a>
-            <a href="https://facebook.com" target="_blank" rel="noreferrer">
+            <a href="https://www.facebook.com/profile.php?id=61590586606665" target="_blank" rel="noreferrer">
               {t('common.footer.social.facebook', 'Facebook')}
             </a>
             <a href="https://twitter.com" target="_blank" rel="noreferrer">

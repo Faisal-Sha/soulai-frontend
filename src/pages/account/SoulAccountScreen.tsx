@@ -390,7 +390,7 @@ export function SoulAccountScreen() {
                 <hr className="soul-account__hairline" />
               </>
             ) : null}
-            <Link to="/contact" className="soul-account__row">
+            <a href="mailto:support@soulplusai.com" className="soul-account__row">
               <span className="soul-account__row-text">
                 <span className="soul-account__row-label">
                   {t('account.rows.contact', 'Contact support')}
@@ -403,7 +403,7 @@ export function SoulAccountScreen() {
                 width={16}
                 height={16}
               />
-            </Link>
+            </a>
             <hr className="soul-account__hairline" />
             <Link to="/terms" className="soul-account__row">
               <span className="soul-account__row-text">

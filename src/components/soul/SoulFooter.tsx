@@ -16,8 +16,8 @@ const NAV = [
 ] as const
 
 const SOCIAL = [
-  { href: 'https://instagram.com', label: 'Instagram' },
-  { href: 'https://facebook.com', label: 'Facebook' },
+  { href: 'https://www.instagram.com/soul.healingcenter/', label: 'Instagram' },
+  { href: 'https://www.facebook.com/profile.php?id=61590586606665', label: 'Facebook' },
   { href: 'https://twitter.com', label: 'Twitter' },
   { href: 'https://youtube.com', label: 'Youtube' },
 ] as const

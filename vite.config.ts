@@ -37,6 +37,12 @@ export default defineConfig(() => ({
     // Allow ngrok tunnels (subdomain changes each session)
     allowedHosts: [".ngrok-free.dev", ".ngrok-free.app", ".ngrok.app"],
   },
+  // Same host rules for `npm run preview` (PWA install testing).
+  preview: {
+    host: "::",
+    port: 4173,
+    allowedHosts: [".ngrok-free.dev", ".ngrok-free.app", ".ngrok.app"],
+  },
   plugins: [
     react(),
     tailwindcss(),
@@ -45,6 +51,7 @@ export default defineConfig(() => ({
       registerType: "autoUpdate",
       includeAssets: ["favicon.png", "pwa-180.png", "pwa-192.png", "pwa-512.png"],
       manifest: {
+        id: "/",
         name: "Soul+AI - Destiny Matrix Insights",
         short_name: "Soul+AI",
         description:
@@ -54,7 +61,7 @@ export default defineConfig(() => ({
         display: "standalone",
         orientation: "portrait-primary",
         scope: "/",
-        start_url: "/",
+        start_url: "/?source=pwa",
         lang: "en",
         categories: ["lifestyle", "health"],
         icons: [
@@ -62,11 +69,13 @@ export default defineConfig(() => ({
             src: "/pwa-192.png",
             sizes: "192x192",
             type: "image/png",
+            purpose: "any",
           },
           {
             src: "/pwa-512.png",
             sizes: "512x512",
             type: "image/png",
+            purpose: "any",
           },
           {
             src: "/pwa-512.png",
@@ -114,6 +123,9 @@ export default defineConfig(() => ({
           },
         ],
       },
+      // Keep SW off in `npm run dev`: free ngrok interstitial HTML can get
+      // cached as the app shell and blank the site. Test PWA via
+      // `npm run build && npm run preview` (or production) over HTTPS.
       devOptions: {
         enabled: false,
       },
