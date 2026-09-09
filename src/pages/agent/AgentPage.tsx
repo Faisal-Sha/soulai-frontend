@@ -20,11 +20,15 @@ import {
   deleteThread,
   fetchHistory,
   fetchThreads,
+  fetchWallet,
   formatApiError,
+  InsufficientCreditsError,
   sendChat,
   type AgentMessage,
   type AgentThread,
+  type AgentWallet,
 } from '@/lib/soulAgentApi'
+import { supabase } from '@/integrations/supabase/client'
 import { toast } from 'sonner'
 import './agent-chat.css'
 import bgChat from './assets/bg-chat.png'
@@ -45,9 +49,8 @@ import { readResumeQuery, useSoulSheetParams } from '@/pages/home/useSoulSheetPa
 
 const DESKTOP_MQ = '(min-width: 900px)'
 const SUGGESTIONS = ['Money this year', 'Why do I pull away?', 'What am I avoiding?'] as const
-/** UI shell until top-up / quota is wired to backend */
-const MESSAGES_LEFT_SHELL = 3
 const AGENT_RESUME_EXTRA = { gate: 'ended' }
+const CREDIT_FLOOR = 0.01
 
 type AgentNavState = {
   starter?: string
@@ -351,10 +354,12 @@ export default function AgentPage() {
   const [threadsError, setThreadsError] = useState<string | null>(null)
   const [input, setInput] = useState(() => navSeed)
   const [composerFocus, setComposerFocus] = useState(() => Boolean(navSeed))
-  /** UI shell until quota / billing is wired */
+  /** Preview gates via ?gate= / ?sheet= ; real quota from wallet */
   const [shellGate, setShellGate] = useState<ChatGate>('none')
   const [gateCardHidden, setGateCardHidden] = useState(false)
-  const [messagesLeft, setMessagesLeft] = useState(MESSAGES_LEFT_SHELL)
+  const [freeRemaining, setFreeRemaining] = useState(5)
+  const [creditBalance, setCreditBalance] = useState(0)
+  const [billingEnabled, setBillingEnabled] = useState(true)
   const [topUpOpen, setTopUpOpen] = useState(false)
   const [topUpMode, setTopUpMode] = useState<TopUpSheetMode>('pay')
   const [topUpPaying, setTopUpPaying] = useState(false)
@@ -364,6 +369,19 @@ export default function AgentPage() {
   const [showTopUpSuccess, setShowTopUpSuccess] = useState(false)
   const [showLimitNote, setShowLimitNote] = useState(false)
   const { resumeOpen, resumeMode, openResume, closeResume } = useSoulSheetParams(AGENT_RESUME_EXTRA)
+
+  const applyWallet = useCallback((w: AgentWallet) => {
+    const free = Number(w.free_remaining ?? 0)
+    const credits = Number(w.credit_balance ?? 0)
+    const enabled = Boolean(w.billing_enabled ?? true)
+    setFreeRemaining(free)
+    setCreditBalance(credits)
+    setBillingEnabled(enabled)
+    if (enabled && free <= 0 && credits < CREDIT_FLOOR) {
+      setShellGate((prev) => (prev === 'ended' ? prev : 'limit'))
+      setGateCardHidden(false)
+    }
+  }, [])
 
   const chatRef = useRef<HTMLDivElement>(null)
   const frameRef = useRef<HTMLDivElement>(null)
@@ -412,7 +430,8 @@ export default function AgentPage() {
 
     if (searchParams.get('sheet') === 'topup') {
       setShellGate('limit')
-      setMessagesLeft(0)
+      setFreeRemaining(0)
+      setCreditBalance(0)
       setGateCardHidden(true)
       setTopUpOpen(true)
       setTopUpMode(searchParams.get('fail') === '1' ? 'declined' : 'pay')
@@ -423,7 +442,8 @@ export default function AgentPage() {
       setGateCardHidden(false)
       setShowLimitNote(false)
       setShowTopUpSuccess(false)
-      setMessagesLeft(0)
+      setFreeRemaining(0)
+      setCreditBalance(0)
       return
     }
     if (param === 'ended' || resume) {
@@ -444,23 +464,16 @@ export default function AgentPage() {
     }
   }, [searchParams, subscription, isPremium])
 
-  const chatLocked = shellGate === 'ended' || messagesLeft <= 0
+  const needsTopUp =
+    billingEnabled && freeRemaining <= 0 && creditBalance < CREDIT_FLOOR
+  const chatLocked = shellGate === 'ended' || needsTopUp
   const showGateCard =
     !topUpOpen &&
     !gateCardHidden &&
-    ((shellGate === 'limit' && messagesLeft <= 0) || shellGate === 'ended')
-
-  const openLimitGate = useCallback(() => {
-    setShellGate('limit')
-    setMessagesLeft(0)
-    setGateCardHidden(false)
-    setShowLimitNote(false)
-    setShowTopUpSuccess(false)
-  }, [])
+    (shellGate === 'ended' || needsTopUp)
 
   const openTopUp = useCallback(() => {
     setShellGate('limit')
-    setMessagesLeft(0)
     setGateCardHidden(true)
     setShowLimitNote(false)
     setTopUpMode('pay')
@@ -474,27 +487,56 @@ export default function AgentPage() {
     setGateCardHidden(true)
     setShowLimitNote(true)
     setShellGate('limit')
-    setMessagesLeft(0)
   }, [])
 
-  const completeTopUp = useCallback(() => {
+  const completeTopUp = useCallback(async () => {
+    if (!userId) return
     setTopUpPaying(true)
-    window.setTimeout(() => {
-      const forceFail = searchParams.get('fail') === '1'
+    const forceFail = searchParams.get('fail') === '1'
+    if (forceFail) {
       setTopUpPaying(false)
-      if (forceFail) {
-        setTopUpMode('declined')
-        return
+      setTopUpMode('declined')
+      return
+    }
+    try {
+      const { data, error } = await supabase.functions.invoke('charge-agent-credits', {
+        body: {},
+      })
+      if (error) {
+        const detail = (data as { message?: string; error?: string } | null)?.message
+          || (data as { error?: string } | null)?.error
+        throw new Error(detail || error.message)
       }
+      if (data?.error) {
+        throw new Error(data.message || data.error)
+      }
+
+      if (typeof data?.credit_balance === 'number' || typeof data?.free_remaining === 'number') {
+        applyWallet({
+          free_remaining: Number(data.free_remaining ?? freeRemaining),
+          free_granted: Number(data.free_granted ?? 5),
+          credit_balance: Number(data.credit_balance ?? 0),
+          billing_enabled: true,
+        })
+      } else {
+        const wallet = await fetchWallet(userId)
+        applyWallet(wallet)
+      }
+
       setTopUpOpen(false)
       setTopUpMode('pay')
       setShellGate('none')
-      setMessagesLeft(10)
       setGateCardHidden(true)
       setShowLimitNote(false)
       setShowTopUpSuccess(true)
-    }, 650)
-  }, [searchParams])
+    } catch (err) {
+      const message = formatApiError(err)
+      toast.error(message)
+      setTopUpMode('declined')
+    } finally {
+      setTopUpPaying(false)
+    }
+  }, [searchParams, userId, applyWallet, freeRemaining])
 
   const scrollChatToBottom = useCallback(() => {
     const el = chatRef.current
@@ -641,6 +683,22 @@ export default function AgentPage() {
   }, [userId])
 
   useEffect(() => {
+    if (!userId) return
+    let cancelled = false
+    ;(async () => {
+      try {
+        const wallet = await fetchWallet(userId)
+        if (!cancelled) applyWallet(wallet)
+      } catch (err) {
+        if (!cancelled) toast.error(formatApiError(err))
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [userId, applyWallet])
+
+  useEffect(() => {
     const syncViewportHeight = () => {
       const frame = frameRef.current
       if (!frame) return
@@ -707,15 +765,51 @@ export default function AgentPage() {
         ...(prev ?? []),
         { role: 'assistant', content: data.answer ?? '(no answer)' },
       ])
+      if (data.billing) {
+        if (typeof data.billing.free_remaining === 'number' && data.billing.free_remaining >= 0) {
+          setFreeRemaining(data.billing.free_remaining)
+        }
+        if (typeof data.billing.credit_balance === 'number' && data.billing.credit_balance >= 0) {
+          setCreditBalance(data.billing.credit_balance)
+        }
+        const nextFree =
+          typeof data.billing.free_remaining === 'number'
+            ? data.billing.free_remaining
+            : freeRemaining
+        const nextCredits =
+          typeof data.billing.credit_balance === 'number'
+            ? data.billing.credit_balance
+            : creditBalance
+        if (nextFree <= 0 && nextCredits < CREDIT_FLOOR) {
+          setShellGate((prev) => (prev === 'ended' ? prev : 'limit'))
+          setGateCardHidden(false)
+          setShowLimitNote(false)
+        }
+      }
       await loadThreads({ selectFirst: false })
       setThinking(false)
       if (navigator.onLine) setOffline(false)
     } catch (err) {
       setThinking(false)
-      setSendFailed(true)
-      setRetryMessage(message)
-      if (isNetworkError(err) || !navigator.onLine) {
-        setOffline(true)
+      if (err instanceof InsufficientCreditsError) {
+        setFreeRemaining(err.freeRemaining)
+        setCreditBalance(err.creditBalance)
+        setShellGate('limit')
+        setGateCardHidden(false)
+        setShowLimitNote(false)
+        setSendFailed(false)
+        setRetryMessage(null)
+        if (!opts?.isRetry) {
+          setMessages((prev) => (prev ?? []).slice(0, -1))
+          setInput(message)
+        }
+        toast.error(err.message)
+      } else {
+        setSendFailed(true)
+        setRetryMessage(message)
+        if (isNetworkError(err) || !navigator.onLine) {
+          setOffline(true)
+        }
       }
     } finally {
       setIsSending(false)
@@ -923,7 +1017,7 @@ export default function AgentPage() {
                   {thinking ? <ThinkingRow /> : null}
                   {!thinking && sendFailed ? <FailedBubble onRetry={handleRetry} /> : null}
                   {showTopUpSuccess ? <TopUpSuccessPill /> : null}
-                  {showLimitNote && messagesLeft <= 0 && shellGate === 'limit' ? (
+                  {showLimitNote && needsTopUp && shellGate !== 'ended' ? (
                     <p className="soul-chat__limit-note">
                       {t('agent.limitNote', "You have used today's messages.\nYour conversation is saved.")
                         .split('\n')
@@ -941,7 +1035,7 @@ export default function AgentPage() {
           </div>
 
           <div className="soul-chat__dock">
-            {showGateCard && shellGate === 'limit' ? (
+            {showGateCard && shellGate !== 'ended' && needsTopUp ? (
               <LimitGateCard
                 onAddMore={openTopUp}
                 onDismiss={() => {
@@ -989,22 +1083,33 @@ export default function AgentPage() {
             <p className="soul-chat__counter">
               {shellGate === 'ended' ? (
                 t('agent.counter.paused', 'Chat is paused')
-              ) : messagesLeft <= 0 ? (
+              ) : needsTopUp ? (
                 <>
-                  {t('agent.counter.zeroLeft', '0 messages left today')}
-                  {gateCardHidden || showLimitNote ? (
-                    <>
-                      {' · '}
-                      <button type="button" onClick={openTopUp}>
-                        {t('agent.counter.addMore', 'Add more')}
-                      </button>
-                    </>
-                  ) : null}
+                  {t('agent.counter.zeroCredits', '0 credits left')}
+                  {' · '}
+                  <button type="button" onClick={openTopUp}>
+                    {t('agent.counter.addMore', 'Add more')}
+                  </button>
+                </>
+              ) : freeRemaining > 0 ? (
+                <>
+                  {t('agent.counter.freeLeft', `${freeRemaining} free messages left`, {
+                    count: freeRemaining,
+                  })}
+                  {' · '}
+                  <button type="button" onClick={openTopUp}>
+                    {t('agent.counter.addMore', 'Add more')}
+                  </button>
                 </>
               ) : (
                 <>
-                  {t('agent.counter.left', `${messagesLeft} messages left today`, { count: messagesLeft })} ·{' '}
-                  <button type="button" onClick={openLimitGate}>
+                  {t(
+                    'agent.counter.creditsLeft',
+                    `${Number(creditBalance).toFixed(4)} credits left`,
+                    { balance: Number(creditBalance).toFixed(4) },
+                  )}
+                  {' · '}
+                  <button type="button" onClick={openTopUp}>
                     {t('agent.counter.addMore', 'Add more')}
                   </button>
                 </>

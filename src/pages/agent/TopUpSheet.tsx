@@ -190,9 +190,9 @@ export function TopUpSheet({
           <>
             <div className="soul-chat__sheet-heading">
               <h2 id="soul-topup-title" className="soul-chat__sheet-title">
-                {t('agent.topup.title', '10 more messages')}
-              </h2>
-              <p className="soul-chat__sheet-sub">
+                {t('agent.topup.title', '10 more credits')}
+                </h2>
+                <p className="soul-chat__sheet-sub">
                 {t('agent.topup.sub', 'Your conversation stays exactly where it is.')}
               </p>
             </div>
@@ -221,7 +221,7 @@ export function TopUpSheet({
               </div>
             ) : (
               <p className="soul-chat__sheet-note">
-                {t('agent.topup.oneTime', 'One-time charge. Unused messages stay on your account.')}
+                {t('agent.topup.oneTime', 'One-time charge. Unused credits stay on your account.')}
               </p>
             )}
 
@@ -263,7 +263,7 @@ export function TopUpSuccessPill() {
   return (
     <div className="soul-chat__topup-pill" role="status">
       <img src={iconCheck} alt="" width={13} height={13} />
-      <span>{t('agent.topup.success', '10 messages added · $7.00')}</span>
+      <span>{t('agent.topup.success', '10 credits added · $7.00')}</span>
     </div>
   )
 }

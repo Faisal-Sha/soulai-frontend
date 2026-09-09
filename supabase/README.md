@@ -10,7 +10,7 @@ Migrations are **one feature at a time**. Planned full schema: [`erd.md`](./erd.
 npx supabase login
 npx supabase link --project-ref <V2_PROJECT_REF>
 npx supabase db push
-npx supabase functions deploy quiz-complete create-checkout-session stripe-webhook cancel-subscription
+npx supabase functions deploy quiz-complete create-checkout-session stripe-webhook cancel-subscription charge-agent-credits
 npx supabase config push
 ```
 
@@ -27,6 +27,7 @@ npx supabase secrets set RESEND_FROM_EMAIL=noreply@soulplus-ai.com
 Stripe webhook events (V2 endpoint only — enable these on the sandbox endpoint). Each of these **re-fetches the live Stripe subscription** and copies status/dates; we do not invent trial/cancel dates.
 
 - `checkout.session.completed`
+- `payment_intent.succeeded` (agent credit pack only — metadata.kind=agent_credits)
 - `customer.subscription.created`
 - `customer.subscription.updated`
 - `customer.subscription.deleted`

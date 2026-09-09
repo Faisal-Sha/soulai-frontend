@@ -16,6 +16,11 @@ import {
   snapshotFromStripe,
   willCollectAfterTrial,
 } from '../_shared/stripe-sub.ts'
+import {
+  AGENT_CREDIT_PACK_CREDITS,
+  AGENT_CREDITS_KIND,
+  creditWalletFromPaymentIntent,
+} from '../_shared/agent-credits.ts'
 
 /** V2 Stripe webhook. V1 lives under src/legacy and is not called from here. */
 
@@ -343,8 +348,39 @@ Deno.serve(async (req) => {
 
   try {
     switch (event.type) {
+      case 'payment_intent.succeeded': {
+        const pi = event.data.object as Stripe.PaymentIntent
+        if (pi.metadata?.kind !== AGENT_CREDITS_KIND) {
+          // Ignore PaymentIntents from quiz Checkout / other flows.
+          console.log(`[stripe-webhook] skip PI ${pi.id} — not agent_credits`)
+          break
+        }
+
+        const authUserId = asText(pi.metadata?.auth_user_id)
+        if (!authUserId) {
+          throw new Error(`agent_credits PI ${pi.id} missing auth_user_id metadata`)
+        }
+
+        const credits = Number(pi.metadata?.credits || AGENT_CREDIT_PACK_CREDITS)
+        const result = await creditWalletFromPaymentIntent(admin, {
+          authUserId,
+          paymentIntentId: pi.id,
+          credits: Number.isFinite(credits) && credits > 0 ? credits : AGENT_CREDIT_PACK_CREDITS,
+          amountCents: pi.amount_received || pi.amount,
+        })
+        console.log(
+          `[stripe-webhook] agent_credits PI=${pi.id} credited=${result.credited} already=${result.already}`,
+        )
+        break
+      }
+
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
+        // Never let agent credit payments fall into quiz provisioning.
+        if (session.metadata?.kind === AGENT_CREDITS_KIND) {
+          console.log(`[stripe-webhook] skip checkout ${session.id} — agent_credits (use PaymentIntent path)`)
+          break
+        }
         const planType = session.metadata?.plan_type || INTRO_PLAN_SKU
         const intentId = asText(session.metadata?.intent_id)
 

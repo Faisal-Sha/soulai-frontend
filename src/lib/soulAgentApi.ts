@@ -16,11 +16,44 @@ export type AgentMessage = {
   content: string;
 };
 
+export type AgentBilling = {
+  billing_mode?: string;
+  turn_id?: string;
+  raw_usd?: number;
+  charge_usd?: number;
+  credits_charged?: number;
+  free_remaining?: number;
+  credit_balance?: number;
+  tools_used?: number;
+  skipped?: boolean;
+  skip_reason?: string | null;
+};
+
+export type AgentWallet = {
+  free_remaining: number;
+  free_granted: number;
+  credit_balance: number;
+  billing_enabled: boolean;
+};
+
 export type ChatResponse = {
   answer?: string;
   status?: string;
   detail?: string | unknown;
+  billing?: AgentBilling | null;
 };
+
+export class InsufficientCreditsError extends Error {
+  freeRemaining: number;
+  creditBalance: number;
+
+  constructor(message: string, freeRemaining = 0, creditBalance = 0) {
+    super(message);
+    this.name = "InsufficientCreditsError";
+    this.freeRemaining = freeRemaining;
+    this.creditBalance = creditBalance;
+  }
+}
 
 /** Turn FastAPI / Pydantic / network errors into short UI-safe copy. */
 export function formatApiError(err: unknown): string {
@@ -80,6 +113,37 @@ async function parseError(res: Response, data: unknown): Promise<never> {
     data && typeof data === "object" && "detail" in data
       ? (data as { detail: unknown }).detail
       : data;
+
+  if (
+    res.status === 402 &&
+    detail &&
+    typeof detail === "object" &&
+    "code" in detail &&
+    (detail as { code: unknown }).code === "INSUFFICIENT_CREDITS"
+  ) {
+    const d = detail as {
+      message?: string;
+      free_remaining?: number;
+      credit_balance?: number;
+    };
+    throw new InsufficientCreditsError(
+      d.message || "Free messages used up. Buy credits to continue.",
+      Number(d.free_remaining ?? 0),
+      Number(d.credit_balance ?? 0),
+    );
+  }
+
+  if (
+    res.status === 501 &&
+    detail &&
+    typeof detail === "object" &&
+    "code" in detail &&
+    (detail as { code: unknown }).code === "STRIPE_TOPUP_REQUIRED"
+  ) {
+    const d = detail as { message?: string; code?: string };
+    throw new Error(d.message || "STRIPE_TOPUP_REQUIRED");
+  }
+
   const fallback = `Request failed (${res.status})`;
   throw new Error(
     formatDetail(detail) ||
@@ -166,6 +230,39 @@ export async function sendChat(
   return {
     ...(data as ChatResponse),
     answer,
+  };
+}
+
+export async function fetchWallet(userId: string): Promise<AgentWallet> {
+  const res = await fetch(
+    `${API_BASE}/chat/wallet?user_id=${encodeURIComponent(userId)}`,
+  );
+  const data = await res.json();
+  if (!res.ok) await parseError(res, data);
+  return {
+    free_remaining: Number((data as AgentWallet).free_remaining ?? 0),
+    free_granted: Number((data as AgentWallet).free_granted ?? 5),
+    credit_balance: Number((data as AgentWallet).credit_balance ?? 0),
+    billing_enabled: Boolean((data as AgentWallet).billing_enabled ?? true),
+  };
+}
+
+export async function topUpCredits(
+  userId: string,
+  credits = 10,
+): Promise<AgentWallet> {
+  const res = await fetch(`${API_BASE}/chat/wallet/topup`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ user_id: userId, credits }),
+  });
+  const data = await res.json();
+  if (!res.ok) await parseError(res, data);
+  return {
+    free_remaining: Number((data as AgentWallet).free_remaining ?? 0),
+    free_granted: Number((data as AgentWallet).free_granted ?? 5),
+    credit_balance: Number((data as AgentWallet).credit_balance ?? 0),
+    billing_enabled: Boolean((data as AgentWallet).billing_enabled ?? true),
   };
 }
 
